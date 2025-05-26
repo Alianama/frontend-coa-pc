@@ -32,6 +32,7 @@ import {
   Clock,
   Download,
   Eye,
+  FileClock,
   FileEdit,
   FilePlus,
   MoreHorizontal,
@@ -75,24 +76,41 @@ export default function COAListPage() {
     }
   };
 
-  const getStatusBadge = (approvedBy) => {
-    if (approvedBy) {
-      return (
-        <Badge className="bg-green-500 shadow-lg cursor-pointer hover:bg-green-600">
-          <CheckCircle2 className="mr-1 h-3 w-3" />
-          Approved
-        </Badge>
-      );
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "approved":
+        return (
+          <Badge className="bg-green-500 shadow-lg cursor-pointer hover:bg-green-600">
+            <CheckCircle2 className="mr-1 h-3 w-3" />
+            Approved
+          </Badge>
+        );
+      case "draft":
+        return (
+          <Badge className="bg-yellow-500 shadow-lg cursor-pointer hover:bg-yellow-600">
+            <FileEdit className="mr-1 h-3 w-3" />
+            Draft
+          </Badge>
+        );
+      case "need_approval":
+        return (
+          <Badge
+            variant="outline"
+            className="text-primary shadow-lg cursor-pointer border-primary"
+          >
+            <Clock className="mr-1 h-3 w-3" /> Need Approval
+          </Badge>
+        );
+      default:
+        return (
+          <Badge
+            variant="outline"
+            className="text-gray-500 shadow-lg cursor-pointer border-gray-500"
+          >
+            <Clock className="mr-1 h-3 w-3" /> Unknown
+          </Badge>
+        );
     }
-
-    return (
-      <Badge
-        variant="outline"
-        className="text-primary shadow-lg cursor-pointer border-primary"
-      >
-        <Clock className="mr-1 h-3 w-3" /> Need Approval
-      </Badge>
-    );
   };
 
   const handlePageChange = (newPage) => {
@@ -172,7 +190,7 @@ export default function COAListPage() {
                   <TableCell>
                     {new Date(coa.createdAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>{getStatusBadge(coa.approvedBy)}</TableCell>
+                  <TableCell>{getStatusBadge(coa.status)}</TableCell>
                   <TableCell>
                     {getFullNameById(coa.createdBy, allUsers)}
                   </TableCell>
@@ -184,7 +202,21 @@ export default function COAListPage() {
                       <Eye className="h-3 w-3" />
                       View
                     </Button>
-                    {!coa.approvedBy &&
+
+                    {coa.status === "draft" &&
+                      coa.approvedBy === null &&
+                      authUser?.username === coa.issueBy && (
+                        <Button
+                          onClick={() => handleApprove(coa.id)}
+                          className="text-[10px] bg-transparent"
+                        >
+                          <FileClock className="h-3 w-3" />
+                          <h1 className="">Request Approval</h1>
+                        </Button>
+                      )}
+
+                    {coa.status === "need_approval" &&
+                      coa.approvedBy === null &&
                       (authUser?.role?.name === "SUPER_ADMIN" ||
                         authUser?.role?.name === "ADMIN") && (
                         <Button
