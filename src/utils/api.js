@@ -143,6 +143,70 @@ const api = (() => {
     };
   }
 
+  async function requestApprovalCOA(coa_id) {
+    const response = await _fetchWithAuth(
+      `${BASE_URL}/coa/${coa_id}/request-approval`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const responseJson = await response.json();
+
+    const { status, message, data } = responseJson;
+
+    if (status !== "success") {
+      throw new Error(message || "Gagal Request Approval COA");
+    }
+
+    return {
+      status,
+      message,
+      data,
+    };
+  }
+
+  async function getCoaDetail(coa_id) {
+    const response = await _fetchWithAuth(`${BASE_URL}/coa/${coa_id}`);
+    const responseJson = await response.json();
+
+    const { status, message, data } = responseJson;
+
+    if (status !== "success") {
+      throw new Error(message || "Get Detail COA Failed");
+    }
+
+    return {
+      status,
+      message,
+      data,
+    };
+  }
+
+  async function deleteCOA(coaId) {
+    const response = await _fetchWithAuth(`${BASE_URL}/coa/${coaId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const responseJson = await response.json();
+
+    const { status, message, data } = responseJson;
+
+    if (status !== "success") {
+      throw new Error(message || "Gagal menghapus COA");
+    }
+
+    return {
+      status,
+      message,
+      data,
+    };
+  }
+
   return {
     putAccessToken,
     getAccessToken,
@@ -152,6 +216,9 @@ const api = (() => {
     getCOA,
     getAllUser,
     approveCOA,
+    requestApprovalCOA,
+    getCoaDetail,
+    deleteCOA,
   };
 })();
 

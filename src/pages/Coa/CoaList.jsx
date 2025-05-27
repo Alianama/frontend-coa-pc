@@ -44,10 +44,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { asyncGetCOA, asyncApproveCOA } from "@/store/coa/action";
+import {
+  asyncGetCOA,
+  asyncApproveCOA,
+  asyncRequestApprovalCOA,
+} from "@/store/coa/action";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getFullNameById } from "@/utils/userUtils";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { getStatusBadge } from "@/utils/statusBedge";
 
 export default function COAListPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,6 +64,7 @@ export default function COAListPage() {
     useSelector((state) => state.coa || {});
   const authUser = useSelector((state) => state.authUser);
   const allUsers = useSelector((state) => state.allUsers || []);
+  const navigate = useNavigate();
 
   console.log(authUser);
 
@@ -76,42 +83,51 @@ export default function COAListPage() {
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "approved":
-        return (
-          <Badge className="bg-green-500 shadow-lg cursor-pointer hover:bg-green-600">
-            <CheckCircle2 className="mr-1 h-3 w-3" />
-            Approved
-          </Badge>
-        );
-      case "draft":
-        return (
-          <Badge className="bg-yellow-500 shadow-lg cursor-pointer hover:bg-yellow-600">
-            <FileEdit className="mr-1 h-3 w-3" />
-            Draft
-          </Badge>
-        );
-      case "need_approval":
-        return (
-          <Badge
-            variant="outline"
-            className="text-primary shadow-lg cursor-pointer border-primary"
-          >
-            <Clock className="mr-1 h-3 w-3" /> Need Approval
-          </Badge>
-        );
-      default:
-        return (
-          <Badge
-            variant="outline"
-            className="text-gray-500 shadow-lg cursor-pointer border-gray-500"
-          >
-            <Clock className="mr-1 h-3 w-3" /> Unknown
-          </Badge>
-        );
+  const handleRequestApproval = async (coaId) => {
+    try {
+      const response = await dispatch(asyncRequestApprovalCOA(coaId));
+      toast.success(response.message || "Request Approval berhasil");
+    } catch (error) {
+      toast.error(error.message || "Gagal Request Approval COA");
     }
   };
+
+  // const getStatusBadge = (status) => {
+  //   switch (status) {
+  //     case "approved":
+  //       return (
+  //         <Badge className="bg-green-500 shadow-lg cursor-pointer hover:bg-green-600">
+  //           <CheckCircle2 className="mr-1 h-3 w-3" />
+  //           Approved
+  //         </Badge>
+  //       );
+  //     case "draft":
+  //       return (
+  //         <Badge className="bg-red-500/50 shadow-lg cursor-pointer hover:bg-red-600">
+  //           <FileEdit className="mr-1 h-3 w-3" />
+  //           Draft
+  //         </Badge>
+  //       );
+  //     case "need_approval":
+  //       return (
+  //         <Badge
+  //           variant="outline"
+  //           className="bg-yellow-500 shadow-lg cursor-pointer hover:bg-yellow-600"
+  //         >
+  //           <Clock className="mr-1 h-3 w-3" /> Need Approval
+  //         </Badge>
+  //       );
+  //     default:
+  //       return (
+  //         <Badge
+  //           variant="outline"
+  //           className="text-gray-500 shadow-lg cursor-pointer border-gray-500"
+  //         >
+  //           <Clock className="mr-1 h-3 w-3" /> Unknown
+  //         </Badge>
+  //       );
+  //   }
+  // };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -196,7 +212,7 @@ export default function COAListPage() {
                   </TableCell>
                   <TableCell className="pl-10">
                     <Button
-                      onClick={() => alert("View Detail")}
+                      onClick={() => navigate(`/COA/detail/${coa.id}`)}
                       className="text-[10px] bg-transparent"
                     >
                       <Eye className="h-3 w-3" />
@@ -207,7 +223,7 @@ export default function COAListPage() {
                       coa.approvedBy === null &&
                       authUser?.username === coa.issueBy && (
                         <Button
-                          onClick={() => handleApprove(coa.id)}
+                          onClick={() => handleRequestApproval(coa.id)}
                           className="text-[10px] bg-transparent"
                         >
                           <FileClock className="h-3 w-3" />

@@ -2,6 +2,7 @@ import { ActionType } from "./action";
 
 const initialState = {
   coas: [],
+  detail_coa: null,
   pagination: {
     totalItems: 0,
     totalPages: 0,
@@ -21,6 +22,11 @@ const coaReducer = (state = initialState, action) => {
       return {
         ...state,
         pagination: action.payload,
+      };
+    case ActionType.SET_DETAIL_COA:
+      return {
+        ...state,
+        detail_coa: action.payload,
       };
     default:
       return state;
