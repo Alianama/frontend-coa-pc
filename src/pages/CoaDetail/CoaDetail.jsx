@@ -96,16 +96,37 @@ const DataCell = ({ value, isMissing = false, unit = "" }) => (
   </TableCell>
 );
 
-const SectionHeader = ({ title, icon, hasIncompleteData = false }) => (
-  <TableRow className="bg-gradient-to-r from-yellow-50 to-amber-50 border-b-2 border-yellow-200">
-    <TableCell colSpan={2} className="font-bold text-gray-800 py-4">
+const SectionHeader = ({
+  title,
+  icon,
+  hasIncompleteData = false,
+  hasPendingApprove = null,
+}) => (
+  <TableRow className="bg-secondary/90">
+    <TableCell colSpan={2} className="font-bold text-gray-800 py-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-yellow-100 rounded-lg text-yellow-700">
+          <div className="p-1 bg-yellow-100 rounded-lg text-yellow-700">
             {icon}
           </div>
-          <span className="text-lg">{title}</span>
+          <span className="text-sm">{title}</span>
         </div>
+        {hasPendingApprove !== null &&
+          (hasPendingApprove ? (
+            <div className="flex items-center gap-1">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-green-600 font-medium">
+                Approved
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <span className="text-sm text-amber-600 font-medium">
+                Pending Approved
+              </span>
+            </div>
+          ))}
         {hasIncompleteData && (
           <div className="flex items-center gap-1">
             <AlertTriangle className="w-4 h-4 text-amber-500" />
@@ -285,74 +306,76 @@ export default function COADetail() {
                   {getStatusBadge(data.status)}
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    onClick={handleEdit}
-                    disabled={data.status === "approved"}
-                    variant="outline"
-                    size="sm"
-                    className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                  >
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    {completeness.isComplete ? "Edit" : "Complete Data"}
-                  </Button>
+                <div className="border-l border-gray-200 pl-4">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={handleEdit}
+                      disabled={data.status === "approved"}
+                      variant="outline"
+                      size="sm"
+                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                    >
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      {completeness.isComplete ? "Edit" : "Complete Data"}
+                    </Button>
 
-                  <Button
-                    onClick={handlePrint}
-                    variant="outline"
-                    size="sm"
-                    disabled={data.status !== "approved" || isPrinting}
-                    className="border-green-200 text-green-700 hover:bg-green-50"
-                  >
-                    <Printer className="w-4 h-4 mr-2" />
-                    {isPrinting ? "Printing..." : "Print"}
-                  </Button>
+                    <Button
+                      onClick={handlePrint}
+                      variant="outline"
+                      size="sm"
+                      disabled={data.status !== "approved" || isPrinting}
+                      className="border-green-200 text-green-700 hover:bg-green-50"
+                    >
+                      <Printer className="w-4 h-4 mr-2" />
+                      {isPrinting ? "Printing..." : "Print"}
+                    </Button>
 
-                  <Button
-                    onClick={handleExport}
-                    variant="outline"
-                    size="sm"
-                    className="border-purple-200 text-purple-700 hover:bg-purple-50"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export PDF
-                  </Button>
+                    <Button
+                      onClick={handleExport}
+                      variant="outline"
+                      size="sm"
+                      className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export PDF
+                    </Button>
 
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        disabled={data.status === "approved"}
-                        variant="outline"
-                        size="sm"
-                        className="border-red-200 text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Delete Certificate of Analysis
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete this COA? This action
-                          cannot be undone and will permanently remove the
-                          certificate and all associated data.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDelete}
-                          className="bg-red-600 hover:bg-red-700"
-                          disabled={isDeleting}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          disabled={data.status === "approved"}
+                          variant="outline"
+                          size="sm"
+                          className="border-red-200 text-red-700 hover:bg-red-50"
                         >
-                          {isDeleting ? "Deleting..." : "Delete COA"}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-secondary">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Delete Certificate of Analysis
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this COA? This
+                            action cannot be undone and will permanently remove
+                            the certificate and all associated data.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDelete}
+                            className="bg-red-600 hover:bg-red-700"
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? "Deleting..." : "Delete COA"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -413,14 +436,6 @@ export default function COADetail() {
                     title="Document Information"
                     icon={<Shield className="w-5 h-5" />}
                   />
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Document ID
-                    </TableCell>
-                    <DataCell
-                      value={`COA-${data.id.toString().padStart(6, "0")}`}
-                    />
-                  </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Status
@@ -586,7 +601,7 @@ export default function COADetail() {
                   <SectionHeader
                     title="Authorization & Approval"
                     icon={<CheckCircle className="w-5 h-5" />}
-                    hasIncompleteData={!data.approvedBy}
+                    hasPendingApprove={data.status === "approved"}
                   />
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -620,12 +635,6 @@ export default function COADetail() {
                       Last Updated
                     </TableCell>
                     <DataCell value={formatDateShort(data.updatedAt)} />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Version
-                    </TableCell>
-                    <DataCell value="1.0" />
                   </TableRow>
                 </TableBody>
               </Table>
