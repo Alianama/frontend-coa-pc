@@ -45,8 +45,9 @@ import {
   asyncGetCOA,
   asyncApproveCOA,
   asyncRequestApprovalCOA,
+  asyncRemoveCoa,
 } from "@/store/coa/action";
-import { useDebounce } from "@/hooks/useDebounce";
+
 import { getFullNameById } from "@/utils/userUtils";
 import { useNavigate } from "react-router-dom";
 import { getStatusBadge } from "@/components/common/statusBedge";
@@ -64,8 +65,6 @@ export default function COAListPage() {
   const [createCoaIsOpen, setCreatCoaIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  // const debouncedSearch = useDebounce(searchTerm, 500);
-
   useEffect(() => {
     dispatch(asyncGetCOA(currentPage, itemsPerPage, searchTerm));
   }, [dispatch, currentPage, itemsPerPage, searchTerm]);
@@ -73,12 +72,16 @@ export default function COAListPage() {
   const handleApprove = async (coaId) => {
     try {
       await dispatch(asyncApproveCOA(coaId));
-    } catch (error) {}
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
-  const handleDeleteCoa = (coa_id, coa_status) => {
-    if (coa_status === "approved") {
-    } else {
+  const handleDeleteCoa = async (coaId) => {
+    try {
+      await dispatch(asyncRemoveCoa(coaId));
+    } catch (error) {
+      console.error(error.message);
     }
   };
 

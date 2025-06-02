@@ -7,6 +7,7 @@ const ActionType = {
   SET_PAGINATION: "SET_PAGINATION",
   SET_DETAIL_COA: "SET_DETAIL_COA",
   CREATE_COA: "CREATE_COA",
+  REMOVE_COA: "REMOVE_COA",
 };
 
 function setCOAActionCreator(coas) {
@@ -23,6 +24,13 @@ function createCOAActionCreator(coa) {
   };
 }
 
+function removeCOAActionCreator(coaId) {
+  return {
+    type: ActionType.REMOVE_COA,
+    payload: coaId,
+  };
+}
+
 function setPaginationActionCreator(pagination) {
   return {
     type: ActionType.SET_PAGINATION,
@@ -34,6 +42,28 @@ function setDetailCoaActionCreator(detail_coa) {
   return {
     type: ActionType.SET_DETAIL_COA,
     payload: detail_coa,
+  };
+}
+
+function asyncRemoveCoa(coaId) {
+  return async (dispatch) => {
+    dispatch(showLoading());
+    try {
+      const response = await api.deleteCOA(coaId);
+      if (response.status === "success") {
+        toast.success("COA berhasil dihapus");
+        dispatch(removeCOAActionCreator(coaId));
+        await dispatch(asyncGetCOA());
+        return response;
+      }
+      throw new Error(response.message || "Failed Delete COA");
+    } catch (error) {
+      toast.error(error.message || "Failed Delete COA");
+      console.error("Error deleting COA:", error.message);
+      throw error;
+    } finally {
+      dispatch(hideLoading());
+    }
   };
 }
 
@@ -170,4 +200,6 @@ export {
   asyncGetDetailCOA,
   asyncCreateCoa,
   createCOAActionCreator,
+  asyncRemoveCoa,
+  removeCOAActionCreator,
 };

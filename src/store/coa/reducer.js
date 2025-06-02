@@ -33,6 +33,13 @@ const coaReducer = (state = initialState, action) => {
         ...state,
         coas: [action.payload, ...state.coas],
       };
+    case ActionType.REMOVE_COA:
+      return {
+        ...state,
+        coas: state.coas.filter((coa) => coa.id !== action.payload),
+        detail_coa:
+          state.detail_coa?.id === action.payload ? null : state.detail_coa,
+      };
 
     default:
       return state;

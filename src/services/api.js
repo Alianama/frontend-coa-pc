@@ -162,6 +162,32 @@ const api = (() => {
     }
   }
 
+  async function deleteCoa(coaId) {
+    try {
+      const response = await _fetchWithAuth(`${BASE_URL}/coa/${coaId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const responseJson = await response.json();
+      const { status, message } = responseJson;
+
+      if (status !== "success") {
+        throw new Error(message || "Delete COA failed");
+      }
+
+      return {
+        status,
+        message,
+      };
+    } catch (error) {
+      console.error("Error creating COA:", error);
+      throw error;
+    }
+  }
+
   async function getCOA(page = 0, limit = 0, search = "") {
     const queryParams = new URLSearchParams();
 
@@ -316,6 +342,7 @@ const api = (() => {
     getCoaDetail,
     deleteCOA,
     createCOA,
+    deleteCOA,
   };
 })();
 

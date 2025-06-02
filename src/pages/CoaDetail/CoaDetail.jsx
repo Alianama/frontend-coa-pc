@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { asyncGetDetailCOA } from "@/store/coa/action";
 import {
@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { getStatusBadge } from "@/components/common/statusBedge";
 import { formatDate } from "@/utils/formatDate";
+import { asyncRemoveCoa } from "@/store/coa/action";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -126,6 +127,7 @@ export default function COADetail() {
   const [isPrinting, setIsPrinting] = useState(false);
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { detail_coa: data } = useSelector((state) => state.coa);
 
   useEffect(() => {
@@ -133,6 +135,18 @@ export default function COADetail() {
       dispatch(asyncGetDetailCOA(id));
     }
   }, [dispatch, id]);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await dispatch(asyncRemoveCoa(id));
+      navigate("/COA");
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const checkDataCompleteness = () => {
     if (!data)
@@ -212,19 +226,6 @@ export default function COADetail() {
     } catch (error) {
       console.error("Print error:", error);
       setIsPrinting(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      // TODO: Implement delete functionality
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("COA deleted");
-    } catch (error) {
-      console.error("Delete error:", error);
-    } finally {
-      setIsDeleting(false);
     }
   };
 
