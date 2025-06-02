@@ -9,19 +9,84 @@ const api = (() => {
     return localStorage.getItem("accessToken");
   }
 
+  function putRefreshToken(token) {
+    localStorage.setItem("refreshToken", token);
+  }
+
+  function getRefreshToken() {
+    return localStorage.getItem("refreshToken");
+  }
+
   function clearAccessToken() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   }
 
   async function _fetchWithAuth(url, options = {}) {
-    return fetch(url, {
-      ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${getAccessToken()}`,
-      },
-    });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+
+      if (response.status === 401) {
+        // Token expired, coba refresh
+        const refreshToken = getRefreshToken();
+        if (!refreshToken) {
+          throw new Error("No refresh token available");
+        }
+
+        async function asynRefreshToken(refreshToken) {
+          try {
+            const response = await fetch(`${BASE_URL}/auth/refresh-token`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ refreshToken }),
+            });
+
+            const responseJson = await response.json();
+
+            if (responseJson.status === "success") {
+              console.log(responseJson.data.accessToken);
+
+              const { accessToken } = responseJson.data;
+              putAccessToken(accessToken);
+              return { accessToken };
+            }
+
+            throw new Error(responseJson.message || "Failed to refresh token");
+          } catch (error) {
+            console.error("Error refreshing token:", error);
+            clearAccessToken();
+            throw error;
+          }
+        }
+
+        const newTokens = await asynRefreshToken(refreshToken);
+        if (!newTokens) {
+          throw new Error("Failed to refresh token");
+        }
+
+        // Coba request ulang dengan token baru
+        return fetch(url, {
+          ...options,
+          headers: {
+            ...options.headers,
+            Authorization: `Bearer ${newTokens.accessToken}`,
+          },
+        });
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error in _fetchWithAuth:", error);
+      throw error;
+    }
   }
 
   async function login(username, password) {
@@ -38,6 +103,7 @@ const api = (() => {
 
     if (message === "success") {
       putAccessToken(data.accessToken);
+      putRefreshToken(data.refreshToken);
       return {
         message,
         data: {
@@ -66,6 +132,34 @@ const api = (() => {
       status: "success",
       data,
     };
+  }
+
+  async function createCOA(coas) {
+    try {
+      const response = await _fetchWithAuth(`${BASE_URL}/coa`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(coas),
+      });
+
+      const responseJson = await response.json();
+      const { status, data, message } = responseJson;
+
+      if (status !== "success") {
+        throw new Error(message || "Gagal membuat COA");
+      }
+
+      return {
+        status,
+        data,
+        message,
+      };
+    } catch (error) {
+      console.error("Error creating COA:", error);
+      throw error;
+    }
   }
 
   async function getCOA(page = 0, limit = 0, search = "") {
@@ -210,6 +304,8 @@ const api = (() => {
   return {
     putAccessToken,
     getAccessToken,
+    putRefreshToken,
+    getRefreshToken,
     clearAccessToken,
     login,
     getOwnProfile,
@@ -219,6 +315,7 @@ const api = (() => {
     requestApprovalCOA,
     getCoaDetail,
     deleteCOA,
+    createCOA,
   };
 })();
 

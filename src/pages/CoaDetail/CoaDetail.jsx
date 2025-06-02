@@ -35,9 +35,9 @@ import {
   AlertTriangle,
   Plus,
   Download,
-  Building2,
 } from "lucide-react";
 import { getStatusBadge } from "@/components/common/statusBedge";
+import { formatDate } from "@/utils/formatDate";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -60,24 +60,6 @@ const itemVariants = {
       ease: "easeOut",
     },
   },
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return "-";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
-
-const formatDateShort = (dateString) => {
-  if (!dateString) return "-";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
 };
 
 const DataCell = ({ value, isMissing = false, unit = "" }) => (
@@ -183,7 +165,8 @@ export default function COADetail() {
     ];
 
     const completedFields = requiredFields.filter(
-      (field) => field && field.toString().trim() !== ""
+      (field) =>
+        field !== null && field !== undefined && field.toString().trim() !== ""
     ).length;
     const totalFields = requiredFields.length;
     const completionPercentage = Math.round(
@@ -439,122 +422,146 @@ export default function COADetail() {
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Status
                     </TableCell>
-                    <DataCell value={getStatusBadge(data.status)} />
+                    <DataCell
+                      value={getStatusBadge(data.status)}
+                      isMissing={!data.status}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Lot Number
                     </TableCell>
-                    <DataCell value={data.lotNumber} />
+                    <DataCell
+                      value={data.lotNumber}
+                      isMissing={!data.lotNumber}
+                    />
                   </TableRow>
-
-                  {/* Customer & Product Information */}
-                  <SectionHeader
-                    title="Customer & Product Information"
-                    icon={<Building2 className="w-5 h-5" />}
-                  />
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Customer Name
                     </TableCell>
-                    <DataCell value={data.costumerName} />
+                    <DataCell
+                      value={data.costumerName}
+                      isMissing={!data.costumerName}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Product Name
                     </TableCell>
-                    <DataCell value={data.productName} />
+                    <DataCell
+                      value={data.productName}
+                      isMissing={!data.productName}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Let Down Resin
                     </TableCell>
-                    <DataCell value={data.letDownResin} />
+                    <DataCell
+                      value={data.letDownResin}
+                      isMissing={!data.letDownResin}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Quantity
                     </TableCell>
-                    <DataCell value={data.quantity} unit="kg" />
+                    <DataCell
+                      value={data.quantity}
+                      unit="kg"
+                      isMissing={!data.quantity}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Color
                     </TableCell>
-                    <DataCell value={data.color} />
+                    <DataCell value={data.color} isMissing={!data.color} />
                   </TableRow>
-
-                  {/* Physical Properties */}
-                  <SectionHeader
-                    title="Physical Properties"
-                    icon={<CheckCircle className="w-5 h-5" />}
-                  />
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Pellet Size
                     </TableCell>
-                    <DataCell value={data.pelletSize} />
+                    <DataCell
+                      value={data.pelletSize}
+                      isMissing={!data.pelletSize}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Pellet Visual
                     </TableCell>
-                    <DataCell value={data.pelletVisual} />
+                    <DataCell
+                      value={data.pelletVisual}
+                      isMissing={!data.pelletVisual}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Dispersibility
                     </TableCell>
-                    <DataCell value={data.dispersibility} />
+                    <DataCell
+                      value={data.dispersibility}
+                      isMissing={!data.dispersibility}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Foreign Matter
                     </TableCell>
-                    <DataCell value={data.foreignMatter} />
+                    <DataCell
+                      value={data.foreignMatter}
+                      isMissing={!data.foreignMatter}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Weight of Chips
                     </TableCell>
-                    <DataCell value={data.weightOfChips} />
+                    <DataCell
+                      value={data.weightOfChips}
+                      isMissing={!data.weightOfChips}
+                    />
                   </TableRow>
-
-                  {/* Chemical Properties */}
-                  <SectionHeader
-                    title="Chemical Properties"
-                    icon={<CheckCircle className="w-5 h-5" />}
-                    hasIncompleteData={!data.intrinsicViscosity}
-                  />
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       MFR (Melt Flow Rate)
                     </TableCell>
-                    <DataCell value={data.mfr} />
+                    <DataCell value={data.mfr} isMissing={!data.mfr} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Density
                     </TableCell>
-                    <DataCell value={data.density} />
+                    <DataCell value={data.density} isMissing={!data.density} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Moisture Content
                     </TableCell>
-                    <DataCell value={data.moisture} />
+                    <DataCell
+                      value={data.moisture}
+                      isMissing={!data.moisture}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Carbon Content
                     </TableCell>
-                    <DataCell value={data.carbonContent} />
+                    <DataCell
+                      value={data.carbonContent}
+                      isMissing={!data.carbonContent}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Ash Content
                     </TableCell>
-                    <DataCell value={data.ashContent} />
+                    <DataCell
+                      value={data.ashContent}
+                      isMissing={!data.ashContent}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -565,48 +572,47 @@ export default function COADetail() {
                       isMissing={!data.intrinsicViscosity}
                     />
                   </TableRow>
-
-                  {/* Date Information */}
-                  <SectionHeader
-                    title="Date Information"
-                    icon={<CheckCircle className="w-5 h-5" />}
-                  />
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Manufacturing Date
                     </TableCell>
-                    <DataCell value={formatDateShort(data.mfgDate)} />
+                    <DataCell
+                      value={formatDate(data.mfgDate)}
+                      isMissing={!data.mfgDate}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Analysis Date
                     </TableCell>
-                    <DataCell value={formatDateShort(data.analysisDate)} />
+                    <DataCell
+                      value={formatDate(data.analysisDate)}
+                      isMissing={!data.analysisDate}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Printed Date
                     </TableCell>
-                    <DataCell value={formatDateShort(data.printedDate)} />
+                    <DataCell
+                      value={formatDate(data.printedDate)}
+                      isMissing={!data.printedDate}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Expiry Date
                     </TableCell>
-                    <DataCell value={formatDateShort(data.expiryDate)} />
+                    <DataCell
+                      value={formatDate(data.expiryDate)}
+                      isMissing={!data.expiryDate}
+                    />
                   </TableRow>
-
-                  {/* Authorization & Approval */}
-                  <SectionHeader
-                    title="Authorization & Approval"
-                    icon={<CheckCircle className="w-5 h-5" />}
-                    hasPendingApprove={data.status === "approved"}
-                  />
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Issued By
                     </TableCell>
-                    <DataCell value={data.issueBy} />
+                    <DataCell value={data.issueBy} isMissing={!data.issueBy} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -621,13 +627,19 @@ export default function COADetail() {
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Created At
                     </TableCell>
-                    <DataCell value={formatDateShort(data.createdAt)} />
+                    <DataCell
+                      value={formatDate(data.createdAt)}
+                      isMissing={!data.createdAt}
+                    />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Last Updated
                     </TableCell>
-                    <DataCell value={formatDateShort(data.updatedAt)} />
+                    <DataCell
+                      value={formatDate(data.updatedAt)}
+                      isMissing={!data.updatedAt}
+                    />
                   </TableRow>
                 </TableBody>
               </Table>

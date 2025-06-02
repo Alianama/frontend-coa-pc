@@ -28,6 +28,12 @@ const coaReducer = (state = initialState, action) => {
         ...state,
         detail_coa: action.payload,
       };
+    case ActionType.CREATE_COA:
+      return {
+        ...state,
+        coas: [action.payload, ...state.coas],
+      };
+
     default:
       return state;
   }

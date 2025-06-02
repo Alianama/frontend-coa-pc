@@ -1,4 +1,4 @@
-import api from "../../utils/api";
+import api from "../../services/api";
 import { setAuthUserActionCreator } from "../authUser/action";
 import { setAllUserActionCreator } from "../users/action";
 

@@ -17,8 +17,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { asyncCreateCoa } from "@/store/coa/action";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function CoaCreateInput() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     costumerName: "",
     productName: "",
@@ -42,6 +47,18 @@ export default function CoaCreateInput() {
     intrinsicViscosity: "",
     ashContent: "",
   });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { status, message } = await dispatch(asyncCreateCoa(formData));
+      if (status !== "success") {
+        console.error(message);
+      }
+      navigate("/COA");
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,7 +91,7 @@ export default function CoaCreateInput() {
           <CardDescription>Please enter complete COA data</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="costumerName">Customer Name</Label>
@@ -327,11 +344,11 @@ export default function CoaCreateInput() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="forignMater">Benda Asing</Label>
+                <Label htmlFor="foreignMatter">Benda Asing</Label>
                 <Input
-                  id="forignMater"
-                  name="forignMater"
-                  value={formData.forignMater}
+                  id="foreignMatter"
+                  name="foreignMatter"
+                  value={formData.foreignMatter}
                   onChange={handleChange}
                 />
               </div>

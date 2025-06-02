@@ -48,7 +48,6 @@ import {
 } from "@/store/coa/action";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getFullNameById } from "@/utils/userUtils";
-import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { getStatusBadge } from "@/components/common/statusBedge";
 import CoaCreateDialog from "./CoaCreateDialog";
@@ -65,38 +64,28 @@ export default function COAListPage() {
   const [createCoaIsOpen, setCreatCoaIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  console.log(authUser);
-
-  const debouncedSearch = useDebounce(searchTerm, 500);
+  // const debouncedSearch = useDebounce(searchTerm, 500);
 
   useEffect(() => {
-    dispatch(asyncGetCOA(currentPage, itemsPerPage, debouncedSearch));
-  }, [dispatch, currentPage, itemsPerPage, debouncedSearch]);
+    dispatch(asyncGetCOA(currentPage, itemsPerPage, searchTerm));
+  }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
   const handleApprove = async (coaId) => {
     try {
-      const response = await dispatch(asyncApproveCOA(coaId));
-      toast.success(response.message || "COA berhasil disetujui");
-    } catch (error) {
-      toast.error(error.message || "Gagal menyetujui COA");
-    }
+      await dispatch(asyncApproveCOA(coaId));
+    } catch (error) {}
   };
 
   const handleDeleteCoa = (coa_id, coa_status) => {
     if (coa_status === "approved") {
-      toast.error("Can't delete, COA Already Approved!");
     } else {
-      toast.success("anjay");
     }
   };
 
   const handleRequestApproval = async (coaId) => {
     try {
-      const response = await dispatch(asyncRequestApprovalCOA(coaId));
-      toast.success(response.message || "Request Approval berhasil");
-    } catch (error) {
-      toast.error(error.message || "Gagal Request Approval COA");
-    }
+      await dispatch(asyncRequestApprovalCOA(coaId));
+    } catch (error) {}
   };
 
   const handlePageChange = (newPage) => {

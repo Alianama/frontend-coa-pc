@@ -1,4 +1,4 @@
-import api from "@/utils/api";
+import api from "@/services/api";
 import { showLoading, hideLoading } from "react-redux-loading-bar";
 
 const ActionType = {

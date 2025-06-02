@@ -1,4 +1,4 @@
-import api from "../../utils/api";
+import api from "../../services/api";
 import { toast } from "sonner";
 import { showLoading, hideLoading } from "react-redux-loading-bar";
 
