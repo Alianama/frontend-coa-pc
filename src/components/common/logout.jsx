@@ -1,10 +1,8 @@
 import { useDispatch } from "react-redux";
 import { asyncUnsetAuthUser } from "@/store/authUser/action";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,

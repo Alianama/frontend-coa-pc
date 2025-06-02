@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   CheckCircle,
-  Clock,
   Shield,
   Edit3,
   Printer,
@@ -38,7 +37,7 @@ import {
   Download,
   Building2,
 } from "lucide-react";
-import { getStatusBadge } from "@/utils/statusBedge";
+import { getStatusBadge } from "@/components/common/statusBedge";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -176,10 +175,10 @@ export default function COADetail() {
       data.mfr,
       data.density,
       data.moisture,
-      data.carbonConten,
+      data.carbonContent,
       data.intrinsicViscosity,
       data.ashContent,
-      data.forignMater,
+      data.foreignMatter,
       data.weightOfChips,
     ];
 
@@ -440,7 +439,7 @@ export default function COADetail() {
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Status
                     </TableCell>
-                    <DataCell value={data.status.toUpperCase()} />
+                    <DataCell value={getStatusBadge(data.status)} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -512,7 +511,7 @@ export default function COADetail() {
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Foreign Matter
                     </TableCell>
-                    <DataCell value={data.forignMater} />
+                    <DataCell value={data.foreignMatter} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -549,7 +548,7 @@ export default function COADetail() {
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Carbon Content
                     </TableCell>
-                    <DataCell value={data.carbonConten} />
+                    <DataCell value={data.carbonContent} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -582,7 +581,7 @@ export default function COADetail() {
                     <TableCell className="font-medium text-gray-700 pl-6">
                       Analysis Date
                     </TableCell>
-                    <DataCell value={formatDateShort(data.anaysisDate)} />
+                    <DataCell value={formatDateShort(data.analysisDate)} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -608,12 +607,6 @@ export default function COADetail() {
                       Issued By
                     </TableCell>
                     <DataCell value={data.issueBy} />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Creator
-                    </TableCell>
-                    <DataCell value={data.creator.username} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
@@ -651,21 +644,12 @@ export default function COADetail() {
                   </p>
                   <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
                 </div>
-                <p className="text-xs text-gray-600 max-w-2xl mx-auto">
-                  This document certifies that the above-mentioned product has
-                  been tested and analyzed according to established procedures
-                  and meets the specified quality requirements. This certificate
-                  is valid only for the tested sample and cannot be reproduced
-                  without written authorization.
-                </p>
+
                 <div className="flex items-center justify-center gap-4 pt-2">
                   <span className="text-xs text-gray-500">
-                    Document ID: COA-{data.id.toString().padStart(6, "0")}
+                    Lot Number : {data.lotNumber.toString().padStart(6, "0")}
                   </span>
                   <span className="text-xs text-gray-400">•</span>
-                  <span className="text-xs text-gray-500">
-                    Generated: {formatDate(data.printedDate)}
-                  </span>
                 </div>
               </div>
             </div>

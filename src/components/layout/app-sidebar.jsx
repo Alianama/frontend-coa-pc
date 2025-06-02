@@ -28,7 +28,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // import { asyncUnsetAuthUser } from "@/store/authUser/action";
-import Logout from "@/components/logout";
+import Logout from "@/components/common/logout";
 
 // Konfigurasi menu sidebar
 const sidebarConfig = {

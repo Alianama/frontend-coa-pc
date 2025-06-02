@@ -26,10 +26,8 @@ import {
 } from "@/components/ui/select";
 import {
   Check,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Clock,
   Download,
   Eye,
   FileClock,
@@ -40,7 +38,6 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,7 +50,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { getFullNameById } from "@/utils/userUtils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { getStatusBadge } from "@/utils/statusBedge";
+import { getStatusBadge } from "@/components/common/statusBedge";
+import CoaCreateDialog from "./CoaCreateDialog";
 
 export default function COAListPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,6 +62,7 @@ export default function COAListPage() {
     useSelector((state) => state.coa || {});
   const authUser = useSelector((state) => state.authUser);
   const allUsers = useSelector((state) => state.allUsers || []);
+  const [createCoaIsOpen, setCreatCoaIsOpen] = useState(false);
   const navigate = useNavigate();
 
   console.log(authUser);
@@ -83,6 +82,14 @@ export default function COAListPage() {
     }
   };
 
+  const handleDeleteCoa = (coa_id, coa_status) => {
+    if (coa_status === "approved") {
+      toast.error("Can't delete, COA Already Approved!");
+    } else {
+      toast.success("anjay");
+    }
+  };
+
   const handleRequestApproval = async (coaId) => {
     try {
       const response = await dispatch(asyncRequestApprovalCOA(coaId));
@@ -92,43 +99,6 @@ export default function COAListPage() {
     }
   };
 
-  // const getStatusBadge = (status) => {
-  //   switch (status) {
-  //     case "approved":
-  //       return (
-  //         <Badge className="bg-green-500 shadow-lg cursor-pointer hover:bg-green-600">
-  //           <CheckCircle2 className="mr-1 h-3 w-3" />
-  //           Approved
-  //         </Badge>
-  //       );
-  //     case "draft":
-  //       return (
-  //         <Badge className="bg-red-500/50 shadow-lg cursor-pointer hover:bg-red-600">
-  //           <FileEdit className="mr-1 h-3 w-3" />
-  //           Draft
-  //         </Badge>
-  //       );
-  //     case "need_approval":
-  //       return (
-  //         <Badge
-  //           variant="outline"
-  //           className="bg-yellow-500 shadow-lg cursor-pointer hover:bg-yellow-600"
-  //         >
-  //           <Clock className="mr-1 h-3 w-3" /> Need Approval
-  //         </Badge>
-  //       );
-  //     default:
-  //       return (
-  //         <Badge
-  //           variant="outline"
-  //           className="text-gray-500 shadow-lg cursor-pointer border-gray-500"
-  //         >
-  //           <Clock className="mr-1 h-3 w-3" /> Unknown
-  //         </Badge>
-  //       );
-  //   }
-  // };
-
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -136,6 +106,10 @@ export default function COAListPage() {
   const handleItemsPerPageChange = (newLimit) => {
     setItemsPerPage(Number(newLimit));
     setCurrentPage(1);
+  };
+
+  const handleCreateCoaIsOpen = () => {
+    setCreatCoaIsOpen(true);
   };
 
   return (
@@ -173,7 +147,7 @@ export default function COAListPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="ml-auto">
+              <Button onClick={handleCreateCoaIsOpen} className="ml-auto">
                 <FilePlus className="mr-2 h-4 w-4" />
                 Create COA
               </Button>
@@ -181,6 +155,10 @@ export default function COAListPage() {
           </div>
         </CardContent>
       </Card>
+      <CoaCreateDialog
+        createCoaIsOpen={createCoaIsOpen}
+        setCreateCoaIsOpen={setCreatCoaIsOpen}
+      />
 
       <div className="rounded-md border">
         <Table>
@@ -290,8 +268,9 @@ export default function COAListPage() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600">
                           <Button
+                            // disabled={coa.status === "approved"}
                             className="bg-transparent text-red-600"
-                            onClick={() => alert("halo")}
+                            onClick={() => handleDeleteCoa(coa.id, coa.status)}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete

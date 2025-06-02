@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import { asyncPreloadProcess } from "@/store/isPreload/action";
 import Loading from "@/components/ui/loading";
 import COADetailLayout from "./pages/CoaDetail/CoaDetailLayout";
+import COACreateLayout from "./pages/Coa/CoaCreateLayout";
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
   return isAuthenticated ? children : <Navigate to="/login" />;
@@ -60,6 +61,14 @@ function App() {
           element={
             <ProtectedRoute>
               <COAListLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/COA/create"
+          element={
+            <ProtectedRoute>
+              <COACreateLayout />
             </ProtectedRoute>
           }
         />
