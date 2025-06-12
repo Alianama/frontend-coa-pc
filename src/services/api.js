@@ -162,7 +162,7 @@ const api = (() => {
     }
   }
 
-  async function deleteCoa(coaId) {
+  async function deleteCOA(coaId) {
     try {
       const response = await _fetchWithAuth(`${BASE_URL}/coa/${coaId}`, {
         method: "DELETE",
@@ -305,19 +305,13 @@ const api = (() => {
     };
   }
 
-  async function deleteCOA(coaId) {
-    const response = await _fetchWithAuth(`${BASE_URL}/coa/${coaId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  async function getCustomer() {
+    const response = await _fetchWithAuth(`${BASE_URL}/customer`);
     const responseJson = await response.json();
-
     const { status, message, data } = responseJson;
 
     if (status !== "success") {
-      throw new Error(message || "Gagal menghapus COA");
+      throw new Error(message || "Get Customer Failed");
     }
 
     return {
@@ -340,9 +334,9 @@ const api = (() => {
     approveCOA,
     requestApprovalCOA,
     getCoaDetail,
-    deleteCOA,
     createCOA,
     deleteCOA,
+    getCustomer,
   };
 })();
 

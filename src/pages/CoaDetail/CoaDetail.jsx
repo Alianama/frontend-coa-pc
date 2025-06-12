@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,6 +79,12 @@ const DataCell = ({ value, isMissing = false, unit = "" }) => (
   </TableCell>
 );
 
+DataCell.propTypes = {
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  isMissing: PropTypes.bool,
+  unit: PropTypes.string,
+};
+
 const SectionHeader = ({
   title,
   icon,
@@ -122,6 +129,13 @@ const SectionHeader = ({
   </TableRow>
 );
 
+SectionHeader.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+  hasIncompleteData: PropTypes.bool,
+  hasPendingApprove: PropTypes.bool,
+};
+
 export default function COADetail() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -129,6 +143,7 @@ export default function COADetail() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { detail_coa: data } = useSelector((state) => state.coa);
+  const { authUser } = useSelector((state) => state.authUser);
 
   useEffect(() => {
     if (id) {
@@ -323,41 +338,45 @@ export default function COADetail() {
                       Export PDF
                     </Button>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          disabled={data.status === "approved"}
-                          variant="outline"
-                          size="sm"
-                          className="border-red-200 text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-secondary">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Delete Certificate of Analysis
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete this COA? This
-                            action cannot be undone and will permanently remove
-                            the certificate and all associated data.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleDelete}
-                            className="bg-red-600 hover:bg-red-700"
-                            disabled={isDeleting}
+                    {(data.status === "draft" ||
+                      data.status === "need_approval" ||
+                      authUser?.role.name === "SUPER_ADMIN") && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            disabled={data.status === "approved"}
+                            variant="outline"
+                            size="sm"
+                            className="border-red-200 text-red-700 hover:bg-red-50"
                           >
-                            {isDeleting ? "Deleting..." : "Delete COA"}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-secondary">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Delete Certificate of Analysis
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this COA? This
+                              action cannot be undone and will permanently
+                              remove the certificate and all associated data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDelete}
+                              className="bg-red-600 hover:bg-red-700"
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? "Deleting..." : "Delete COA"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </div>
                 </div>
               </div>

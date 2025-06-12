@@ -1,0 +1,607 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ChevronDown,
+  ChevronUp,
+  Edit,
+  MoreHorizontal,
+  Plus,
+  Save,
+  Search,
+  X,
+} from "lucide-react";
+
+// Available fields for selection
+const availableFields = [
+  "productName",
+  "letDownResin",
+  "lotNumber",
+  "pelletSize",
+  "pelletVisual",
+  "color",
+  "dispersibility",
+  "mfr",
+  "density",
+  "moisture",
+  "carbonContent",
+  "mfgDate",
+  "expiryDate",
+  "analysisDate",
+  "printedDate",
+  "foreignMatter",
+  "weightOfChips",
+  "intrinsicViscosity",
+  "ashContent",
+];
+
+// Field labels for display
+const fieldLabels = {
+  productName: "Product Name",
+  letDownResin: "Let Down Resin",
+  lotNumber: "Lot Number",
+  pelletSize: "Pellet Size",
+  pelletVisual: "Pellet Visual",
+  color: "Color",
+  dispersibility: "Dispersibility",
+  mfr: "MFR",
+  density: "Density",
+  moisture: "Moisture",
+  carbonContent: "Carbon Content",
+  mfgDate: "Manufacturing Date",
+  expiryDate: "Expiry Date",
+  analysisDate: "Analysis Date",
+  printedDate: "Printed Date",
+  foreignMatter: "Foreign Matter",
+  weightOfChips: "Weight of Chips",
+  intrinsicViscosity: "Intrinsic Viscosity",
+  ashContent: "Ash Content",
+};
+
+export default function CustomerList() {
+  // Initial customer data
+  const [customers, setCustomers] = useState([
+    {
+      id: 1,
+      name: "PT. Makmur Indonesia",
+      createdAt: "2025-06-11T07:19:37.062Z",
+      updatedAt: "2025-06-11T07:19:37.062Z",
+      mandatoryFields: [
+        {
+          id: 1,
+          fieldName: "productName",
+          customerId: 1,
+          createdAt: "2025-06-11T07:19:37.065Z",
+          updatedAt: "2025-06-11T07:19:37.065Z",
+        },
+        {
+          id: 2,
+          fieldName: "lotNumber",
+          customerId: 1,
+          createdAt: "2025-06-11T07:19:37.065Z",
+          updatedAt: "2025-06-11T07:19:37.065Z",
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: "PT. Asian Indonesia",
+      createdAt: "2025-06-11T07:38:08.933Z",
+      updatedAt: "2025-06-11T07:38:08.933Z",
+      mandatoryFields: [
+        {
+          id: 3,
+          fieldName: "productName",
+          customerId: 2,
+          createdAt: "2025-06-11T07:38:08.965Z",
+          updatedAt: "2025-06-11T07:38:08.965Z",
+        },
+        {
+          id: 4,
+          fieldName: "lotNumber",
+          customerId: 2,
+          createdAt: "2025-06-11T07:38:08.965Z",
+          updatedAt: "2025-06-11T07:38:08.965Z",
+        },
+      ],
+    },
+    {
+      id: 3,
+      name: "PT. Shangai Indonesia",
+      createdAt: "2025-06-11T07:38:14.297Z",
+      updatedAt: "2025-06-11T07:38:14.297Z",
+      mandatoryFields: [
+        {
+          id: 5,
+          fieldName: "productName",
+          customerId: 3,
+          createdAt: "2025-06-11T07:38:14.299Z",
+          updatedAt: "2025-06-11T07:38:14.299Z",
+        },
+        {
+          id: 6,
+          fieldName: "lotNumber",
+          customerId: 3,
+          createdAt: "2025-06-11T07:38:14.299Z",
+          updatedAt: "2025-06-11T07:38:14.299Z",
+        },
+      ],
+    },
+    {
+      id: 4,
+      name: "PT. Ali Indonesia",
+      createdAt: "2025-06-11T07:38:18.015Z",
+      updatedAt: "2025-06-11T07:38:18.015Z",
+      mandatoryFields: [
+        {
+          id: 7,
+          fieldName: "productName",
+          customerId: 4,
+          createdAt: "2025-06-11T07:38:18.017Z",
+          updatedAt: "2025-06-11T07:38:18.017Z",
+        },
+        {
+          id: 8,
+          fieldName: "lotNumber",
+          customerId: 4,
+          createdAt: "2025-06-11T07:38:18.017Z",
+          updatedAt: "2025-06-11T07:38:18.017Z",
+        },
+      ],
+    },
+    {
+      id: 5,
+      name: "PT. Puta Indonesia",
+      createdAt: "2025-06-11T07:38:21.598Z",
+      updatedAt: "2025-06-11T07:38:21.598Z",
+      mandatoryFields: [
+        {
+          id: 9,
+          fieldName: "productName",
+          customerId: 5,
+          createdAt: "2025-06-11T07:38:21.600Z",
+          updatedAt: "2025-06-11T07:38:21.600Z",
+        },
+        {
+          id: 10,
+          fieldName: "lotNumber",
+          customerId: 5,
+          createdAt: "2025-06-11T07:38:21.600Z",
+          updatedAt: "2025-06-11T07:38:21.600Z",
+        },
+      ],
+    },
+  ]);
+
+  // State for search, editing, and expanded rows
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingCustomerId, setEditingCustomerId] = useState(null);
+  const [selectedFields, setSelectedFields] = useState([]);
+  const [expandedRows, setExpandedRows] = useState([]);
+
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newCustomerName, setNewCustomerName] = useState("");
+  const [newCustomerFields, setNewCustomerFields] = useState([]);
+
+  console.log({ newCustomerFields, newCustomerName });
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Toggle row expansion
+  const toggleRowExpansion = (customerId) => {
+    setExpandedRows((prev) =>
+      prev.includes(customerId)
+        ? prev.filter((id) => id !== customerId)
+        : [...prev, customerId]
+    );
+  };
+
+  // Filter customers based on search term
+  const filteredCustomers = customers.filter((customer) =>
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Handle field selection toggle
+  const handleFieldToggle = (fieldName) => {
+    setSelectedFields((prev) =>
+      prev.includes(fieldName)
+        ? prev.filter((f) => f !== fieldName)
+        : [...prev, fieldName]
+    );
+  };
+
+  // Open edit dialog for a customer
+  const openEditDialog = (customer) => {
+    setEditingCustomerId(customer.id);
+    setSelectedFields(customer.mandatoryFields.map((field) => field.fieldName));
+  };
+
+  // Save changes to mandatory fields
+  const handleSaveChanges = () => {
+    if (editingCustomerId === null) return;
+
+    setCustomers((prevCustomers) =>
+      prevCustomers.map((customer) => {
+        if (customer.id === editingCustomerId) {
+          // Create new mandatory fields based on selection
+          const newMandatoryFields = selectedFields.map((fieldName, index) => ({
+            id:
+              customer.mandatoryFields.length > index
+                ? customer.mandatoryFields[index].id
+                : Date.now() + index,
+            fieldName,
+            customerId: customer.id,
+            createdAt:
+              customer.mandatoryFields.length > index
+                ? customer.mandatoryFields[index].createdAt
+                : new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }));
+
+          return {
+            ...customer,
+            mandatoryFields: newMandatoryFields,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return customer;
+      })
+    );
+
+    setEditingCustomerId(null);
+  };
+
+  // Handle new customer field toggle
+  const handleNewCustomerFieldToggle = (fieldName) => {
+    setNewCustomerFields((prev) =>
+      prev.includes(fieldName)
+        ? prev.filter((f) => f !== fieldName)
+        : [...prev, fieldName]
+    );
+  };
+
+  // Handle adding new customer
+  const handleAddCustomer = () => {
+    if (!newCustomerName.trim()) return;
+
+    const newCustomer = {
+      id: Math.max(...customers.map((c) => c.id)) + 1,
+      name: newCustomerName.trim(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      mandatoryFields: newCustomerFields.map((fieldName, index) => ({
+        id: Date.now() + index,
+        fieldName,
+        customerId: Math.max(...customers.map((c) => c.id)) + 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })),
+    };
+
+    setCustomers((prev) => [...prev, newCustomer]);
+
+    // Reset form
+    setNewCustomerName("");
+    setNewCustomerFields([]);
+    setIsAddDialogOpen(false);
+  };
+
+  // Reset add customer form
+  const resetAddCustomerForm = () => {
+    setNewCustomerName("");
+    setNewCustomerFields([]);
+    setIsAddDialogOpen(false);
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto p-4 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Customer Data</h1>
+          <p className="text-gray-600 text-sm">
+            Manage customer information and mandatory fields
+          </p>
+        </div>
+        <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Add Customer
+        </Button>
+      </div>
+
+      <Card className="shadow-sm">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Customer List</CardTitle>
+            <div className="relative w-64">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search customers..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-10"></TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Mandatory Fields</TableHead>
+                <TableHead>Last Updated</TableHead>
+                <TableHead className="w-10"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer) => (
+                  <>
+                    <TableRow key={customer.id} className="hover:bg-gray-50">
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleRowExpansion(customer.id)}
+                          className="h-8 w-8"
+                        >
+                          {expandedRows.includes(customer.id) ? (
+                            <ChevronUp className="h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {customer.name}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {customer.mandatoryFields.map((field) => (
+                            <Badge
+                              key={field.id}
+                              variant="secondary"
+                              className="bg-yellow-50 text-yellow-800 border-yellow-200"
+                            >
+                              {fieldLabels[field.fieldName] || field.fieldName}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>{formatDate(customer.updatedAt)}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => openEditDialog(customer)}
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Fields
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                    {expandedRows.includes(customer.id) && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="bg-gray-50 p-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="font-medium text-gray-700">
+                                Customer ID:
+                              </span>
+                              <p className="text-gray-600">{customer.id}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">
+                                Created:
+                              </span>
+                              <p className="text-gray-600">
+                                {formatDate(customer.createdAt)}
+                              </p>
+                            </div>
+                            <div className="md:col-span-2">
+                              <span className="font-medium text-gray-700">
+                                Mandatory Fields:
+                              </span>
+                              <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
+                                {customer.mandatoryFields.map((field) => (
+                                  <div
+                                    key={field.id}
+                                    className="flex items-center"
+                                  >
+                                    <Badge
+                                      variant="secondary"
+                                      className="bg-yellow-50 text-yellow-800 border-yellow-200 mr-2"
+                                    >
+                                      {fieldLabels[field.fieldName] ||
+                                        field.fieldName}
+                                    </Badge>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-8 text-gray-500"
+                  >
+                    No customers found matching your search
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Edit Dialog */}
+      <Dialog
+        open={editingCustomerId !== null}
+        onOpenChange={(open) => !open && setEditingCustomerId(null)}
+      >
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Update Mandatory Fields</DialogTitle>
+            <DialogDescription>
+              Select the fields that are mandatory for{" "}
+              {customers.find((c) => c.id === editingCustomerId)?.name ||
+                "this customer"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+            {availableFields.map((field) => (
+              <div key={field} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`field-${field}`}
+                  checked={selectedFields.includes(field)}
+                  onCheckedChange={() => handleFieldToggle(field)}
+                />
+                <label
+                  htmlFor={`field-${field}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {fieldLabels[field]}
+                </label>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditingCustomerId(null)}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+            <Button onClick={handleSaveChanges} className="gap-2">
+              <Save className="w-4 h-4" />
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Customer Dialog */}
+      <Dialog
+        open={isAddDialogOpen}
+        onOpenChange={(open) => !open && resetAddCustomerForm()}
+      >
+        <DialogContent className="max-w-2xl max-h-[80vh] bg-secondary overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Customer</DialogTitle>
+            <DialogDescription>
+              Enter customer name and select mandatory fields for the new
+              customer
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label
+                htmlFor="customer-name"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Customer Name
+              </label>
+              <Input
+                id="customer-name"
+                placeholder="Enter customer name..."
+                value={newCustomerName}
+                onChange={(e) => setNewCustomerName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Mandatory Fields
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {availableFields.map((field) => (
+                  <div key={field} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`new-field-${field}`}
+                      checked={newCustomerFields.includes(field)}
+                      onCheckedChange={() =>
+                        handleNewCustomerFieldToggle(field)
+                      }
+                    />
+                    <label
+                      htmlFor={`new-field-${field}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {fieldLabels[field]}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={resetAddCustomerForm}>
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddCustomer}
+              className="gap-2"
+              disabled={!newCustomerName.trim()}
+            >
+              <Plus className="w-4 h-4" />
+              Add Customer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

@@ -30,7 +30,7 @@ import {
   ChevronRight,
   Download,
   Eye,
-  FileClock,
+  // FileClock,
   FileEdit,
   FilePlus,
   MoreHorizontal,
@@ -44,14 +44,23 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   asyncGetCOA,
   asyncApproveCOA,
-  asyncRequestApprovalCOA,
+  // asyncRequestApprovalCOA,
   asyncRemoveCoa,
 } from "@/store/coa/action";
 
 import { getFullNameById } from "@/utils/userUtils";
 import { useNavigate } from "react-router-dom";
 import { getStatusBadge } from "@/components/common/statusBedge";
-import CoaCreateDialog from "./CoaCreateDialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export default function COAListPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,7 +71,6 @@ export default function COAListPage() {
     useSelector((state) => state.coa || {});
   const authUser = useSelector((state) => state.authUser);
   const allUsers = useSelector((state) => state.allUsers || []);
-  const [createCoaIsOpen, setCreatCoaIsOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -85,11 +93,13 @@ export default function COAListPage() {
     }
   };
 
-  const handleRequestApproval = async (coaId) => {
-    try {
-      await dispatch(asyncRequestApprovalCOA(coaId));
-    } catch (error) {}
-  };
+  // const handleRequestApproval = async (coaId) => {
+  //   try {
+  //     await dispatch(asyncRequestApprovalCOA(coaId));
+  //   } catch (error) {
+
+  //   }
+  // };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -98,10 +108,6 @@ export default function COAListPage() {
   const handleItemsPerPageChange = (newLimit) => {
     setItemsPerPage(Number(newLimit));
     setCurrentPage(1);
-  };
-
-  const handleCreateCoaIsOpen = () => {
-    setCreatCoaIsOpen(true);
   };
 
   return (
@@ -139,7 +145,10 @@ export default function COAListPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleCreateCoaIsOpen} className="ml-auto">
+              <Button
+                onClick={() => navigate("/COA/create")}
+                className="ml-auto"
+              >
                 <FilePlus className="mr-2 h-4 w-4" />
                 Create COA
               </Button>
@@ -147,10 +156,6 @@ export default function COAListPage() {
           </div>
         </CardContent>
       </Card>
-      <CoaCreateDialog
-        createCoaIsOpen={createCoaIsOpen}
-        setCreateCoaIsOpen={setCreatCoaIsOpen}
-      />
 
       <div className="rounded-md border">
         <Table>
@@ -159,6 +164,7 @@ export default function COAListPage() {
               <TableHead>Lot Number</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Product Name</TableHead>
+              <TableHead>Quantity</TableHead>
               <TableHead>Created Date</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created By</TableHead>
@@ -173,6 +179,7 @@ export default function COAListPage() {
                   <TableCell className="font-medium">{coa.lotNumber}</TableCell>
                   <TableCell>{coa.costumerName}</TableCell>
                   <TableCell>{coa.productName}</TableCell>
+                  <TableCell>{coa.quantity} kg</TableCell>
                   <TableCell>
                     {new Date(coa.createdAt).toLocaleDateString()}
                   </TableCell>
@@ -189,7 +196,7 @@ export default function COAListPage() {
                       View
                     </Button>
 
-                    {coa.status === "draft" &&
+                    {/* {coa.status === "draft" &&
                       coa.approvedBy === null &&
                       authUser?.username === coa.issueBy && (
                         <Button
@@ -199,19 +206,43 @@ export default function COAListPage() {
                           <FileClock className="h-3 w-3" />
                           <h1 className="">Request Approval</h1>
                         </Button>
-                      )}
+                      )} */}
 
                     {coa.status === "need_approval" &&
                       coa.approvedBy === null &&
                       (authUser?.role?.name === "SUPER_ADMIN" ||
                         authUser?.role?.name === "ADMIN") && (
-                        <Button
-                          onClick={() => handleApprove(coa.id)}
-                          className="text-[10px] bg-transparent"
-                        >
-                          <Check className="h-3 w-3" />
-                          <h1 className="">Approve</h1>
-                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button className="text-[10px] bg-transparent">
+                              <Check className="h-3 w-3" />
+                              <h1 className="">Approve</h1>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-secondary">
+                            <DialogHeader>
+                              <DialogTitle>Confirm Approval COA</DialogTitle>
+                            </DialogHeader>
+                            <DialogDescription>
+                              Are you sure you want to approve this COA?
+                            </DialogDescription>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                              </DialogClose>
+                              <Button
+                                onClick={() => {
+                                  handleApprove(coa.id);
+                                  document
+                                    .querySelector('button[aria-label="Close"]')
+                                    .click();
+                                }}
+                              >
+                                Approve
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       )}
                   </TableCell>
 
@@ -258,16 +289,19 @@ export default function COAListPage() {
                           </Button>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
-                          <Button
-                            // disabled={coa.status === "approved"}
-                            className="bg-transparent text-red-600"
-                            onClick={() => handleDeleteCoa(coa.id, coa.status)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </Button>
-                        </DropdownMenuItem>
+                        {(coa.status === "draft" ||
+                          coa.status === "need_approval" ||
+                          authUser?.role.name === "SUPER_ADMIN") && (
+                          <DropdownMenuItem className="text-red-600">
+                            <Button
+                              className="bg-transparent text-red-600"
+                              onClick={() => handleDeleteCoa(coa.id)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </Button>
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

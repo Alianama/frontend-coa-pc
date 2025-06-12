@@ -1,5 +1,3 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sidebar,
   SidebarContent,
@@ -15,19 +13,17 @@ import {
 } from "@/components/ui/sidebar";
 import {
   BarChart3,
-  ClipboardList,
   FileText,
   Home,
   LogOut,
-  Search,
-  Settings,
   ShieldCheck,
   User,
+  Contact,
+  History,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-// import { asyncUnsetAuthUser } from "@/store/authUser/action";
+import { useSelector } from "react-redux";
 import Logout from "@/components/common/logout";
 
 // Konfigurasi menu sidebar
@@ -44,9 +40,15 @@ const sidebarConfig = {
       icon: FileText,
     },
     {
-      path: "/coa/approval",
-      label: "COA Approval",
-      icon: ClipboardList,
+      path: "/coa/history",
+      label: "COA History",
+      icon: History,
+    },
+
+    {
+      path: "/customers",
+      label: "Customers List",
+      icon: Contact,
     },
     {
       path: "/reports",
@@ -62,10 +64,10 @@ const sidebarConfig = {
       permission: "manage:roles",
     },
     {
-      path: "/settings",
-      label: "Settings",
-      icon: Settings,
-      permission: "manage:roles",
+      path: "/users",
+      label: "User Management",
+      icon: User,
+      permission: "manage:users",
     },
   ],
 };
@@ -73,20 +75,15 @@ const sidebarConfig = {
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const authUser = useSelector((state) => state.authUser);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    console.log(authUser);
     if (authUser) {
       setUser(authUser);
     }
   }, [authUser]);
-
-  // const logout = () => {
-  //   dispatch(asyncUnsetAuthUser());
-  //   navigate("/login");
-  // };
 
   const isActive = (path) => {
     return (
@@ -128,15 +125,6 @@ export function AppSidebar() {
             </div>
             <div className="font-semibold">COA Creator</div>
           </div>
-          <form className="px-2 py-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Label htmlFor="search" className="sr-only">
-                Search
-              </Label>
-              <Input id="search" placeholder="Search..." className="pl-8 h-9" />
-            </div>
-          </form>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -145,24 +133,31 @@ export function AppSidebar() {
               <SidebarMenu>{renderMenuItems(sidebarConfig.main)}</SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-
-          <SidebarGroup>
-            <SidebarGroupLabel>Administration</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{renderMenuItems(sidebarConfig.admin)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          {authUser?.role.name === "SUPER_ADMIN" && (
+            <SidebarGroup>
+              <SidebarGroupLabel>Administration</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {renderMenuItems(sidebarConfig.admin)}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => handleNavigation("/profile")}>
+              <SidebarMenuButton>
                 <User className="h-4 w-4" />
                 <span>{user?.fullName}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setLogoutIsOpen(true)}>
+              <SidebarMenuButton
+                className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/80
+                 hover:text-primary-foreground rounded-md p-2 hover:scale-105 transition-all duration-300"
+                onClick={() => setLogoutIsOpen(true)}
+              >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
               </SidebarMenuButton>

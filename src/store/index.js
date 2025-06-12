@@ -7,6 +7,7 @@ import {
 } from "react-redux-loading-bar";
 import coaReducer from "./coa/reducer";
 import usersReducer from "./users/reducer";
+import customerReducer from "./customer/reducer";
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     coa: coaReducer,
     loadingBar: loadingBarReducer,
     allUsers: usersReducer,
+    customers: customerReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

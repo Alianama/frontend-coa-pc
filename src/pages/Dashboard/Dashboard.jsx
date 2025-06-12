@@ -18,8 +18,10 @@ import { motion } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { asyncGetCOA } from "@/store/coa/action";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { coas = [] } = useSelector((state) => state.coa || {});
 
@@ -65,7 +67,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Card>
+          <Card onClick={() => navigate("/coa")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total COAs</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
