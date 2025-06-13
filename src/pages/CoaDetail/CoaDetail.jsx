@@ -177,8 +177,8 @@ export default function COADetail() {
       data.productName,
       data.letDownResin,
       data.lotNumber,
-      data.quantity,
-      data.pelletSize,
+      data.pelletLength,
+      data.pelletDimension,
       data.pelletVisual,
       data.color,
       data.status,
@@ -191,6 +191,11 @@ export default function COADetail() {
       data.ashContent,
       data.foreignMatter,
       data.weightOfChips,
+      data.heatStability,
+      data.lightFastness,
+      data.granule,
+      data.deltaE,
+      data.macaroni,
     ];
 
     const completedFields = requiredFields.filter(
@@ -485,12 +490,31 @@ export default function COADetail() {
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
-                      Quantity
+                      Pellet Length
                     </TableCell>
                     <DataCell
-                      value={data.quantity}
-                      unit="kg"
-                      isMissing={!data.quantity}
+                      value={data.pelletLength}
+                      unit="mm"
+                      isMissing={!data.pelletLength}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Pellet Dimension
+                    </TableCell>
+                    <DataCell
+                      value={data.pelletDimension}
+                      unit="mm"
+                      isMissing={!data.pelletDimension}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Pellet Visual
+                    </TableCell>
+                    <DataCell
+                      value={data.pelletVisual ? "Pass" : "No"}
+                      isMissing={data.pelletVisual === undefined}
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
@@ -501,29 +525,113 @@ export default function COADetail() {
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
                     <TableCell className="font-medium text-gray-700 pl-6">
-                      Pellet Size
-                    </TableCell>
-                    <DataCell
-                      value={data.pelletSize}
-                      isMissing={!data.pelletSize}
-                    />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Pellet Visual
-                    </TableCell>
-                    <DataCell
-                      value={data.pelletVisual}
-                      isMissing={!data.pelletVisual}
-                    />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
                       Dispersibility
                     </TableCell>
                     <DataCell
                       value={data.dispersibility}
                       isMissing={!data.dispersibility}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      MFR (Melt Flow Rate)
+                    </TableCell>
+                    <DataCell
+                      value={data.mfr}
+                      unit="g/10min"
+                      isMissing={!data.mfr}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Density
+                    </TableCell>
+                    <DataCell
+                      value={data.density}
+                      unit="g/cm³"
+                      isMissing={!data.density}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Moisture Content
+                    </TableCell>
+                    <DataCell
+                      value={data.moisture}
+                      unit="%"
+                      isMissing={!data.moisture}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Carbon Content
+                    </TableCell>
+                    <DataCell
+                      value={data.carbonContent}
+                      unit="%"
+                      isMissing={!data.carbonContent}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Ash Content
+                    </TableCell>
+                    <DataCell
+                      value={data.ashContent}
+                      unit="%"
+                      isMissing={!data.ashContent}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Intrinsic Viscosity
+                    </TableCell>
+                    <DataCell
+                      value={data.intrinsicViscosity}
+                      unit="dl/g"
+                      isMissing={!data.intrinsicViscosity}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Heat Stability
+                    </TableCell>
+                    <DataCell
+                      value={data.heatStability}
+                      unit="°C"
+                      isMissing={!data.heatStability}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Light Fastness
+                    </TableCell>
+                    <DataCell
+                      value={data.lightFastness}
+                      unit="grade"
+                      isMissing={!data.lightFastness}
+                    />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Granule
+                    </TableCell>
+                    <DataCell value={data.Granule} isMissing={!data.Granule} />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Delta E
+                    </TableCell>
+                    <DataCell value={data.deltaE} isMissing={!data.deltaE} />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-700 pl-6">
+                      Macaroni
+                    </TableCell>
+                    <DataCell
+                      value={data.macaroni}
+                      unit="%"
+                      isMissing={!data.macaroni}
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
@@ -541,55 +649,8 @@ export default function COADetail() {
                     </TableCell>
                     <DataCell
                       value={data.weightOfChips}
+                      unit="g"
                       isMissing={!data.weightOfChips}
-                    />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      MFR (Melt Flow Rate)
-                    </TableCell>
-                    <DataCell value={data.mfr} isMissing={!data.mfr} />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Density
-                    </TableCell>
-                    <DataCell value={data.density} isMissing={!data.density} />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Moisture Content
-                    </TableCell>
-                    <DataCell
-                      value={data.moisture}
-                      isMissing={!data.moisture}
-                    />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Carbon Content
-                    </TableCell>
-                    <DataCell
-                      value={data.carbonContent}
-                      isMissing={!data.carbonContent}
-                    />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Ash Content
-                    </TableCell>
-                    <DataCell
-                      value={data.ashContent}
-                      isMissing={!data.ashContent}
-                    />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Intrinsic Viscosity
-                    </TableCell>
-                    <DataCell
-                      value={data.intrinsicViscosity}
-                      isMissing={!data.intrinsicViscosity}
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">

@@ -165,6 +165,9 @@ export default function COAListPage() {
               <TableHead>Customer</TableHead>
               <TableHead>Product Name</TableHead>
               <TableHead>Quantity</TableHead>
+              <TableHead>Color</TableHead>
+              <TableHead>MFR</TableHead>
+              <TableHead>Density</TableHead>
               <TableHead>Created Date</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created By</TableHead>
@@ -179,7 +182,10 @@ export default function COAListPage() {
                   <TableCell className="font-medium">{coa.lotNumber}</TableCell>
                   <TableCell>{coa.costumerName}</TableCell>
                   <TableCell>{coa.productName}</TableCell>
-                  <TableCell>{coa.quantity} kg</TableCell>
+                  <TableCell>{coa.quantity ? coa.quantity : 0} kg</TableCell>
+                  <TableCell>{coa.color}</TableCell>
+                  <TableCell>{coa.mfr}</TableCell>
+                  <TableCell>{coa.density}</TableCell>
                   <TableCell>
                     {new Date(coa.createdAt).toLocaleDateString()}
                   </TableCell>
@@ -256,13 +262,15 @@ export default function COAListPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>
-                          <Button
-                            className="bg-transparent"
-                            onClick={() => alert("halo")}
-                          >
-                            <FileEdit className="mr-2 h-4 w-4" />
-                            Edit
-                          </Button>
+                          {coa.status !== "approved" && (
+                            <Button
+                              className="bg-transparent"
+                              onClick={() => alert("halo")}
+                            >
+                              <FileEdit className="mr-2 h-4 w-4" />
+                              Edit
+                            </Button>
+                          )}
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Button

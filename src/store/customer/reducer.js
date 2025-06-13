@@ -1,15 +1,12 @@
 import { ActionType } from "./action";
 
-const customerReducer = (state = [], action) => {
+function customerReducer(customers = [], action = {}) {
   switch (action.type) {
     case ActionType.RECEIVE_CUSTOMER:
-      return {
-        ...state,
-        customers: action.payload,
-      };
+      return action.payload;
     default:
-      return state;
+      return customers;
   }
-};
+}
 
 export default customerReducer;

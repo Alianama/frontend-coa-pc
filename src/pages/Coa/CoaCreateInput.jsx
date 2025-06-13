@@ -33,8 +33,10 @@ const formFields = [
   { id: "customerId", label: "Customer Name", mandatory: true },
   { id: "productName", label: "Product Name", mandatory: true },
   { id: "lotNumber", label: "Lot Number", mandatory: true },
+  // { id: "quantity", label: "Quantity", mandatory: true },
   { id: "letDownResin", label: "Let Down Resin" },
-  { id: "pelletSize", label: "Pellet Size" },
+  { id: "pelletLength", label: "Pellet Length" },
+  { id: "pelletDimension", label: "Pellet Dimension" },
   { id: "pelletVisual", label: "Pellet Visual" },
   { id: "color", label: "Color" },
   { id: "dispersibility", label: "Dispersibility" },
@@ -46,6 +48,11 @@ const formFields = [
   { id: "weightOfChips", label: "Weight of Chips" },
   { id: "intrinsicViscosity", label: "Intrinsic Viscosity" },
   { id: "ashContent", label: "Ash Content" },
+  { id: "heatStability", label: "Heat Stability" },
+  { id: "lightFastness", label: "Light Fastness" },
+  { id: "granule", label: "Granule" },
+  { id: "deltaE", label: "Delta E" },
+  { id: "macaroni", label: "Macaroni" },
 ];
 
 const dateFields = [
@@ -57,15 +64,17 @@ const dateFields = [
 export default function CoaCreateInput() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { customers } = useSelector((state) => state.customers);
+  const customers = useSelector((state) => state.customers);
 
   const [formData, setFormData] = useState({
     customerId: "",
     productName: "",
     lotNumber: "",
+    quantity: "",
     letDownResin: "",
-    pelletSize: "",
-    pelletVisual: "",
+    pelletLength: "",
+    pelletDimension: "",
+    pelletVisual: false,
     color: "",
     dispersibility: "",
     mfr: "",
@@ -76,6 +85,11 @@ export default function CoaCreateInput() {
     weightOfChips: "",
     intrinsicViscosity: "",
     ashContent: "",
+    heatStability: "",
+    lightFastness: "",
+    granule: "",
+    deltaE: "",
+    macaroni: "",
     mfgDate: null,
     expiryDate: null,
     analysisDate: null,
@@ -233,6 +247,31 @@ export default function CoaCreateInput() {
         />
       );
     }
+    if (field.id === "pelletVisual") {
+      return (
+        <select
+          id={field.id}
+          name={field.id}
+          value={formData[field.id]}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              [field.id]: e.target.value === "true",
+            }))
+          }
+          className="w-full rounded-md border border-input bg-background px-3 py-2"
+          required={isFieldMandatory(field.id)}
+        >
+          <option value="">Select...</option>
+          <option className="text-green-400" value="true">
+            Pass
+          </option>
+          <option className="text-red-400" value="false">
+            Not Pass
+          </option>
+        </select>
+      );
+    }
     return (
       <Input
         id={field.id}
@@ -240,9 +279,86 @@ export default function CoaCreateInput() {
         value={formData[field.id]}
         onChange={handleChange}
         required={isFieldMandatory(field.id)}
-        min={field.id === "quantity" ? "0" : undefined}
-        step={field.id === "quantity" ? "0.001" : undefined}
-        inputMode={field.id === "quantity" ? "decimal" : "text"}
+        type={
+          [
+            "quantity",
+            "pelletLength",
+            "pelletDimension",
+            "mfr",
+            "density",
+            "moisture",
+            "carbonContent",
+            "weightOfChips",
+            "intrinsicViscosity",
+            "ashContent",
+            "heatStability",
+            "lightFastness",
+            "deltaE",
+            "macaroni",
+          ].includes(field.id)
+            ? "number"
+            : "text"
+        }
+        min={
+          [
+            "quantity",
+            "pelletLength",
+            "pelletDimension",
+            "mfr",
+            "density",
+            "moisture",
+            "carbonContent",
+            "weightOfChips",
+            "intrinsicViscosity",
+            "ashContent",
+            "heatStability",
+            "lightFastness",
+            "deltaE",
+            "macaroni",
+          ].includes(field.id)
+            ? "0"
+            : undefined
+        }
+        step={
+          [
+            "quantity",
+            "pelletLength",
+            "pelletDimension",
+            "mfr",
+            "density",
+            "moisture",
+            "carbonContent",
+            "weightOfChips",
+            "intrinsicViscosity",
+            "ashContent",
+            "heatStability",
+            "lightFastness",
+            "deltaE",
+            "macaroni",
+          ].includes(field.id)
+            ? "0.001"
+            : undefined
+        }
+        inputMode={
+          [
+            "quantity",
+            "pelletLength",
+            "pelletDimension",
+            "mfr",
+            "density",
+            "moisture",
+            "carbonContent",
+            "weightOfChips",
+            "intrinsicViscosity",
+            "ashContent",
+            "heatStability",
+            "lightFastness",
+            "deltaE",
+            "macaroni",
+          ].includes(field.id)
+            ? "decimal"
+            : "text"
+        }
       />
     );
   };

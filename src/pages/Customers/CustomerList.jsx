@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,14 +37,25 @@ import {
   Save,
   Search,
   X,
+  Trash2,
 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  asyncGetCustomer,
+  asyncUpdateCustomer,
+  asyncAddCustomer,
+  asyncDeleteCustomer,
+} from "@/store/customer/action";
 
 // Available fields for selection
 const availableFields = [
-  "productName",
+  // "customerId",
+  // "productName",
+  // "lotNumber",
+  // "quantity",
   "letDownResin",
-  "lotNumber",
-  "pelletSize",
+  "pelletLength",
+  "pelletDimension",
   "pelletVisual",
   "color",
   "dispersibility",
@@ -55,19 +66,22 @@ const availableFields = [
   "mfgDate",
   "expiryDate",
   "analysisDate",
-  "printedDate",
   "foreignMatter",
   "weightOfChips",
   "intrinsicViscosity",
   "ashContent",
+  "heatStability",
+  "lightFastness",
+  "granule",
+  "deltaE",
+  "macaroni",
 ];
 
 // Field labels for display
 const fieldLabels = {
-  productName: "Product Name",
   letDownResin: "Let Down Resin",
-  lotNumber: "Lot Number",
-  pelletSize: "Pellet Size",
+  pelletLength: "Pellet Length",
+  pelletDimension: "Pellet Dimension",
   pelletVisual: "Pellet Visual",
   color: "Color",
   dispersibility: "Dispersibility",
@@ -78,135 +92,32 @@ const fieldLabels = {
   mfgDate: "Manufacturing Date",
   expiryDate: "Expiry Date",
   analysisDate: "Analysis Date",
-  printedDate: "Printed Date",
   foreignMatter: "Foreign Matter",
   weightOfChips: "Weight of Chips",
   intrinsicViscosity: "Intrinsic Viscosity",
   ashContent: "Ash Content",
+  heatStability: "Heat Stability",
+  lightFastness: "Light Fastness",
+  granule: "Granule",
+  deltaE: "Delta E",
+  macaroni: "Macaroni",
 };
 
 export default function CustomerList() {
-  // Initial customer data
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "PT. Makmur Indonesia",
-      createdAt: "2025-06-11T07:19:37.062Z",
-      updatedAt: "2025-06-11T07:19:37.062Z",
-      mandatoryFields: [
-        {
-          id: 1,
-          fieldName: "productName",
-          customerId: 1,
-          createdAt: "2025-06-11T07:19:37.065Z",
-          updatedAt: "2025-06-11T07:19:37.065Z",
-        },
-        {
-          id: 2,
-          fieldName: "lotNumber",
-          customerId: 1,
-          createdAt: "2025-06-11T07:19:37.065Z",
-          updatedAt: "2025-06-11T07:19:37.065Z",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "PT. Asian Indonesia",
-      createdAt: "2025-06-11T07:38:08.933Z",
-      updatedAt: "2025-06-11T07:38:08.933Z",
-      mandatoryFields: [
-        {
-          id: 3,
-          fieldName: "productName",
-          customerId: 2,
-          createdAt: "2025-06-11T07:38:08.965Z",
-          updatedAt: "2025-06-11T07:38:08.965Z",
-        },
-        {
-          id: 4,
-          fieldName: "lotNumber",
-          customerId: 2,
-          createdAt: "2025-06-11T07:38:08.965Z",
-          updatedAt: "2025-06-11T07:38:08.965Z",
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "PT. Shangai Indonesia",
-      createdAt: "2025-06-11T07:38:14.297Z",
-      updatedAt: "2025-06-11T07:38:14.297Z",
-      mandatoryFields: [
-        {
-          id: 5,
-          fieldName: "productName",
-          customerId: 3,
-          createdAt: "2025-06-11T07:38:14.299Z",
-          updatedAt: "2025-06-11T07:38:14.299Z",
-        },
-        {
-          id: 6,
-          fieldName: "lotNumber",
-          customerId: 3,
-          createdAt: "2025-06-11T07:38:14.299Z",
-          updatedAt: "2025-06-11T07:38:14.299Z",
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: "PT. Ali Indonesia",
-      createdAt: "2025-06-11T07:38:18.015Z",
-      updatedAt: "2025-06-11T07:38:18.015Z",
-      mandatoryFields: [
-        {
-          id: 7,
-          fieldName: "productName",
-          customerId: 4,
-          createdAt: "2025-06-11T07:38:18.017Z",
-          updatedAt: "2025-06-11T07:38:18.017Z",
-        },
-        {
-          id: 8,
-          fieldName: "lotNumber",
-          customerId: 4,
-          createdAt: "2025-06-11T07:38:18.017Z",
-          updatedAt: "2025-06-11T07:38:18.017Z",
-        },
-      ],
-    },
-    {
-      id: 5,
-      name: "PT. Puta Indonesia",
-      createdAt: "2025-06-11T07:38:21.598Z",
-      updatedAt: "2025-06-11T07:38:21.598Z",
-      mandatoryFields: [
-        {
-          id: 9,
-          fieldName: "productName",
-          customerId: 5,
-          createdAt: "2025-06-11T07:38:21.600Z",
-          updatedAt: "2025-06-11T07:38:21.600Z",
-        },
-        {
-          id: 10,
-          fieldName: "lotNumber",
-          customerId: 5,
-          createdAt: "2025-06-11T07:38:21.600Z",
-          updatedAt: "2025-06-11T07:38:21.600Z",
-        },
-      ],
-    },
-  ]);
+  const dispatch = useDispatch();
+  const customers = useSelector((state) => state.customers);
 
-  // State for search, editing, and expanded rows
+  useEffect(() => {
+    dispatch(asyncGetCustomer());
+  }, [dispatch]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCustomerId, setEditingCustomerId] = useState(null);
   const [selectedFields, setSelectedFields] = useState([]);
   const [expandedRows, setExpandedRows] = useState([]);
-
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
   const [newCustomerName, setNewCustomerName] = useState("");
   const [newCustomerFields, setNewCustomerFields] = useState([]);
 
@@ -231,7 +142,7 @@ export default function CustomerList() {
   };
 
   // Filter customers based on search term
-  const filteredCustomers = customers.filter((customer) =>
+  const filteredCustomers = customers?.filter((customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -254,34 +165,16 @@ export default function CustomerList() {
   const handleSaveChanges = () => {
     if (editingCustomerId === null) return;
 
-    setCustomers((prevCustomers) =>
-      prevCustomers.map((customer) => {
-        if (customer.id === editingCustomerId) {
-          // Create new mandatory fields based on selection
-          const newMandatoryFields = selectedFields.map((fieldName, index) => ({
-            id:
-              customer.mandatoryFields.length > index
-                ? customer.mandatoryFields[index].id
-                : Date.now() + index,
-            fieldName,
-            customerId: customer.id,
-            createdAt:
-              customer.mandatoryFields.length > index
-                ? customer.mandatoryFields[index].createdAt
-                : new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          }));
+    const customer = customers.find((c) => c.id === editingCustomerId);
+    if (!customer) return;
 
-          return {
-            ...customer,
-            mandatoryFields: newMandatoryFields,
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        return customer;
-      })
-    );
+    const updatedCustomer = {
+      id: customer.id,
+      name: customer.name,
+      mandatoryFields: selectedFields,
+    };
 
+    dispatch(asyncUpdateCustomer(updatedCustomer));
     setEditingCustomerId(null);
   };
 
@@ -299,25 +192,12 @@ export default function CustomerList() {
     if (!newCustomerName.trim()) return;
 
     const newCustomer = {
-      id: Math.max(...customers.map((c) => c.id)) + 1,
       name: newCustomerName.trim(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      mandatoryFields: newCustomerFields.map((fieldName, index) => ({
-        id: Date.now() + index,
-        fieldName,
-        customerId: Math.max(...customers.map((c) => c.id)) + 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      })),
+      mandatoryFields: newCustomerFields,
     };
 
-    setCustomers((prev) => [...prev, newCustomer]);
-
-    // Reset form
-    setNewCustomerName("");
-    setNewCustomerFields([]);
-    setIsAddDialogOpen(false);
+    dispatch(asyncAddCustomer(newCustomer));
+    resetAddCustomerForm();
   };
 
   // Reset add customer form
@@ -325,6 +205,20 @@ export default function CustomerList() {
     setNewCustomerName("");
     setNewCustomerFields([]);
     setIsAddDialogOpen(false);
+  };
+
+  // Handle delete customer
+  const handleDeleteCustomer = (customer) => {
+    setCustomerToDelete(customer);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (customerToDelete) {
+      dispatch(asyncDeleteCustomer(customerToDelete.id));
+      setIsDeleteDialogOpen(false);
+      setCustomerToDelete(null);
+    }
   };
 
   return (
@@ -369,7 +263,7 @@ export default function CustomerList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCustomers.length > 0 ? (
+              {filteredCustomers?.length > 0 ? (
                 filteredCustomers.map((customer) => (
                   <>
                     <TableRow key={customer.id} className="hover:bg-gray-50">
@@ -421,6 +315,13 @@ export default function CustomerList() {
                             >
                               <Edit className="mr-2 h-4 w-4" />
                               Edit Fields
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteCustomer(customer)}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -486,17 +387,45 @@ export default function CustomerList() {
         </CardContent>
       </Card>
 
+      {/* Delete Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-secondary">
+          <DialogHeader>
+            <DialogTitle>Hapus Customer</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus customer{" "}
+              <span className="font-semibold">{customerToDelete?.name}</span>?
+              Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-5 ">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setCustomerToDelete(null);
+              }}
+            >
+              Batal
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Hapus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Dialog */}
       <Dialog
         open={editingCustomerId !== null}
         onOpenChange={(open) => !open && setEditingCustomerId(null)}
       >
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] bg-secondary overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Update Mandatory Fields</DialogTitle>
             <DialogDescription>
               Select the fields that are mandatory for{" "}
-              {customers.find((c) => c.id === editingCustomerId)?.name ||
+              {customers?.find((c) => c.id === editingCustomerId)?.name ||
                 "this customer"}
             </DialogDescription>
           </DialogHeader>

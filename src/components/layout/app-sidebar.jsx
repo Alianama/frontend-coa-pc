@@ -20,6 +20,7 @@ import {
   User,
   Contact,
   History,
+  BadgeDollarSign,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -43,6 +44,11 @@ const sidebarConfig = {
       path: "/coa/history",
       label: "COA History",
       icon: History,
+    },
+    {
+      path: "/products",
+      label: "Product",
+      icon: BadgeDollarSign,
     },
 
     {

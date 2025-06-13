@@ -15,6 +15,7 @@ import Loading from "@/components/ui/loading";
 import COADetailLayout from "./pages/CoaDetail/CoaDetailLayout";
 import COACreateLayout from "./pages/Coa/CoaCreateLayout";
 import CustomerLayout from "./pages/Customers/CustomerLayout";
+import ProductsLayout from "./pages/Product/ProductLayout";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
@@ -87,6 +88,15 @@ function App() {
           element={
             <ProtectedRoute>
               <CustomerLayout />
+            </ProtectedRoute>
+          }
+        />
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <ProductsLayout />
             </ProtectedRoute>
           }
         />
