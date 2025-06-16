@@ -1,32 +1,12 @@
-"use client";
-
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -36,6 +16,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -44,159 +31,252 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, Edit, Trash2, Eye } from "lucide-react";
-import ProductForm from "@/components/Product/ProductForm";
-import ProductDetails from "@/components/Product/ProductDetails";
-
-const initialData = [
-  {
-    id: 1,
-    productName: "Plastic Colorant Red",
-    resin: "PP",
-    letDownRatio: "1:100",
-    color: "Red",
-    mfr: 2.5,
-    density: 0.95,
-    heatStability: 280,
-    lightFastness: 7,
-  },
-  {
-    id: 2,
-    productName: "Plastic Colorant Yellow",
-    resin: "PP",
-    letDownRatio: "1:100",
-    color: "Yellow",
-    mfr: 2.5,
-    density: 0.95,
-    heatStability: 280,
-    lightFastness: 7,
-  },
-];
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  PlusCircle,
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Search,
+  ArrowUpDown,
+} from "lucide-react";
+import ProductDetailDialog from "@/components/Product/product-detail-dialog";
+import ProductFormDialog from "@/components/Product/product-form-dialog";
+import { Pagination } from "@/components/Product/Pagination";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  asyncAddProduct,
+  asyncDeleteProduct,
+  asyncGetProduct,
+  asyncUpdateProduct,
+} from "@/store/product/action";
 
 export default function ProductList() {
-  const [products, setProducts] = useState(initialData);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterResin, setFilterResin] = useState("all");
   const [filterColor, setFilterColor] = useState("all");
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [formData, setFormData] = useState({});
-  const itemsPerPage = 10;
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const dispatch = useDispatch();
+  const { products } = useSelector((state) => state.products);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        await dispatch(asyncGetProduct());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [dispatch]);
+
+  // Get unique values for filters
+  const uniqueResins = useMemo(() => {
+    return Array.from(new Set(products.map((product) => product.resin)));
+  }, [products]);
+
+  const uniqueColors = useMemo(() => {
+    return Array.from(new Set(products.map((product) => product.color)));
+  }, [products]);
+
+  // Filter and sort products
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesSearch =
-        product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.color.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.resin.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesResin =
-        filterResin === "all" || product.resin === filterResin;
-      const matchesColor =
-        filterColor === "all" || product.color === filterColor;
-      return matchesSearch && matchesResin && matchesColor;
-    });
-  }, [products, searchTerm, filterResin, filterColor]);
+    return products
+      .filter((product) => {
+        const matchesSearch =
+          searchTerm === "" ||
+          product.productName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          product.color.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.resin.toLowerCase().includes(searchTerm.toLowerCase());
 
+        const matchesResin =
+          filterResin === "all" || product.resin === filterResin;
+        const matchesColor =
+          filterColor === "all" || product.color === filterColor;
+
+        return matchesSearch && matchesResin && matchesColor;
+      })
+      .sort((a, b) => {
+        if (!sortField) return 0;
+
+        const aValue = a[sortField];
+        const bValue = b[sortField];
+
+        if (sortField === "createdAt") {
+          return sortDirection === "asc"
+            ? new Date(aValue) - new Date(bValue)
+            : new Date(bValue) - new Date(aValue);
+        }
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortDirection === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      });
+  }, [
+    products,
+    searchTerm,
+    filterResin,
+    filterColor,
+    sortField,
+    sortDirection,
+  ]);
+
+  // Rest of the code remains the same...
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const paginatedProducts = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProducts, currentPage]);
+  }, [filteredProducts, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const uniqueResins = [...new Set(products.map((p) => p.resin))];
-  const uniqueColors = [...new Set(products.map((p) => p.color))];
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterResin, filterColor]);
 
-  const handleAdd = () => {
-    if (formData.productName) {
-      const newProduct = {
-        id: Math.max(...products.map((p) => p.id)) + 1,
-        ...formData,
-      };
-      setProducts([...products, newProduct]);
-      setFormData({});
-      setIsAddDialogOpen(false);
+  const handleAddProductClick = () => {
+    setSelectedProduct(null);
+    setIsFormDialogOpen(true);
+  };
+
+  const handleEditProductClick = (product) => {
+    setSelectedProduct(product);
+    setIsFormDialogOpen(true);
+  };
+
+  const handleViewDetailClick = (product) => {
+    setSelectedProduct(product);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (productToDelete) {
+      await handleDeleteProduct(productToDelete.id);
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
     }
   };
 
-  const handleEdit = () => {
-    if (selectedProduct && formData.productName) {
-      const updatedProducts = products.map((p) =>
-        p.id === selectedProduct.id ? { ...selectedProduct, ...formData } : p
-      );
-      setProducts(updatedProducts);
-      setFormData({});
-      setIsEditDialogOpen(false);
+  const handleDeleteProduct = async (id) => {
+    setIsLoading(true);
+    try {
+      await dispatch(asyncDeleteProduct(id));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddProduct = async (product) => {
+    setIsLoading(true);
+    try {
+      await dispatch(asyncAddProduct(product));
+      setIsFormDialogOpen(false);
       setSelectedProduct(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDelete = (id) => {
-    setProducts(products.filter((p) => p.id !== id));
+  const handleEditProduct = async (product) => {
+    setIsLoading(true);
+    try {
+      await dispatch(asyncUpdateProduct(selectedProduct.id, product));
+      setIsFormDialogOpen(false);
+      setSelectedProduct(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveProduct = async (product) => {
+    if (selectedProduct) {
+      await handleEditProduct(product);
+    } else {
+      await handleAddProduct(product);
+    }
+  };
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const resetFilters = () => {
+    setSearchTerm("");
+    setFilterResin("all");
+    setFilterColor("all");
+    setSortField("createdAt");
+    setSortDirection("desc");
+    setCurrentPage(1);
   };
 
   return (
-    <div>
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Main Content */}
-        <Card className=" backdrop-blur-sm">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <CardTitle className="text-xl text-gray-900">
-                  Product Catalog
-                </CardTitle>
-                <CardDescription>
-                  Manage your plastic colorant inventory
-                </CardDescription>
-              </div>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className=" text-white">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Add New Product</DialogTitle>
-                    <DialogDescription>
-                      Enter the details for the new plastic colorant product.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <ProductForm formData={formData} setFormData={setFormData} />
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsAddDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button onClick={handleAdd}>Add Product</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <CardTitle className="text-2xl font-bold">
+              Product Management
+            </CardTitle>
+            <CardDescription>
+              Manage your plastic colorant products.
+            </CardDescription>
+          </div>
+          <Button onClick={handleAddProductClick} disabled={isLoading}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Add Product
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {/* Search and Filters */}
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10  "
-                />
-              </div>
+            <div className="flex gap-2">
               <Select value={filterResin} onValueChange={setFilterResin}>
-                <SelectTrigger className="w-full sm:w-[180px] ">
-                  <Filter className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Filter by Resin" />
                 </SelectTrigger>
                 <SelectContent>
@@ -208,9 +288,9 @@ export default function ProductList() {
                   ))}
                 </SelectContent>
               </Select>
+
               <Select value={filterColor} onValueChange={setFilterColor}>
-                <SelectTrigger className="w-full sm:w-[180px] ">
-                  <Filter className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Filter by Color" />
                 </SelectTrigger>
                 <SelectContent>
@@ -222,191 +302,235 @@ export default function ProductList() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
 
-            {/* Products Table */}
-            <div className="rounded-md border  overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="font-semibold">
-                      Product Name
-                    </TableHead>
-                    <TableHead className="font-semibold">Resin</TableHead>
-                    <TableHead className="font-semibold">Color</TableHead>
-                    <TableHead className="font-semibold">
-                      Let Down Ratio
-                    </TableHead>
-                    <TableHead className="font-semibold">MFR</TableHead>
-                    <TableHead className="font-semibold">Density</TableHead>
-                    <TableHead className="font-semibold text-right">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedProducts.map((product) => (
-                    <TableRow
-                      key={product.id}
-                      className="hover:bg-yellow-50/50"
+              {(searchTerm ||
+                filterResin !== "all" ||
+                filterColor !== "all") && (
+                <Button variant="outline" onClick={resetFilters}>
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Results summary */}
+        <div className="text-sm text-muted-foreground mb-4">
+          Showing {filteredProducts.length} of {products.length} products
+        </div>
+
+        {/* Table */}
+        <div className="rounded-md border">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[250px]">
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={() => handleSort("productName")}
                     >
+                      Product Name
+                      {sortField === "productName" && (
+                        <ArrowUpDown
+                          className={`ml-2 h-4 w-4 ${
+                            sortDirection === "desc" ? "rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={() => handleSort("resin")}
+                    >
+                      Resin
+                      {sortField === "resin" && (
+                        <ArrowUpDown
+                          className={`ml-2 h-4 w-4 ${
+                            sortDirection === "desc" ? "rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={() => handleSort("color")}
+                    >
+                      Color
+                      {sortField === "color" && (
+                        <ArrowUpDown
+                          className={`ml-2 h-4 w-4 ${
+                            sortDirection === "desc" ? "rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                    </div>
+                  </TableHead>
+                  <TableHead>Let Down Ratio</TableHead>
+                  <TableHead>Pellet</TableHead>
+                  <TableHead>Dispersibility</TableHead>
+                  <TableHead>Cretaed Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      No products found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginatedProducts.map((product) => (
+                    <TableRow key={product.id}>
                       <TableCell className="font-medium">
                         {product.productName}
                       </TableCell>
+                      <TableCell>{product.resin}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{product.resin}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getColorBadgeClass(product.color)}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded-full"
+                            style={{
+                              backgroundColor: product.color.toLowerCase(),
+                              border:
+                                product.color.toLowerCase() === "white"
+                                  ? "1px solid #e2e8f0"
+                                  : "none",
+                            }}
+                          />
                           {product.color}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{product.letDownRatio}</TableCell>
-                      <TableCell>{product.mfr}</TableCell>
-                      <TableCell>{product.density}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedProduct(product);
-                              setIsViewDialogOpen(true);
-                            }}
-                            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedProduct(product);
-                              setFormData(product);
-                              setIsEditDialogOpen(true);
-                            }}
-                            className=" hover:text-yellow-800 hover:bg-yellow-50"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete the product &ldquo;
-                                  {product.productName}&rdquo;.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(product.id)}
-                                  className="bg-red-600 hover:bg-red-700"
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
                         </div>
                       </TableCell>
+                      <TableCell>{product.letDownRatio}</TableCell>
+                      <TableCell>{product.pellet}</TableCell>
+                      <TableCell>{product.dispersibility}</TableCell>
+                      <TableCell>
+                        {new Date(product.createdAt).toLocaleDateString(
+                          "id-ID",
+                          {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          }
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleViewDetailClick(product)}
+                            >
+                              <Eye className="mr-2 h-4 w-4" /> View Detail
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleEditProductClick(product)}
+                            >
+                              <Edit className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteClick(product)}
+                              className="text-red-600"
+                              disabled={isLoading}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                  className=""
-                >
-                  Previous
-                </Button>
-                <span className="flex items-center px-4 py-2 text-sm text-gray-600">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
+        {/* Pagination */}
+        {filteredProducts.length > 0 && (
+          <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-muted-foreground">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, filteredProducts.length)}{" "}
+                of {filteredProducts.length} entries
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Edit Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Product</DialogTitle>
-              <DialogDescription>Update the product details.</DialogDescription>
-            </DialogHeader>
-            <ProductForm formData={formData} setFormData={setFormData} />
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditDialogOpen(false)}
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={(value) => {
+                  setItemsPerPage(Number(value));
+                  setCurrentPage(1);
+                }}
               >
-                Cancel
-              </Button>
-              <Button onClick={handleEdit}>Update Product</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                <SelectTrigger>
+                  <SelectValue placeholder="Items per page" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 / page</SelectItem>
+                  <SelectItem value="10">10 / page</SelectItem>
+                  <SelectItem value="20">20 / page</SelectItem>
+                  <SelectItem value="50">50 / page</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
+      </CardContent>
 
-        {/* View Dialog */}
-        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Product Details</DialogTitle>
-              <DialogDescription>
-                Complete information about the selected product.
-              </DialogDescription>
-            </DialogHeader>
-            {selectedProduct && <ProductDetails product={selectedProduct} />}
-          </DialogContent>
-        </Dialog>
-      </div>
-    </div>
+      <ProductDetailDialog
+        product={selectedProduct}
+        isOpen={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+      />
+
+      <ProductFormDialog
+        product={selectedProduct}
+        isOpen={isFormDialogOpen}
+        onOpenChange={setIsFormDialogOpen}
+        onSave={handleSaveProduct}
+        isLoading={isLoading}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus produk{" "}
+              <span className="font-semibold">
+                {productToDelete?.productName}
+              </span>{" "}
+              secara permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={isLoading}
+            >
+              {isLoading ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Card>
   );
-}
-
-function getColorBadgeClass(color) {
-  switch (color.toLowerCase()) {
-    case "red":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "yellow":
-      return "bg-yellow-100 text-yellow-800 ";
-    case "blue":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    case "green":
-      return "bg-green-100 text-green-800 border-green-200";
-    default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
-  }
 }

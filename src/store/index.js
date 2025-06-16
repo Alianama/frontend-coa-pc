@@ -8,6 +8,7 @@ import {
 import coaReducer from "./coa/reducer";
 import usersReducer from "./users/reducer";
 import customerReducer from "./customer/reducer";
+import productReducer from "./product/reducer";
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     loadingBar: loadingBarReducer,
     allUsers: usersReducer,
     customers: customerReducer,
+    products: productReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

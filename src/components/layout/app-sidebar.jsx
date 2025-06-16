@@ -42,12 +42,12 @@ const sidebarConfig = {
     },
     {
       path: "/coa/history",
-      label: "COA History",
+      label: "Print History",
       icon: History,
     },
     {
       path: "/products",
-      label: "Product",
+      label: "Products",
       icon: BadgeDollarSign,
     },
 

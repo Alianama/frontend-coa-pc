@@ -31,7 +31,33 @@ const coaReducer = (state = initialState, action) => {
     case ActionType.CREATE_COA:
       return {
         ...state,
+        coas: state.coas.map((coa) =>
+          coa.isOptimistic && coa.id === action.payload.id
+            ? action.payload
+            : coa
+        ),
+      };
+    case ActionType.OPTIMISTIC_CREATE_COA:
+      return {
+        ...state,
         coas: [action.payload, ...state.coas],
+      };
+    case ActionType.REVERT_OPTIMISTIC_CREATE_COA:
+      return {
+        ...state,
+        coas: state.coas.filter((coa) => coa.id !== action.payload),
+      };
+    case ActionType.OPTIMISTIC_REMOVE_COA:
+      return {
+        ...state,
+        coas: state.coas.filter((coa) => coa.id !== action.payload),
+        detail_coa:
+          state.detail_coa?.id === action.payload ? null : state.detail_coa,
+      };
+    case ActionType.REVERT_OPTIMISTIC_REMOVE_COA:
+      return {
+        ...state,
+        coas: [...state.coas, action.payload],
       };
     case ActionType.REMOVE_COA:
       return {
@@ -40,7 +66,6 @@ const coaReducer = (state = initialState, action) => {
         detail_coa:
           state.detail_coa?.id === action.payload ? null : state.detail_coa,
       };
-
     default:
       return state;
   }

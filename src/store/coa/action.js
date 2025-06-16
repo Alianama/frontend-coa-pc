@@ -8,6 +8,10 @@ const ActionType = {
   SET_DETAIL_COA: "SET_DETAIL_COA",
   CREATE_COA: "CREATE_COA",
   REMOVE_COA: "REMOVE_COA",
+  OPTIMISTIC_CREATE_COA: "OPTIMISTIC_CREATE_COA",
+  OPTIMISTIC_REMOVE_COA: "OPTIMISTIC_REMOVE_COA",
+  REVERT_OPTIMISTIC_CREATE_COA: "REVERT_OPTIMISTIC_CREATE_COA",
+  REVERT_OPTIMISTIC_REMOVE_COA: "REVERT_OPTIMISTIC_REMOVE_COA",
 };
 
 function setCOAActionCreator(coas) {
@@ -45,24 +49,50 @@ function setDetailCoaActionCreator(detail_coa) {
   };
 }
 
+function optimisticCreateCOAActionCreator(coa) {
+  return {
+    type: ActionType.OPTIMISTIC_CREATE_COA,
+    payload: coa,
+  };
+}
+
+function revertOptimisticCreateCOAActionCreator(coaId) {
+  return {
+    type: ActionType.REVERT_OPTIMISTIC_CREATE_COA,
+    payload: coaId,
+  };
+}
+
+function optimisticRemoveCOAActionCreator(coaId) {
+  return {
+    type: ActionType.OPTIMISTIC_REMOVE_COA,
+    payload: coaId,
+  };
+}
+
+function revertOptimisticRemoveCOAActionCreator(coa) {
+  return {
+    type: ActionType.REVERT_OPTIMISTIC_REMOVE_COA,
+    payload: coa,
+  };
+}
+
 function asyncRemoveCoa(coaId) {
   return async (dispatch) => {
-    dispatch(showLoading());
+    const coaToRemove = dispatch(optimisticRemoveCOAActionCreator(coaId));
     try {
       const response = await api.deleteCOA(coaId);
       if (response.status === "success") {
         toast.success("COA berhasil dihapus");
         dispatch(removeCOAActionCreator(coaId));
-        await dispatch(asyncGetCOA());
         return response;
       }
       throw new Error(response.message || "Failed Delete COA");
     } catch (error) {
       toast.error(error.message || "Failed Delete COA");
       console.error("Error deleting COA:", error.message);
+      dispatch(revertOptimisticRemoveCOAActionCreator(coaToRemove));
       throw error;
-    } finally {
-      dispatch(hideLoading());
     }
   };
 }
@@ -89,23 +119,24 @@ function asyncGetDetailCOA(coaId) {
 
 function asyncCreateCoa(coa) {
   return async (dispatch) => {
-    dispatch(showLoading());
+    const tempId = Date.now().toString();
+    const optimisticCoa = { ...coa, id: tempId, isOptimistic: true };
+
+    dispatch(optimisticCreateCOAActionCreator(optimisticCoa));
+
     try {
       const response = await api.createCOA(coa);
       if (response.status === "success") {
         toast.success("COA Created");
         dispatch(createCOAActionCreator(response.data));
-        await dispatch(asyncGetCOA());
         return response;
       }
-
       throw new Error(response.message || "Error Create COA");
     } catch (error) {
       toast.error(error.message || "Failed Create COA");
       console.error("Error creating COA:", error.message);
+      dispatch(revertOptimisticCreateCOAActionCreator(tempId));
       throw error;
-    } finally {
-      dispatch(hideLoading());
     }
   };
 }
@@ -202,4 +233,8 @@ export {
   createCOAActionCreator,
   asyncRemoveCoa,
   removeCOAActionCreator,
+  optimisticCreateCOAActionCreator,
+  optimisticRemoveCOAActionCreator,
+  revertOptimisticCreateCOAActionCreator,
+  revertOptimisticRemoveCOAActionCreator,
 };

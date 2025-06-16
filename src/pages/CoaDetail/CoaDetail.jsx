@@ -393,8 +393,8 @@ export default function COADetail() {
         {!completeness.isComplete && (
           <motion.div variants={itemVariants} className="no-print">
             <Card className="border border-amber-200 shadow-sm bg-amber-50">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
+              <CardContent className="px-4">
+                <div className="flex items-center gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-amber-800 mb-1">
@@ -406,15 +406,15 @@ export default function COADetail() {
                       required fields. Please complete all data before final
                       approval.
                     </p>
-                    <Button
-                      onClick={handleEdit}
-                      size="sm"
-                      className="bg-amber-600 hover:bg-amber-700 text-white"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Complete Missing Data
-                    </Button>
                   </div>
+                  <Button
+                    onClick={handleEdit}
+                    size="sm"
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Complete Missing Data
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -732,8 +732,7 @@ export default function COADetail() {
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
                   <p className="text-sm font-semibold text-gray-800">
-                    This certificate is issued in accordance with ISO/IEC
-                    17025:2017 standards
+                    This certificate is issued by PT. Toyo Ink Indonesia
                   </p>
                   <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
                 </div>

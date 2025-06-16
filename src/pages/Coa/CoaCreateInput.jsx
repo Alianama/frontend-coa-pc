@@ -22,16 +22,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Combobox } from "@/components/ui/combo-box";
 import { asyncGetCustomer } from "@/store/customer/action";
+import { asyncGetProduct } from "@/store/product/action";
 
-const products = [
-  { value: "product1", label: "Product 1" },
-  { value: "product2", label: "Product 2" },
-  { value: "product3", label: "Product 3" },
-];
+// const products = [
+//   { value: "product1", label: "Product 1" },
+//   { value: "product2", label: "Product 2" },
+//   { value: "product3", label: "Product 3" },
+// ];
 
 const formFields = [
   { id: "customerId", label: "Customer Name", mandatory: true },
-  { id: "productName", label: "Product Name", mandatory: true },
+  { id: "productId", label: "Product Name", mandatory: true },
   { id: "lotNumber", label: "Lot Number", mandatory: true },
   // { id: "quantity", label: "Quantity", mandatory: true },
   { id: "letDownResin", label: "Let Down Resin" },
@@ -65,10 +66,11 @@ export default function CoaCreateInput() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const customers = useSelector((state) => state.customers);
+  const { products } = useSelector((state) => state.products);
 
   const [formData, setFormData] = useState({
     customerId: "",
-    productName: "",
+    productId: "",
     lotNumber: "",
     quantity: "",
     letDownResin: "",
@@ -97,6 +99,7 @@ export default function CoaCreateInput() {
 
   useEffect(() => {
     dispatch(asyncGetCustomer());
+    dispatch(asyncGetProduct());
   }, [dispatch]);
 
   const handleSubmit = async (e) => {
@@ -233,13 +236,28 @@ export default function CoaCreateInput() {
         />
       );
     }
-    if (field.id === "productName") {
+
+    if (field.id === "color") {
+      return <Input disabled value={formData.color} />;
+    }
+
+    if (field.id === "productId") {
       return (
         <Combobox
-          items={products}
-          value={formData[field.id]}
+          items={products?.map((product) => ({
+            value: product.id.toString(),
+            label: product.productName,
+          }))}
+          value={formData.productId?.toString()}
           onValueChange={(value) => {
-            setFormData((prev) => ({ ...prev, [field.id]: value }));
+            const selectedProduct = products?.find(
+              (p) => p.id.toString() === value
+            );
+            setFormData((prev) => ({
+              ...prev,
+              productId: value,
+              color: selectedProduct?.color || "",
+            }));
           }}
           placeholder="Select product..."
           searchPlaceholder="Search product..."
