@@ -225,6 +225,29 @@ const api = (() => {
     };
   }
 
+  async function updateCoa(coaId, body) {
+    const response = await _fetchWithAuth(`${BASE_URL}/coa/${coaId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const responseJson = await response.json();
+    const { status, message, data } = responseJson;
+
+    if (status !== "success") {
+      throw new Error(message || "Gagal memperbarui COA");
+    }
+
+    return {
+      status,
+      message,
+      data,
+    };
+  }
+
   async function getAllUser() {
     const response = await _fetchWithAuth(`${BASE_URL}/users`);
     const responseJson = await response.json();
@@ -467,7 +490,8 @@ const api = (() => {
         productName: product.productName,
         resin: product.resin,
         letDownRatio: product.letDownRatio,
-        pellet: product.pellet,
+        pelletLength: product.pelletLength,
+        pelletHeight: product.pelletHeight,
         color: product.color,
         dispersibility: product.dispersibility,
         mfr: product.mfr,
@@ -500,6 +524,132 @@ const api = (() => {
     };
   }
 
+  async function getAllPrint(page = 1, limit = 100, search = "") {
+    const queryParams = new URLSearchParams();
+    queryParams.append("page", page.toString());
+    queryParams.append("limit", limit.toString());
+    if (search) {
+      queryParams.append("search", search);
+    }
+
+    const response = await _fetchWithAuth(
+      `${BASE_URL}/print?${queryParams.toString()}`
+    );
+    const responseJson = await response.json();
+    const { status, message, data, pagination } = responseJson;
+
+    if (status !== "success") {
+      throw new Error(message || "Get Print list failed");
+    }
+
+    return {
+      status,
+      message,
+      data,
+      pagination,
+    };
+  }
+
+  async function getPlanning(page = 1, limit = 100, search = "") {
+    const queryParams = new URLSearchParams();
+    queryParams.append("page", page.toString());
+    queryParams.append("limit", limit.toString());
+    if (search) {
+      queryParams.append("search", search);
+    }
+    const url = `${BASE_URL}/planning?${queryParams.toString()}`;
+    const response = await _fetchWithAuth(url);
+    const responseJson = await response.json();
+    if (responseJson.status !== "success")
+      throw new Error(responseJson.message || "Gagal ambil planning");
+    return {
+      status: "success",
+      data: responseJson.data,
+      pagination: responseJson.pagination,
+      message: responseJson.message,
+    };
+  }
+
+  async function createPlanning(planning) {
+    const response = await _fetchWithAuth(`${BASE_URL}/planning`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(planning),
+    });
+    const responseJson = await response.json();
+    if (responseJson.status !== "success")
+      throw new Error(responseJson.message || "Gagal membuat planning");
+    return {
+      status: "success",
+      data: responseJson.data,
+      message: responseJson.message,
+    };
+  }
+
+  async function deletePlanning(planningId) {
+    const response = await _fetchWithAuth(
+      `${BASE_URL}/planning/${planningId}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    const responseJson = await response.json();
+    if (responseJson.status !== "success")
+      throw new Error(responseJson.message || "Gagal hapus planning");
+    return { status: "success", message: responseJson.message };
+  }
+
+  async function updatePlanning(planningId, planning) {
+    const response = await _fetchWithAuth(
+      `${BASE_URL}/planning/${planningId}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(planning),
+      }
+    );
+    const responseJson = await response.json();
+    if (responseJson.status !== "success")
+      throw new Error(responseJson.message || "Gagal update planning");
+    return {
+      status: "success",
+      data: responseJson.data,
+      message: responseJson.message,
+    };
+  }
+
+  async function getDetailPlanningByLot(lotNumber) {
+    const url = `${BASE_URL}/planning/detail/by-lot/${lotNumber}`;
+    const response = await _fetchWithAuth(url);
+    const responseJson = await response.json();
+    if (responseJson.status !== "success")
+      throw new Error(responseJson.message || "Failed get detail planning");
+    return {
+      status: "success",
+      data: responseJson.data,
+      totalQtyCheck: responseJson.totalQtyCheck,
+      header: responseJson.header,
+    };
+  }
+
+  async function postPlanningDetail(data) {
+    const response = await _fetchWithAuth(`${BASE_URL}/planning/detail`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const responseJson = await response.json();
+    if (responseJson.status !== "success") {
+      throw new Error(responseJson.message || "Gagal post detail planning");
+    }
+    return {
+      status: responseJson.status,
+      message: responseJson.message,
+      data: responseJson.data,
+    };
+  }
+
   return {
     putAccessToken,
     getAccessToken,
@@ -508,13 +658,14 @@ const api = (() => {
     clearAccessToken,
     login,
     getOwnProfile,
-    getCOA,
     getAllUser,
     approveCOA,
     requestApprovalCOA,
     getCoaDetail,
+    getCOA,
     createCOA,
     deleteCOA,
+    updateCoa,
     getCustomer,
     addCustomer,
     UpdateCustomer,
@@ -523,6 +674,13 @@ const api = (() => {
     addProduct,
     deleteProduct,
     updateProduct,
+    getAllPrint,
+    getPlanning,
+    createPlanning,
+    deletePlanning,
+    updatePlanning,
+    getDetailPlanningByLot,
+    postPlanningDetail,
   };
 })();
 

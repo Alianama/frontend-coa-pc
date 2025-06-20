@@ -30,6 +30,7 @@ export function Combobox({
   className,
 }) {
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
 
   const selectedItem = items.find((item) => item.value === value);
 
@@ -47,8 +48,23 @@ export function Combobox({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+        <Command
+          filter={(value, search, keywords) => {
+            if (
+              value.toLowerCase().includes(search.toLowerCase()) ||
+              (keywords &&
+                keywords.join(" ").toLowerCase().includes(search.toLowerCase()))
+            ) {
+              return 1;
+            }
+            return 0;
+          }}
+        >
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={search}
+            onValueChange={setSearch}
+          />
           <CommandList>
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>
@@ -56,6 +72,7 @@ export function Combobox({
                 <CommandItem
                   key={item.value}
                   value={item.value}
+                  keywords={[item.label]}
                   onSelect={(currentValue) => {
                     onValueChange(currentValue === value ? "" : currentValue);
                     setOpen(false);

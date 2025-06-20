@@ -55,7 +55,7 @@ const availableFields = [
   // "quantity",
   "letDownResin",
   "pelletLength",
-  "pelletDimension",
+  "pelletHeight",
   "pelletVisual",
   "color",
   "dispersibility",
@@ -81,7 +81,7 @@ const availableFields = [
 const fieldLabels = {
   letDownResin: "Let Down Resin",
   pelletLength: "Pellet Length",
-  pelletDimension: "Pellet Dimension",
+  pelletHeight: "Pellet Height",
   pelletVisual: "Pellet Visual",
   color: "Color",
   dispersibility: "Dispersibility",

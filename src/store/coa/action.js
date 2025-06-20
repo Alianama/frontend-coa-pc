@@ -8,6 +8,7 @@ const ActionType = {
   SET_DETAIL_COA: "SET_DETAIL_COA",
   CREATE_COA: "CREATE_COA",
   REMOVE_COA: "REMOVE_COA",
+  UPDATE_COA: "UPDATE_COA",
   OPTIMISTIC_CREATE_COA: "OPTIMISTIC_CREATE_COA",
   OPTIMISTIC_REMOVE_COA: "OPTIMISTIC_REMOVE_COA",
   REVERT_OPTIMISTIC_CREATE_COA: "REVERT_OPTIMISTIC_CREATE_COA",
@@ -32,6 +33,13 @@ function removeCOAActionCreator(coaId) {
   return {
     type: ActionType.REMOVE_COA,
     payload: coaId,
+  };
+}
+
+function updateCOAActionCreator(coa) {
+  return {
+    type: ActionType.UPDATE_COA,
+    payload: coa,
   };
 }
 
@@ -141,6 +149,28 @@ function asyncCreateCoa(coa) {
   };
 }
 
+function asyncUpdateCoa(coaId, coa) {
+  return async (dispatch) => {
+    dispatch(showLoading());
+    try {
+      const response = await api.updateCoa(coaId, coa);
+      if (response.status === "success") {
+        toast.success("COA berhasil diperbarui");
+        dispatch(updateCOAActionCreator(response.data));
+        await dispatch(asyncGetCOA());
+        return response;
+      }
+      throw new Error(response.message || "Gagal memperbarui COA");
+    } catch (error) {
+      toast.error(error.message || "Gagal memperbarui COA");
+      console.error("Error updating COA:", error.message);
+      throw error;
+    } finally {
+      dispatch(hideLoading());
+    }
+  };
+}
+
 function asyncGetCOA(page = 0, limit = 0, search = "") {
   return async (dispatch) => {
     dispatch(showLoading());
@@ -230,9 +260,11 @@ export {
   asyncGetCOA,
   asyncGetDetailCOA,
   asyncCreateCoa,
+  asyncUpdateCoa,
   createCOAActionCreator,
   asyncRemoveCoa,
   removeCOAActionCreator,
+  updateCOAActionCreator,
   optimisticCreateCOAActionCreator,
   optimisticRemoveCOAActionCreator,
   revertOptimisticCreateCOAActionCreator,

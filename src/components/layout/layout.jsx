@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/common/mode-toggle";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 import {
   Breadcrumb,
@@ -21,7 +22,7 @@ export default function Layout({ children, title, items = [] }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="w-0">
         <header className="sticky top-0 z-50 flex h-14 items-center gap-4 border-b bg-background backdrop-blur-sm px-4 lg:h-16">
           <SidebarTrigger />
           <div className="flex-1">
@@ -31,7 +32,7 @@ export default function Layout({ children, title, items = [] }) {
             <ModeToggle />
           </div>
         </header>
-        <main className="flex-1 px-5 overflow-auto">
+        <main className="flex-1 px-5 overflow-auto overflow-x-hidden">
           <Breadcrumb className="mt-4">
             <BreadcrumbList>
               {items.map((item, index) => (
@@ -70,3 +71,9 @@ export default function Layout({ children, title, items = [] }) {
     </SidebarProvider>
   );
 }
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+  items: PropTypes.array,
+};

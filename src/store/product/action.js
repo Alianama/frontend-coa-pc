@@ -94,12 +94,12 @@ function asyncAddProduct(product) {
       const response = await api.addProduct(product);
       if (response.status === "success") {
         dispatch(asyncGetProduct());
-        toast.success("Add Product Success");
+        toast.success("Berhasil menambahkan produk");
+        return;
       }
-      dispatch(updateProductActionCreator(tempId, response.data));
       throw new Error(response.message);
     } catch (error) {
-      toast.error(error.message || "Failed Add product");
+      toast.error(error.message || "Gagal menambahkan produk");
       dispatch(rollbackAddProductActionCreator(tempId));
     } finally {
       dispatch(hideLoading());
@@ -153,11 +153,12 @@ function asyncUpdateProduct(productId, updatedData) {
       const response = await api.updateProduct(productId, productData);
       if (response.status === "success") {
         dispatch(asyncGetProduct());
-        toast.success("Update Product Success");
+        toast.success("Berhasil memperbarui produk");
+        return;
       }
       throw new Error(response.message);
     } catch (error) {
-      toast.error(error.message || "Failed update product");
+      toast.error(error.message || "Gagal memperbarui produk");
       dispatch(rollbackUpdateProductActionCreator(originalProduct));
     } finally {
       dispatch(hideLoading());
@@ -173,11 +174,12 @@ function asyncDeleteProduct(productId) {
       const response = await api.deleteProduct(productId);
       if (response.status === "success") {
         dispatch(deleteProductActionCreator(productId));
-        toast.success("Delete Product Success");
+        toast.success("Berhasil menghapus produk");
+        return;
       }
       throw new Error(response.message);
     } catch (error) {
-      toast.error(error.message || "Failed delete product");
+      toast.error(error.message || "Gagal menghapus produk");
     } finally {
       dispatch(hideLoading());
     }

@@ -371,8 +371,6 @@ export default function ProductList() {
                     </div>
                   </TableHead>
                   <TableHead>Let Down Ratio</TableHead>
-                  <TableHead>Pellet</TableHead>
-                  <TableHead>Dispersibility</TableHead>
                   <TableHead>Cretaed Date</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -392,7 +390,7 @@ export default function ProductList() {
                       </TableCell>
                       <TableCell>{product.resin}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="">
                           <div
                             className="w-4 h-4 rounded-full"
                             style={{
@@ -407,8 +405,6 @@ export default function ProductList() {
                         </div>
                       </TableCell>
                       <TableCell>{product.letDownRatio}</TableCell>
-                      <TableCell>{product.pellet}</TableCell>
-                      <TableCell>{product.dispersibility}</TableCell>
                       <TableCell>
                         {new Date(product.createdAt).toLocaleDateString(
                           "id-ID",

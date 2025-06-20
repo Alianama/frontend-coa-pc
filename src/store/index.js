@@ -9,6 +9,9 @@ import coaReducer from "./coa/reducer";
 import usersReducer from "./users/reducer";
 import customerReducer from "./customer/reducer";
 import productReducer from "./product/reducer";
+import printReducer from "./print/reducer";
+import planningReducer from "./planning/reducer";
+import planningDetailReducer from "./planningDetail/reducer";
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +22,9 @@ export const store = configureStore({
     allUsers: usersReducer,
     customers: customerReducer,
     products: productReducer,
+    prints: printReducer,
+    planning: planningReducer,
+    planningDetail: planningDetailReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

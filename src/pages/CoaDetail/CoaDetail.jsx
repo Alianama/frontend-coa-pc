@@ -72,7 +72,7 @@ const DataCell = ({ value, isMissing = false, unit = "" }) => (
         <span className="text-amber-600 font-medium">Missing Data</span>
       </div>
     ) : (
-      <span className="text-gray-900">
+      <span>
         {value || "-"} {unit}
       </span>
     )}
@@ -92,7 +92,7 @@ const SectionHeader = ({
   hasPendingApprove = null,
 }) => (
   <TableRow className="bg-secondary/90">
-    <TableCell colSpan={2} className="font-bold text-gray-800 py-2">
+    <TableCell colSpan={2} className="font-bold py-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-1 bg-yellow-100 rounded-lg text-yellow-700">
@@ -143,7 +143,9 @@ export default function COADetail() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { detail_coa: data } = useSelector((state) => state.coa);
-  const { authUser } = useSelector((state) => state.authUser);
+  console.log(data);
+
+  const authUser = useSelector((state) => state.authUser);
 
   useEffect(() => {
     if (id) {
@@ -175,10 +177,11 @@ export default function COADetail() {
     const requiredFields = [
       data.costumerName,
       data.productName,
-      data.letDownResin,
+      // data.quantity,
+      data.letDownRatio,
       data.lotNumber,
       data.pelletLength,
-      data.pelletDimension,
+      data.pelletHeight,
       data.pelletVisual,
       data.color,
       data.status,
@@ -218,8 +221,7 @@ export default function COADetail() {
   const completeness = checkDataCompleteness();
 
   const handleEdit = () => {
-    // TODO: Implement edit functionality
-    console.log("Edit COA data");
+    navigate(`/COA/update/${id}`);
   };
 
   const handlePrint = async () => {
@@ -256,7 +258,7 @@ export default function COADetail() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+      <div className="min-h-screen  p-6 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading COA data...</p>
@@ -266,7 +268,7 @@ export default function COADetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 print-area">
+    <div className="min-h-screen p-6 print-area">
       <motion.div
         className="max-w-6xl mx-auto space-y-6"
         variants={containerVariants}
@@ -275,52 +277,53 @@ export default function COADetail() {
       >
         {/* Action Bar */}
         <motion.div variants={itemVariants} className="no-print">
-          <Card className="border border-gray-200 shadow-sm bg-white">
+          <Card className="border text-main border-gray-200 shadow-sm ">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-4">
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-lg font-semibold">
                       COA Detail - {data.lotNumber}
                     </h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-gray-600">
-                        Data Completeness:
-                      </span>
+                      <span className="text-sm">Data Completeness:</span>
                       <Progress
                         value={completeness.completionPercentage}
                         className="w-24 h-2"
                       />
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium ">
                         {completeness.completionPercentage}%
                       </span>
                     </div>
                   </div>
-
-                  {!completeness.isComplete && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-amber-100 text-amber-800 border border-amber-300"
-                    >
-                      <AlertTriangle className="w-3 h-3 mr-1" />
-                      Incomplete Data
-                    </Badge>
-                  )}
-                  {getStatusBadge(data.status)}
+                  <div className="border-l flex gap-5 border-gray-200 pl-4">
+                    {!completeness.isComplete && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-amber-100 text-amber-800 border border-amber-300"
+                      >
+                        <AlertTriangle className="w-3 h-3 mr-1" />
+                        Incomplete Data
+                      </Badge>
+                    )}
+                    {getStatusBadge(data.status)}
+                  </div>
                 </div>
 
                 <div className="border-l border-gray-200 pl-4">
                   <div className="flex flex-wrap gap-2">
-                    <Button
-                      onClick={handleEdit}
-                      disabled={data.status === "approved"}
-                      variant="outline"
-                      size="sm"
-                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                    >
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      {completeness.isComplete ? "Edit" : "Complete Data"}
-                    </Button>
+                    {data.status === "need_approval" &&
+                      data?.createdBy === authUser?.id && (
+                        <Button
+                          onClick={handleEdit}
+                          variant="outline"
+                          size="sm"
+                          className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                        >
+                          <Edit3 className="w-4 h-4 mr-2" />
+                          {completeness.isComplete ? "Edit" : "Complete Data"}
+                        </Button>
+                      )}
 
                     <Button
                       onClick={handlePrint}
@@ -390,7 +393,7 @@ export default function COADetail() {
         </motion.div>
 
         {/* Data Completeness Alert */}
-        {!completeness.isComplete && (
+        {!completeness.isComplete && data.status === "need_approval" && (
           <motion.div variants={itemVariants} className="no-print">
             <Card className="border border-amber-200 shadow-sm bg-amber-50">
               <CardContent className="px-4">
@@ -407,14 +410,16 @@ export default function COADetail() {
                       approval.
                     </p>
                   </div>
-                  <Button
-                    onClick={handleEdit}
-                    size="sm"
-                    className="bg-amber-600 hover:bg-amber-700 text-white"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Complete Missing Data
-                  </Button>
+                  {data.createdBy === authUser.id && (
+                    <Button
+                      onClick={handleEdit}
+                      size="sm"
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Complete Missing Data
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -423,18 +428,14 @@ export default function COADetail() {
 
         {/* Main COA Table */}
         <motion.div variants={itemVariants}>
-          <Card className="border border-gray-200 shadow-lg bg-white overflow-hidden">
+          <Card className="border border-gray-200 shadow-lg overflow-hidden">
             {/* Main Data Table */}
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-100 border-b-2 border-gray-200">
-                    <TableHead className="font-bold text-gray-800 w-1/3">
-                      Parameter
-                    </TableHead>
-                    <TableHead className="font-bold text-gray-800">
-                      Value / Result
-                    </TableHead>
+                  <TableRow className=" border-b-2 border-gray-200">
+                    <TableHead className="font-bold w-1/3">Parameter</TableHead>
+                    <TableHead className="font-bold">Value / Result</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -444,16 +445,7 @@ export default function COADetail() {
                     icon={<Shield className="w-5 h-5" />}
                   />
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Status
-                    </TableCell>
-                    <DataCell
-                      value={getStatusBadge(data.status)}
-                      isMissing={!data.status}
-                    />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Lot Number
                     </TableCell>
                     <DataCell
@@ -462,7 +454,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Customer Name
                     </TableCell>
                     <DataCell
@@ -471,7 +463,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Product Name
                     </TableCell>
                     <DataCell
@@ -480,16 +472,22 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
+                      Quantity Printed
+                    </TableCell>
+                    <DataCell unit="Kg" value={data.quantity} />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium  pl-6">
                       Let Down Resin
                     </TableCell>
                     <DataCell
-                      value={data.letDownResin}
-                      isMissing={!data.letDownResin}
+                      value={data.letDownRatio}
+                      isMissing={!data.letDownRatio}
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Pellet Length
                     </TableCell>
                     <DataCell
@@ -499,17 +497,17 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Pellet Dimension
+                    <TableCell className="font-medium  pl-6">
+                      Pellet Height
                     </TableCell>
                     <DataCell
-                      value={data.pelletDimension}
+                      value={data.pelletHeight}
                       unit="mm"
-                      isMissing={!data.pelletDimension}
+                      isMissing={!data.pelletHeight}
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Pellet Visual
                     </TableCell>
                     <DataCell
@@ -518,13 +516,11 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Color
-                    </TableCell>
+                    <TableCell className="font-medium  pl-6">Color</TableCell>
                     <DataCell value={data.color} isMissing={!data.color} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Dispersibility
                     </TableCell>
                     <DataCell
@@ -533,7 +529,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       MFR (Melt Flow Rate)
                     </TableCell>
                     <DataCell
@@ -543,9 +539,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Density
-                    </TableCell>
+                    <TableCell className="font-medium  pl-6">Density</TableCell>
                     <DataCell
                       value={data.density}
                       unit="g/cm³"
@@ -553,7 +547,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Moisture Content
                     </TableCell>
                     <DataCell
@@ -563,7 +557,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Carbon Content
                     </TableCell>
                     <DataCell
@@ -573,7 +567,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Ash Content
                     </TableCell>
                     <DataCell
@@ -583,7 +577,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Intrinsic Viscosity
                     </TableCell>
                     <DataCell
@@ -593,7 +587,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Heat Stability
                     </TableCell>
                     <DataCell
@@ -603,7 +597,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Light Fastness
                     </TableCell>
                     <DataCell
@@ -613,19 +607,15 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Granule
-                    </TableCell>
-                    <DataCell value={data.Granule} isMissing={!data.Granule} />
+                    <TableCell className="font-medium  pl-6">Granule</TableCell>
+                    <DataCell value={data.granule} isMissing={!data.granule} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Delta E
-                    </TableCell>
+                    <TableCell className="font-medium  pl-6">Delta E</TableCell>
                     <DataCell value={data.deltaE} isMissing={!data.deltaE} />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Macaroni
                     </TableCell>
                     <DataCell
@@ -635,7 +625,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Foreign Matter
                     </TableCell>
                     <DataCell
@@ -644,7 +634,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Weight of Chips
                     </TableCell>
                     <DataCell
@@ -654,7 +644,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Manufacturing Date
                     </TableCell>
                     <DataCell
@@ -663,7 +653,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Analysis Date
                     </TableCell>
                     <DataCell
@@ -672,7 +662,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Printed Date
                     </TableCell>
                     <DataCell
@@ -681,7 +671,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Expiry Date
                     </TableCell>
                     <DataCell
@@ -690,22 +680,22 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Issued By
                     </TableCell>
-                    <DataCell value={data.issueBy} isMissing={!data.issueBy} />
-                  </TableRow>
-                  <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
-                      Approved By
-                    </TableCell>
                     <DataCell
-                      value={data.approvedBy || ""}
-                      isMissing={!data.approvedBy}
+                      value={data?.creator.fullName}
+                      isMissing={!data.creator.fullName}
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
+                      Approved By
+                    </TableCell>
+                    <DataCell value={data?.approver?.fullName || ""} />
+                  </TableRow>
+                  <TableRow className="hover:bg-gray-50">
+                    <TableCell className="font-medium  pl-6">
                       Created At
                     </TableCell>
                     <DataCell
@@ -714,7 +704,7 @@ export default function COADetail() {
                     />
                   </TableRow>
                   <TableRow className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-gray-700 pl-6">
+                    <TableCell className="font-medium  pl-6">
                       Last Updated
                     </TableCell>
                     <DataCell

@@ -17,27 +17,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { asyncCreateCoa } from "@/store/coa/action";
+import { asyncUpdateCoa, asyncGetDetailCOA } from "@/store/coa/action";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Combobox } from "@/components/ui/combo-box";
 import { asyncGetCustomer } from "@/store/customer/action";
 import { asyncGetProduct } from "@/store/product/action";
-
-// const products = [
-//   { value: "product1", label: "Product 1" },
-//   { value: "product2", label: "Product 2" },
-//   { value: "product3", label: "Product 3" },
-// ];
 
 const formFields = [
   { id: "customerId", label: "Customer Name", mandatory: true },
   { id: "productId", label: "Product Name", mandatory: true },
   { id: "lotNumber", label: "Lot Number", mandatory: true },
-  // { id: "quantity", label: "Quantity", mandatory: true },
-  { id: "letDownResin", label: "Let Down Resin" },
+  { id: "letDownRatio", label: "Let Down Ratio" },
   { id: "pelletLength", label: "Pellet Length" },
-  { id: "pelletDimension", label: "Pellet Dimension" },
+  { id: "pelletHeight", label: "Pellet Height" },
   { id: "pelletVisual", label: "Pellet Visual" },
   { id: "color", label: "Color" },
   { id: "dispersibility", label: "Dispersibility" },
@@ -62,20 +55,22 @@ const dateFields = [
   { id: "analysisDate", label: "Analysis Date" },
 ];
 
-export default function CoaCreateInput() {
+export default function CoaUpdateForm() {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const customers = useSelector((state) => state.customers);
   const { products } = useSelector((state) => state.products);
+  const { detail_coa } = useSelector((state) => state.coa);
 
   const [formData, setFormData] = useState({
     customerId: "",
     productId: "",
     lotNumber: "",
     quantity: "",
-    letDownResin: "",
+    letDownRatio: "",
     pelletLength: "",
-    pelletDimension: "",
+    pelletHeight: "",
     pelletVisual: false,
     color: "",
     dispersibility: "",
@@ -100,12 +95,52 @@ export default function CoaCreateInput() {
   useEffect(() => {
     dispatch(asyncGetCustomer());
     dispatch(asyncGetProduct());
-  }, [dispatch]);
+    if (id) {
+      dispatch(asyncGetDetailCOA(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (detail_coa) {
+      setFormData({
+        customerId: detail_coa.customerId?.toString(),
+        productId: detail_coa.productId?.toString(),
+        lotNumber: detail_coa.lotNumber || "",
+        quantity: detail_coa.quantity || "",
+        letDownRatio: detail_coa.letDownRatio || "",
+        pelletLength: detail_coa.pelletLength || "",
+        pelletHeight: detail_coa.pelletHeight || "",
+        pelletVisual: detail_coa.pelletVisual || false,
+        color: detail_coa.color || "",
+        dispersibility: detail_coa.dispersibility || "",
+        mfr: detail_coa.mfr || "",
+        density: detail_coa.density || "",
+        moisture: detail_coa.moisture || "",
+        carbonContent: detail_coa.carbonContent || "",
+        foreignMatter: detail_coa.foreignMatter || "",
+        weightOfChips: detail_coa.weightOfChips || "",
+        intrinsicViscosity: detail_coa.intrinsicViscosity || "",
+        ashContent: detail_coa.ashContent || "",
+        heatStability: detail_coa.heatStability || "",
+        lightFastness: detail_coa.lightFastness || "",
+        granule: detail_coa.granule || "",
+        deltaE: detail_coa.deltaE || "",
+        macaroni: detail_coa.macaroni || "",
+        mfgDate: detail_coa.mfgDate ? new Date(detail_coa.mfgDate) : null,
+        expiryDate: detail_coa.expiryDate
+          ? new Date(detail_coa.expiryDate)
+          : null,
+        analysisDate: detail_coa.analysisDate
+          ? new Date(detail_coa.analysisDate)
+          : null,
+      });
+    }
+  }, [detail_coa]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { status, message } = await dispatch(asyncCreateCoa(formData));
+      const { status, message } = await dispatch(asyncUpdateCoa(id, formData));
       if (status !== "success") console.error(message);
       navigate("/COA");
     } catch (error) {
@@ -285,7 +320,7 @@ export default function CoaCreateInput() {
             Pass
           </option>
           <option className="text-red-400" value="false">
-            Not Pass
+            Not Good
           </option>
         </select>
       );
@@ -321,7 +356,7 @@ export default function CoaCreateInput() {
           [
             "quantity",
             "pelletLength",
-            "pelletDimension",
+            "pelletHeight",
             "mfr",
             "density",
             "moisture",
@@ -341,7 +376,7 @@ export default function CoaCreateInput() {
           [
             "quantity",
             "pelletLength",
-            "pelletDimension",
+            "pelletHeight",
             "mfr",
             "density",
             "moisture",
@@ -386,7 +421,7 @@ export default function CoaCreateInput() {
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-2">
-            <CardTitle>COA Input Form</CardTitle>
+            <CardTitle>COA Update Form</CardTitle>
             <CardDescription>Please enter complete COA data</CardDescription>
           </div>
         </CardHeader>

@@ -3,6 +3,13 @@ import { CheckCircle2, Clock, FileEdit } from "lucide-react";
 
 export const getStatusBadge = (status) => {
   switch (status) {
+    case "printed":
+      return (
+        <Badge className="bg-purple-500 shadow-lg cursor-pointer text-white hover:bg-purple-600">
+          <CheckCircle2 className="mr-1 h-3 w-3" />
+          Printed
+        </Badge>
+      );
     case "approved":
       return (
         <Badge className="bg-green-500 shadow-lg cursor-pointer hover:bg-green-600">

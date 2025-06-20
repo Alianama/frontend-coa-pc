@@ -7,7 +7,6 @@ import {
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard/DashboardLayout";
 import NotFound from "@/pages/NotFound";
-import COAListLayout from "@/pages/Coa/CoaListLayout";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { asyncPreloadProcess } from "@/store/isPreload/action";
@@ -16,6 +15,13 @@ import COADetailLayout from "./pages/CoaDetail/CoaDetailLayout";
 import COACreateLayout from "./pages/Coa/CoaCreateLayout";
 import CustomerLayout from "./pages/Customers/CustomerLayout";
 import ProductsLayout from "./pages/Product/ProductLayout";
+import COAUpdateLayout from "./pages/Coa/CoaUpdateLayout";
+import PropTypes from "prop-types";
+import PrintListLayout from "./pages/Print/PrintListLayout";
+import PlanningLayout from "./pages/Planning/PlanningLayout";
+import PlanningCreateLayout from "./pages/Planning/PlanningCreateFormLayout";
+import PlanningDetailLayout from "./pages/PlanningDetail/PlanningDetailLayout";
+import PlanningDetailFormLayout from "./pages/PlanningDetail/PlanningDetailFormLayout";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
@@ -60,10 +66,42 @@ function App() {
           }
         />
         <Route
-          path="/COA"
+          path="/planning"
           element={
             <ProtectedRoute>
-              <COAListLayout />
+              <PlanningLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/planning/create"
+          element={
+            <ProtectedRoute>
+              <PlanningCreateLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/planning/update/:id"
+          element={
+            <ProtectedRoute>
+              <PlanningCreateLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/planning/check/:lot"
+          element={
+            <ProtectedRoute>
+              <PlanningDetailLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/planning/check/create/:lot"
+          element={
+            <ProtectedRoute>
+              <PlanningDetailFormLayout />
             </ProtectedRoute>
           }
         />
@@ -72,6 +110,14 @@ function App() {
           element={
             <ProtectedRoute>
               <COACreateLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/COA/update/:id"
+          element={
+            <ProtectedRoute>
+              <COAUpdateLayout />
             </ProtectedRoute>
           }
         />
@@ -91,7 +137,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        />
         <Route
           path="/products"
           element={
@@ -100,10 +145,26 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/printHistory"
+          element={
+            <ProtectedRoute>
+              <PrintListLayout />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
 }
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+PublicRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default App;

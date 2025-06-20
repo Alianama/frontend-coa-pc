@@ -36,12 +36,12 @@ const sidebarConfig = {
       icon: Home,
     },
     {
-      path: "/coa",
-      label: "COA Management",
+      path: "/planning",
+      label: "Planning Management",
       icon: FileText,
     },
     {
-      path: "/coa/history",
+      path: "/printHistory",
       label: "Print History",
       icon: History,
     },
@@ -85,7 +85,6 @@ export function AppSidebar() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    console.log(authUser);
     if (authUser) {
       setUser(authUser);
     }

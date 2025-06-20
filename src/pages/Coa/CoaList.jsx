@@ -30,13 +30,14 @@ import {
   ChevronRight,
   Download,
   Eye,
-  // FileClock,
   FileEdit,
   FilePlus,
   MoreHorizontal,
   Printer,
+  // Printer,
   Search,
   Trash2,
+  ArrowUpDown,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
@@ -44,11 +45,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   asyncGetCOA,
   asyncApproveCOA,
-  // asyncRequestApprovalCOA,
   asyncRemoveCoa,
 } from "@/store/coa/action";
-
-import { getFullNameById } from "@/utils/userUtils";
 import { useNavigate } from "react-router-dom";
 import { getStatusBadge } from "@/components/common/statusBedge";
 import {
@@ -66,11 +64,17 @@ export default function COAListPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedCoaId, setSelectedCoaId] = useState(null);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  const [selectedPrintCoa, setSelectedPrintCoa] = useState(null);
+  const [printQuantity, setPrintQuantity] = useState("");
   const dispatch = useDispatch();
   const { coas = [], pagination = { totalPages: 0, totalItems: 0 } } =
     useSelector((state) => state.coa || {});
   const authUser = useSelector((state) => state.authUser);
-  const allUsers = useSelector((state) => state.allUsers || []);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -85,21 +89,20 @@ export default function COAListPage() {
     }
   };
 
-  const handleDeleteCoa = async (coaId) => {
+  const handleDeleteClick = (coaId) => {
+    setSelectedCoaId(coaId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await dispatch(asyncRemoveCoa(coaId));
+      await dispatch(asyncRemoveCoa(selectedCoaId));
+      setDeleteDialogOpen(false);
+      setSelectedCoaId(null);
     } catch (error) {
       console.error(error.message);
     }
   };
-
-  // const handleRequestApproval = async (coaId) => {
-  //   try {
-  //     await dispatch(asyncRequestApprovalCOA(coaId));
-  //   } catch (error) {
-
-  //   }
-  // };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -108,6 +111,38 @@ export default function COAListPage() {
   const handleItemsPerPageChange = (newLimit) => {
     setItemsPerPage(Number(newLimit));
     setCurrentPage(1);
+  };
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const handlePrintClick = (coa) => {
+    setSelectedPrintCoa(coa);
+    setPrintQuantity(coa.quantity?.toString() || "0");
+    setPrintDialogOpen(true);
+  };
+
+  const handleConfirmPrint = async () => {
+    try {
+      // TODO: Implement print functionality with quantity
+      console.log(
+        "Printing COA:",
+        selectedPrintCoa.id,
+        "with quantity:",
+        printQuantity
+      );
+      setPrintDialogOpen(false);
+      setSelectedPrintCoa(null);
+      setPrintQuantity("");
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   return (
@@ -150,7 +185,7 @@ export default function COAListPage() {
                 className="ml-auto"
               >
                 <FilePlus className="mr-2 h-4 w-4" />
-                Create COA
+                Create Planning
               </Button>
             </div>
           </div>
@@ -161,160 +196,330 @@ export default function COAListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Lot Number</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Product Name</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Color</TableHead>
-              <TableHead>MFR</TableHead>
-              <TableHead>Density</TableHead>
-              <TableHead>Created Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created By</TableHead>
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("lotNumber")}
+                >
+                  Lot Number
+                  {sortField === "lotNumber" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("costumerName")}
+                >
+                  Customer
+                  {sortField === "costumerName" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("productName")}
+                >
+                  Product Name
+                  {sortField === "productName" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("quantity")}
+                >
+                  QTY Printed
+                  {sortField === "quantity" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("color")}
+                >
+                  Color
+                  {sortField === "color" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
+              {/* <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("mfr")}
+                >
+                  MFR
+                  {sortField === "mfr" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead> */}
+              {/* <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("density")}
+                >
+                  Density
+                  {sortField === "density" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead> */}
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("createdAt")}
+                >
+                  Created Date
+                  {sortField === "createdAt" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("status")}
+                >
+                  Status
+                  {sortField === "status" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleSort("creator.fullName")}
+                >
+                  Created By
+                  {sortField === "creator.fullName" && (
+                    <ArrowUpDown
+                      className={`ml-2 h-4 w-4 ${
+                        sortDirection === "desc" ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </div>
+              </TableHead>
               <TableHead className="pl-10">Action Button</TableHead>
               <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {Array.isArray(coas) && coas.length > 0 ? (
-              coas.map((coa) => (
-                <TableRow key={coa.id}>
-                  <TableCell className="font-medium">{coa.lotNumber}</TableCell>
-                  <TableCell>{coa.costumerName}</TableCell>
-                  <TableCell>{coa.productName}</TableCell>
-                  <TableCell>{coa.quantity ? coa.quantity : 0} kg</TableCell>
-                  <TableCell>{coa.color}</TableCell>
-                  <TableCell>{coa.mfr}</TableCell>
-                  <TableCell>{coa.density}</TableCell>
-                  <TableCell>
-                    {new Date(coa.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(coa.status)}</TableCell>
-                  <TableCell>
-                    {getFullNameById(coa.createdBy, allUsers)}
-                  </TableCell>
-                  <TableCell className="pl-10">
-                    <Button
-                      onClick={() => navigate(`/COA/detail/${coa.id}`)}
-                      className="text-[10px] bg-transparent"
+              coas
+                .sort((a, b) => {
+                  if (!sortField) return 0;
+
+                  let aValue = a;
+                  let bValue = b;
+
+                  // Handle nested properties
+                  if (sortField.includes(".")) {
+                    const [parent, child] = sortField.split(".");
+                    aValue = a[parent]?.[child];
+                    bValue = b[parent]?.[child];
+                  } else {
+                    aValue = a[sortField];
+                    bValue = b[sortField];
+                  }
+
+                  if (sortField === "createdAt") {
+                    return sortDirection === "asc"
+                      ? new Date(aValue) - new Date(bValue)
+                      : new Date(bValue) - new Date(aValue);
+                  }
+
+                  if (
+                    typeof aValue === "string" &&
+                    typeof bValue === "string"
+                  ) {
+                    return sortDirection === "asc"
+                      ? aValue.localeCompare(bValue)
+                      : bValue.localeCompare(aValue);
+                  }
+
+                  return sortDirection === "asc"
+                    ? aValue - bValue
+                    : bValue - aValue;
+                })
+                .map((coa) => (
+                  <TableRow key={coa.id}>
+                    <TableCell
+                      onClick={() => navigate(`/coa/detail/${coa.id}`)}
+                      className="font-bold hover:text-green-500 cursor-pointer hover:underline"
                     >
-                      <Eye className="h-3 w-3" />
-                      View
-                    </Button>
-
-                    {/* {coa.status === "draft" &&
-                      coa.approvedBy === null &&
-                      authUser?.username === coa.issueBy && (
-                        <Button
-                          onClick={() => handleRequestApproval(coa.id)}
-                          className="text-[10px] bg-transparent"
-                        >
-                          <FileClock className="h-3 w-3" />
-                          <h1 className="">Request Approval</h1>
-                        </Button>
-                      )} */}
-
-                    {coa.status === "need_approval" &&
-                      coa.approvedBy === null &&
-                      (authUser?.role?.name === "SUPER_ADMIN" ||
-                        authUser?.role?.name === "ADMIN") && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button className="text-[10px] bg-transparent">
-                              <Check className="h-3 w-3" />
-                              <h1 className="">Approve</h1>
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-secondary">
-                            <DialogHeader>
-                              <DialogTitle>Confirm Approval COA</DialogTitle>
-                            </DialogHeader>
-                            <DialogDescription>
-                              Are you sure you want to approve this COA?
-                            </DialogDescription>
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                              </DialogClose>
+                      {coa.lotNumber}
+                    </TableCell>
+                    <TableCell>{coa.costumerName}</TableCell>
+                    <TableCell>{coa.productName}</TableCell>
+                    <TableCell>{coa.quantity ? coa.quantity : 0} kg</TableCell>
+                    <TableCell>{coa.color}</TableCell>
+                    {/* <TableCell>{coa.mfr}</TableCell>
+                    <TableCell>{coa.density}</TableCell> */}
+                    <TableCell>
+                      {new Date(coa.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(coa.status)}</TableCell>
+                    <TableCell> {coa?.creator?.fullName}</TableCell>
+                    <TableCell className="pl-10 gap-1 flex">
+                      {coa.status === "need_approval" &&
+                        coa.approvedBy === null &&
+                        (authUser?.role?.name === "SUPER_ADMIN" ||
+                          authUser?.role?.name === "ADMIN") && (
+                          <Dialog>
+                            <DialogTrigger asChild>
                               <Button
-                                onClick={() => {
-                                  handleApprove(coa.id);
-                                  document
-                                    .querySelector('button[aria-label="Close"]')
-                                    .click();
-                                }}
+                                variant="outline"
+                                className="text-[10px] hover:bg-green-500 bg-transparent"
                               >
-                                Approve
+                                <Check className="h-3 w-3" />
+                                <h1>Approve</h1>
                               </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      )}
-                  </TableCell>
+                            </DialogTrigger>
+                            <DialogContent className="bg-secondary">
+                              <DialogHeader>
+                                <DialogTitle>Confirm Approval COA</DialogTitle>
+                              </DialogHeader>
+                              <DialogDescription>
+                                Are you sure you want to approve this COA?
+                              </DialogDescription>
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button
+                                  onClick={() => {
+                                    handleApprove(coa.id);
+                                    document
+                                      .querySelector(
+                                        'button[aria-label="Close"]'
+                                      )
+                                      .click();
+                                  }}
+                                >
+                                  Approve
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        )}
 
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
+                      {coa?.status === "approved" ||
+                      coa?.status === "printed" ? (
+                        <Button
+                          variant="outline"
+                          className="text-[10px]"
+                          onClick={() => handlePrintClick(coa)}
+                        >
+                          <Printer className="h-3 w-3 mr-1" />
+                          {coa.status === "printed" ? "Reprint" : "Print"}
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                          {coa.status !== "approved" && (
-                            <Button
-                              className="bg-transparent"
-                              onClick={() => alert("halo")}
-                            >
-                              <FileEdit className="mr-2 h-4 w-4" />
-                              Edit
-                            </Button>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Button
-                            disabled={!coa.approvedBy}
-                            className="bg-transparent"
-                            onClick={() => alert("halo")}
-                          >
-                            <Printer className="mr-2 h-4 w-4" />
-                            Print
-                            {!coa.approvedBy && (
-                              <p className="text-[8px] text-red ml-2">
-                                Need Approved
-                              </p>
-                            )}
+                      ) : null}
+                    </TableCell>
+
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Button
-                            className="bg-transparent"
-                            onClick={() => alert("halo")}
-                          >
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                          </Button>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {(coa.status === "draft" ||
-                          coa.status === "need_approval" ||
-                          authUser?.role.name === "SUPER_ADMIN") && (
-                          <DropdownMenuItem className="text-red-600">
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>
                             <Button
-                              className="bg-transparent text-red-600"
-                              onClick={() => handleDeleteCoa(coa.id)}
+                              onClick={() => navigate(`/COA/detail/${coa.id}`)}
+                              className="w-full bg-transparent"
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
+                              <Eye className="mr-2 h-4 w-4" />
+                              Detail
                             </Button>
                           </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
+                          {coa.status === "need_approval" && (
+                            <DropdownMenuItem
+                              onClick={() => navigate(`/COA/update/${coa.id}`)}
+                            >
+                              <Button className="bg-transparent w-full">
+                                <FileEdit className="mr-2 h-4 w-4" />
+                                Edit
+                              </Button>
+                            </DropdownMenuItem>
+                          )}
+
+                          <DropdownMenuItem>
+                            <Button
+                              className="bg-transparent w-full"
+                              onClick={() => alert("halo")}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Download
+                            </Button>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {(coa.status === "draft" ||
+                            coa.status === "need_approval" ||
+                            authUser?.role.name === "SUPER_ADMIN") && (
+                            <DropdownMenuItem className="text-red-600">
+                              <Button
+                                className="bg-transparent w-full text-red-600"
+                                onClick={() => handleDeleteClick(coa.id)}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </Button>
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-4">
@@ -354,6 +559,69 @@ export default function COAListPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="bg-secondary">
+          <DialogHeader>
+            <DialogTitle>Confirm Delete COA</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            Are you sure you want to delete this COA? This action cannot be
+            undone.
+          </DialogDescription>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Print Confirmation Dialog */}
+      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+        <DialogContent className="bg-secondary">
+          <DialogHeader>
+            <DialogTitle>Confirm Print COA</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            Please enter the quantity to print for this COA.
+          </DialogDescription>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="quantity" className="text-right">
+                Quantity
+              </label>
+              <div className="col-span-3 flex items-center gap-2">
+                <Input
+                  id="quantity"
+                  type="number"
+                  value={printQuantity}
+                  onChange={(e) => setPrintQuantity(e.target.value)}
+                  className="col-span-2"
+                  min="0"
+                  step="0.01"
+                />
+                <span className="text-sm text-muted-foreground">kg</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              onClick={handleConfirmPrint}
+              disabled={!printQuantity || Number(printQuantity) <= 0}
+            >
+              Print
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

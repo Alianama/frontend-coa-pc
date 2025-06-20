@@ -37,6 +37,17 @@ const coaReducer = (state = initialState, action) => {
             : coa
         ),
       };
+    case ActionType.UPDATE_COA:
+      return {
+        ...state,
+        coas: state.coas.map((coa) =>
+          coa.id === action.payload.id ? action.payload : coa
+        ),
+        detail_coa:
+          state.detail_coa?.id === action.payload.id
+            ? action.payload
+            : state.detail_coa,
+      };
     case ActionType.OPTIMISTIC_CREATE_COA:
       return {
         ...state,

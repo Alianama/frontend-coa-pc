@@ -1,16 +1,16 @@
-import CoaCreateForm from "./CoaCreateFrom";
+import CoaUpdateForm from "./CoaUpdateForm";
 import Layout from "@/components/layout/layout";
 
-export default function COACreateLayout() {
+export default function COAUpdateLayout() {
   return (
     <Layout
-      title="COA Create"
+      title="COA Update"
       items={[
         { label: "Home", href: "/" },
         { label: "COA List", href: "/coa" },
       ]}
     >
-      <CoaCreateForm />
+      <CoaUpdateForm />
     </Layout>
   );
 }

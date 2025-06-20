@@ -25,8 +25,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 
 ProductFormDialog.propTypes = {
   product: PropTypes.shape({
@@ -34,7 +33,8 @@ ProductFormDialog.propTypes = {
     productName: PropTypes.string,
     resin: PropTypes.string,
     letDownRatio: PropTypes.string,
-    pellet: PropTypes.string,
+    pelletLength: PropTypes.number,
+    pelletHeight: PropTypes.number,
     color: PropTypes.string,
     dispersibility: PropTypes.string,
     mfr: PropTypes.number,
@@ -69,11 +69,12 @@ export default function ProductFormDialog({
   onSave,
   isLoading = false,
 }) {
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     productName: "",
     resin: "",
     letDownRatio: "",
-    pellet: "",
+    pelletLength: 0,
+    pelletHeight: 0,
     color: "",
     dispersibility: "",
     mfr: 0,
@@ -89,13 +90,13 @@ export default function ProductFormDialog({
     granule: "",
     deltaE: 0,
     macaroni: 0,
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
   const isEditMode = Boolean(product);
 
   const [openResin, setOpenResin] = useState(false);
-  const [openPellet, setOpenPellet] = useState(false);
   const [openColor, setOpenColor] = useState(false);
   const [openDispersibility, setOpenDispersibility] = useState(false);
   const [openGranule, setOpenGranule] = useState(false);
@@ -105,36 +106,21 @@ export default function ProductFormDialog({
     if (product) {
       setFormData(product);
     } else {
-      setFormData({
-        productName: "",
-        resin: "",
-        letDownRatio: "",
-        pellet: "",
-        color: "",
-        dispersibility: "",
-        mfr: 0,
-        density: 0,
-        moisture: 0,
-        carbonContent: 0,
-        foreignMatter: "",
-        weightOfChips: 0,
-        intrinsicViscosity: 0,
-        ashContent: 0,
-        heatStability: 0,
-        lightFastness: 0,
-        granule: "",
-        deltaE: 0,
-        macaroni: 0,
-      });
+      setFormData(initialFormState);
     }
     setErrors({});
   }, [product, isOpen]);
 
   const handleChange = (e) => {
-    const { id, value, type } = e.target;
+    const { id, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [id]: type === "number" ? Number.parseFloat(value) : value,
+      [id]:
+        type === "number"
+          ? Number.parseFloat(value)
+          : type === "checkbox"
+          ? checked
+          : value,
     }));
 
     if (errors[id]) {
@@ -168,8 +154,8 @@ export default function ProductFormDialog({
       newErrors.color = "Color is required";
     }
 
-    if (!formData.pellet.trim()) {
-      newErrors.pellet = "Pellet is required";
+    if (!formData.pelletLength || !formData.pelletHeight) {
+      newErrors.pellet = "Pellet length and height are required";
     }
 
     if (formData.mfr < 0) {
@@ -203,22 +189,21 @@ export default function ProductFormDialog({
   };
 
   const resinOptions = ["PP", "PE", "PVC", "PS", "ABS", "PET", "PC"];
-  const pelletOptions = ["Masterbatch", "Compound", "Additive", "Concentrate"];
   const colorOptions = [
+    "Black",
     "Red",
     "Yellow",
     "Blue",
     "Green",
-    "Black",
     "White",
     "Orange",
     "Purple",
     "Brown",
     "Gold",
   ];
-  const dispersibilityOptions = ["Excellent", "Good", "Fair", "Poor"];
-  const granuleOptions = ["Regular", "Fine", "Coarse", "Micro"];
-  const foreignMatterOptions = ["None", "Trace", "Minimal", "Present"];
+  const dispersibilityOptions = ["Good", "Fair", "Poor"];
+  const granuleOptions = ["Uniform", "Fine", "Coarse", "Micro"];
+  const foreignMatterOptions = ["None", "Slight", "Visible"];
 
   return (
     <Dialog
@@ -320,7 +305,7 @@ export default function ProductFormDialog({
                 )}
               </div>
 
-              <div className="grid gap-2">
+              <div className=" gap-2">
                 <Label
                   htmlFor="color"
                   className={errors.color ? "text-red-500" : ""}
@@ -391,59 +376,27 @@ export default function ProductFormDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label
-                  htmlFor="pellet"
-                  className={errors.pellet ? "text-red-500" : ""}
-                >
-                  Pellet *
-                </Label>
-                <Popover open={openPellet} onOpenChange={setOpenPellet}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openPellet}
-                      className={cn(
-                        "justify-between",
-                        errors.pellet && "border-red-500"
-                      )}
-                    >
-                      {formData.pellet || "Select pellet type..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search pellet..." />
-                      <CommandEmpty>No pellet found.</CommandEmpty>
-                      <CommandGroup>
-                        {pelletOptions.map((option) => (
-                          <CommandItem
-                            key={option}
-                            value={option}
-                            onSelect={(currentValue) => {
-                              handleSelectChange("pellet", currentValue);
-                              setOpenPellet(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.pellet === option
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {option}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                {errors.pellet && (
-                  <p className="text-xs text-red-500">{errors.pellet}</p>
-                )}
+                <Label htmlFor="pelletLength">Pellet Length (mm)</Label>
+                <Input
+                  id="pelletLength"
+                  type="number"
+                  step="0.1"
+                  value={formData.pelletLength}
+                  onChange={handleChange}
+                  placeholder="Masukkan panjang pellet"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="pelletHeight">Pellet Height (mm)</Label>
+                <Input
+                  id="pelletHeight"
+                  type="number"
+                  step="0.1"
+                  value={formData.pelletHeight}
+                  onChange={handleChange}
+                  placeholder="Masukkan tinggi pellet"
+                />
               </div>
             </div>
           </div>
@@ -509,7 +462,7 @@ export default function ProductFormDialog({
                   htmlFor="mfr"
                   className={errors.mfr ? "text-red-500" : ""}
                 >
-                  MFR
+                  {"MFR (g/10 min)"}
                 </Label>
                 <Input
                   id="mfr"
@@ -529,7 +482,7 @@ export default function ProductFormDialog({
                   htmlFor="density"
                   className={errors.density ? "text-red-500" : ""}
                 >
-                  Density
+                  {"Density (g/cm³)"}
                 </Label>
                 <Input
                   id="density"
@@ -545,7 +498,9 @@ export default function ProductFormDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="weightOfChips">Weight of Chips</Label>
+                <Label htmlFor="weightOfChips">
+                  {"Weight of Chips (mm / pcs)"}
+                </Label>
                 <Input
                   id="weightOfChips"
                   type="number"
@@ -628,7 +583,7 @@ export default function ProductFormDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="carbonContent">Carbon Content</Label>
+                <Label htmlFor="carbonContent">{"Carbon Content (%)"}</Label>
                 <Input
                   id="carbonContent"
                   type="number"
@@ -687,7 +642,9 @@ export default function ProductFormDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="intrinsicViscosity">Intrinsic Viscosity</Label>
+                <Label htmlFor="intrinsicViscosity">
+                  {"Intrinsic Viscosity (dL/g)"}
+                </Label>
                 <Input
                   id="intrinsicViscosity"
                   type="number"
@@ -698,7 +655,7 @@ export default function ProductFormDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="ashContent">Ash Content</Label>
+                <Label htmlFor="ashContent">{"Ash Content (%)"}</Label>
                 <Input
                   id="ashContent"
                   type="number"
