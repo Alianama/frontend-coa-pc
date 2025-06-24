@@ -1,5 +1,7 @@
+// Menggunakan API terpusat
 import api from "@/services/api";
 import { toast } from "sonner";
+import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 export function setPlanningDetailActionCreator(data, totalQtyCheck, header) {
   return {
@@ -43,6 +45,61 @@ export function asyncAddPlanningDetail(data) {
     } catch (error) {
       toast.error(error.message || "Gagal menambah detail planning");
       throw error;
+    }
+  };
+}
+
+export function asyncDeletePlanningDetail(detailId, lotNumber) {
+  return async (dispatch) => {
+    try {
+      const response = await api.deletePlanningDetail(detailId);
+      if (response.status === "success") {
+        toast.success(response.message || "Berhasil menghapus detail planning");
+        // Refresh data setelah delete
+        dispatch(asyncGetPlanningDetailByLot(lotNumber));
+        return response;
+      }
+      throw new Error(response.message || "Gagal menghapus detail planning");
+    } catch (error) {
+      toast.error(error.message || "Gagal menghapus detail planning");
+      throw error;
+    }
+  };
+}
+
+export function asyncUpdatePlanningDetail(detailId, data, lotNumber) {
+  return async (dispatch) => {
+    try {
+      const response = await api.updatePlanningDetail(detailId, data);
+      if (response.status === "success") {
+        toast.success(response.message || "Berhasil update detail planning");
+        // Refresh data setelah update
+        dispatch(asyncGetPlanningDetailByLot(lotNumber));
+        return response;
+      }
+      throw new Error(response.message || "Gagal update detail planning");
+    } catch (error) {
+      toast.error(error.message || "Gagal update detail planning");
+      throw error;
+    }
+  };
+}
+
+export function asyncPrintCoa(planningId, quantitiy) {
+  return async (dispatch) => {
+    dispatch(showLoading());
+    try {
+      const response = await api.printCoa(planningId, quantitiy);
+      if (response.status === "success") {
+        toast.success(response.message || "COA berhasil dicetak");
+        return response;
+      }
+      throw new Error(response.message || "Gagal mencetak COA");
+    } catch (error) {
+      toast.error(error.message || "Terjadi kesalahan saat mencetak COA");
+      throw error;
+    } finally {
+      dispatch(hideLoading());
     }
   };
 }

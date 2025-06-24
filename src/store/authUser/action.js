@@ -1,4 +1,4 @@
-import api from "../../services/api";
+import api from "@/services/api";
 import { toast } from "sonner";
 import { showLoading, hideLoading } from "react-redux-loading-bar";
 
@@ -36,6 +36,7 @@ function asyncSetAuthUser({ username, password }) {
     } catch (error) {
       toast.error("Login failed");
       dispatch(unsetAuthUserActionCreator());
+      throw new Error(error);
     } finally {
       dispatch(hideLoading());
     }

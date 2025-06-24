@@ -28,6 +28,14 @@ const planningReducer = (state = initialState, action) => {
         ...state,
         plannings: state.plannings.filter((p) => p.id !== action.payload),
       };
+    case ActionType.CLOSE_PLANNING:
+    case ActionType.REOPEN_PLANNING:
+      return {
+        ...state,
+        plannings: state.plannings.map((p) =>
+          p.id === action.payload.id ? action.payload : p
+        ),
+      };
     default:
       return state;
   }

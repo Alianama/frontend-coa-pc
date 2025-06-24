@@ -1,5 +1,5 @@
+import api from "@/services/api";
 import { hideLoading, showLoading } from "react-redux-loading-bar";
-import api from "../../services/api";
 import { toast } from "sonner";
 
 const ActionType = {

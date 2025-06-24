@@ -22,6 +22,7 @@ import PlanningLayout from "./pages/Planning/PlanningLayout";
 import PlanningCreateLayout from "./pages/Planning/PlanningCreateFormLayout";
 import PlanningDetailLayout from "./pages/PlanningDetail/PlanningDetailLayout";
 import PlanningDetailFormLayout from "./pages/PlanningDetail/PlanningDetailFormLayout";
+import ProductStandardsLayout from "./pages/ProductStandards/ProductStandardLayout";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
@@ -142,6 +143,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ProductsLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products/standard/:id"
+          element={
+            <ProtectedRoute>
+              <ProductStandardsLayout />
             </ProtectedRoute>
           }
         />

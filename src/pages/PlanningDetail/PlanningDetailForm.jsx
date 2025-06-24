@@ -17,6 +17,7 @@ import {
 } from "@/store/planningDetail/action";
 import { useParams, useNavigate } from "react-router-dom";
 import DetailHeader from "./PlanningDetailHeader";
+import { toast } from "sonner";
 
 export default function PlanningDetailForm() {
   const dispatch = useDispatch();
@@ -51,7 +52,6 @@ export default function PlanningDetailForm() {
     heatStability: "",
     lightFastness: "",
     granule: "",
-    qcJudgment: "",
     analysisDate: "",
     checkedBy: "",
     remark: "",
@@ -81,6 +81,32 @@ export default function PlanningDetailForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const mandatoryFields = [
+      { key: "qty", label: "Quantity" },
+      { key: "lineNo", label: "Line" },
+      { key: "deltaL", label: "Δ L" },
+      { key: "deltaA", label: "Δ A" },
+      { key: "deltaB", label: "Δ B" },
+      { key: "mfr", label: "MFR (gr/mnt)" },
+      { key: "dispersion", label: "Dispersion" },
+      { key: "density", label: "Density" },
+      { key: "pelletLength", label: "Pallet Length" },
+      { key: "pelletDiameter", label: "Pallet Diameter" },
+      { key: "analysisDate", label: "Checked At" },
+      { key: "visualCheck", label: "Visual Check" },
+    ];
+    const emptyField = mandatoryFields.find(
+      (field) =>
+        formData[field.key] === "" ||
+        formData[field.key] === null ||
+        formData[field.key] === undefined
+    );
+    if (emptyField) {
+      toast.error(`Field '${emptyField.label}' wajib diisi!`);
+
+      return;
+    }
 
     // Konversi tipe data sesuai kebutuhan
     const dataToSubmit = {
@@ -122,7 +148,6 @@ export default function PlanningDetailForm() {
       lightFastness:
         formData.lightFastness === "" ? null : Number(formData.lightFastness),
       granule: formData.granule === "" ? null : Number(formData.granule),
-      qcJudgment: formData.qcJudgment,
       analysisDate:
         formData.analysisDate === ""
           ? null
@@ -161,6 +186,7 @@ export default function PlanningDetailForm() {
                   placeholder="102.036"
                   value={formData.qty}
                   onChange={(e) => handleInputChange("qty", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -171,6 +197,7 @@ export default function PlanningDetailForm() {
                   placeholder="1"
                   value={formData.lineNo}
                   onChange={(e) => handleInputChange("lineNo", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -193,6 +220,7 @@ export default function PlanningDetailForm() {
                   placeholder="0.35"
                   value={formData.deltaL}
                   onChange={(e) => handleInputChange("deltaL", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -204,6 +232,7 @@ export default function PlanningDetailForm() {
                   placeholder="0.20"
                   value={formData.deltaA}
                   onChange={(e) => handleInputChange("deltaA", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -215,6 +244,7 @@ export default function PlanningDetailForm() {
                   placeholder="0.35"
                   value={formData.deltaB}
                   onChange={(e) => handleInputChange("deltaB", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -226,6 +256,7 @@ export default function PlanningDetailForm() {
                   placeholder="1.2"
                   value={formData.density}
                   onChange={(e) => handleInputChange("density", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -237,6 +268,7 @@ export default function PlanningDetailForm() {
                   placeholder="12.5"
                   value={formData.mfr}
                   onChange={(e) => handleInputChange("mfr", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -250,6 +282,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("dispersion", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -263,6 +296,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("contamination", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -276,6 +310,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("macaroni", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -289,6 +324,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("pelletLength", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -302,25 +338,10 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("pelletDiameter", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="visualCheck">Visual Check</Label>
-                <Select
-                  value={formData.visualCheck}
-                  onValueChange={(value) =>
-                    handleInputChange("visualCheck", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Ok">Ok</SelectItem>
-                    <SelectItem value="Not Good">Not Good</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="moisture">Moisture</Label>
                 <Input
@@ -332,6 +353,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("moisture", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -345,6 +367,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("carbonContent", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -358,6 +381,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("foreignMatter", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -371,6 +395,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("weightChips", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -384,6 +409,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("intrinsicViscosity", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -397,6 +423,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("ashContent", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -410,6 +437,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("heatStability", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -423,6 +451,7 @@ export default function PlanningDetailForm() {
                   onChange={(e) =>
                     handleInputChange("lightFastness", e.target.value)
                   }
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">
@@ -434,25 +463,26 @@ export default function PlanningDetailForm() {
                   placeholder="1.0"
                   value={formData.granule}
                   onChange={(e) => handleInputChange("granule", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="qcJudgment">QC Judgment</Label>
-                <Select
-                  value={formData.qcJudgment}
-                  onValueChange={(value) =>
-                    handleInputChange("qcJudgment", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select judgment" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Ok">Ok</SelectItem>
-                    <SelectItem value="Not Pass">Not Pass</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="visualCheck">Visual Check</Label>
+              <Select
+                value={formData.visualCheck}
+                onValueChange={(value) =>
+                  handleInputChange("visualCheck", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ok">Ok</SelectItem>
+                  <SelectItem value="Not Good">Not Good</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="remark">Remark</Label>

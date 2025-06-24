@@ -12,6 +12,7 @@ import productReducer from "./product/reducer";
 import printReducer from "./print/reducer";
 import planningReducer from "./planning/reducer";
 import planningDetailReducer from "./planningDetail/reducer";
+import productStandardReducer from "./productStandard/reducer";
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     prints: printReducer,
     planning: planningReducer,
     planningDetail: planningDetailReducer,
+    productStandard: productStandardReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

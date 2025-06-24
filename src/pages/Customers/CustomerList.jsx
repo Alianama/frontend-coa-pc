@@ -53,9 +53,9 @@ const availableFields = [
   // "productName",
   // "lotNumber",
   // "quantity",
-  "letDownResin",
+  "letDownRatio",
   "pelletLength",
-  "pelletHeight",
+  "pelletDiameter",
   "pelletVisual",
   "color",
   "dispersibility",
@@ -79,9 +79,9 @@ const availableFields = [
 
 // Field labels for display
 const fieldLabels = {
-  letDownResin: "Let Down Resin",
+  letDownRatio: "Let Down Ratio",
   pelletLength: "Pellet Length",
-  pelletHeight: "Pellet Height",
+  pelletDiameter: "Pellet Diameter",
   pelletVisual: "Pellet Visual",
   color: "Color",
   dispersibility: "Dispersibility",

@@ -75,6 +75,18 @@ export default function PlanningCreateForm() {
     setFormData((prev) => ({ ...prev, [name]: date }));
   };
 
+  const handleProductChange = (value) => {
+    const selectedProduct = products?.find(
+      (product) => product.id.toString() === value
+    );
+    setFormData((prev) => ({
+      ...prev,
+      idProduct: value,
+      resin: selectedProduct?.resin || "",
+      ratio: selectedProduct?.letDownRatio || "",
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -97,8 +109,8 @@ export default function PlanningCreateForm() {
         await dispatch(asyncCreatePlanning(payload));
       }
       navigate("/planning");
-    } catch {
-      // error handling
+    } catch (error) {
+      throw new Error(error);
     }
   };
 
@@ -140,9 +152,7 @@ export default function PlanningCreateForm() {
                     label: product.productName,
                   }))}
                   value={formData.idProduct?.toString()}
-                  onValueChange={(value) => {
-                    setFormData((prev) => ({ ...prev, idProduct: value }));
-                  }}
+                  onValueChange={handleProductChange}
                   placeholder="Pilih produk..."
                   searchPlaceholder="Cari produk..."
                   emptyMessage="Produk tidak ditemukan."

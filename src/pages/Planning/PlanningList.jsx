@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { asyncGetPlanning, asyncRemovePlanning } from "@/store/planning/action";
+import {
+  asyncGetPlanning,
+  asyncRemovePlanning,
+  asyncReopenPlanning,
+  asyncClosePlanning,
+} from "@/store/planning/action";
 import { useNavigate } from "react-router-dom";
 import {
   FilePlus,
@@ -21,10 +26,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  MoreHorizontal,
+  Check,
+  Repeat,
 } from "lucide-react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -33,6 +40,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function PlanningList() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,6 +57,7 @@ export default function PlanningList() {
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPlanningId, setSelectedPlanningId] = useState(null);
+  const authUser = useSelector((state) => state.authUser);
 
   useEffect(() => {
     fetchData(page, limit, searchTerm);
@@ -51,7 +65,6 @@ export default function PlanningList() {
   }, [page, limit]);
 
   useEffect(() => {
-    // Reset ke page 1 saat search berubah
     setPage(1);
     fetchData(1, limit, searchTerm);
     // eslint-disable-next-line
@@ -72,6 +85,22 @@ export default function PlanningList() {
       await dispatch(asyncRemovePlanning(selectedPlanningId));
       setDeleteDialogOpen(false);
       setSelectedPlanningId(null);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const handleReopenPlanning = async (id) => {
+    try {
+      await dispatch(asyncReopenPlanning(id));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const handleClosePlanning = async (id) => {
+    try {
+      await dispatch(asyncClosePlanning(id));
     } catch (error) {
       console.error(error.message);
     }
@@ -161,46 +190,74 @@ export default function PlanningList() {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="flex gap-3">
                     <Button
-                      variant="secondary"
-                      size="sm"
+                      variant="outline"
+                      className="w-8 h-8"
                       onClick={() =>
                         navigate(`/planning/check/${planning.lotNumber}`)
                       }
-                      className="mr-2"
+                      title="Lihat Detail"
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="w-4 h-4" />
                     </Button>
-
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() =>
-                        navigate(`/planning/update/${planning.id}`)
-                      }
-                      className="mr-2"
-                    >
-                      <FileEdit className="h-4 w-4" />
-                    </Button>
+                    {planning.status === "close" &&
+                      (authUser?.role?.name === "ADMIN" ||
+                        authUser?.role?.name === "SUPER_ADMIN") && (
+                        <Button
+                          variant="outline"
+                          className="w-8 h-8 hover:bg-green-500 hover:text-white"
+                          onClick={() => handleReopenPlanning(planning.id)}
+                          title="Re-Open Planning"
+                        >
+                          <Repeat className="w-4 h-4" />
+                        </Button>
+                      )}
+                    {planning.status === "progress" &&
+                      (authUser?.role?.name === "ADMIN" ||
+                        authUser?.role?.name === "SUPER_ADMIN") && (
+                        <Button
+                          variant="outline"
+                          className="w-8 h-8 hover:bg-red-500 hover:text-white"
+                          onClick={() => handleClosePlanning(planning.id)}
+                          title="Close Planning"
+                        >
+                          <Check className="w-4 h-4" />
+                        </Button>
+                      )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="w-8 h-8">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            navigate(`/planning/update/${planning.id}`)
+                          }
+                        >
+                          <FileEdit className="w-4 h-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedPlanningId(planning.id);
+                            setDeleteDialogOpen(true);
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <Dialog
                       open={
                         deleteDialogOpen && selectedPlanningId === planning.id
                       }
                       onOpenChange={setDeleteDialogOpen}
                     >
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedPlanningId(planning.id);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-2 w-2" />
-                        </Button>
-                      </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>Delete Confirmation</DialogTitle>

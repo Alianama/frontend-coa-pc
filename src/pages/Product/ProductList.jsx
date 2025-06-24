@@ -48,6 +48,7 @@ import {
   Trash2,
   Search,
   ArrowUpDown,
+  Sheet,
 } from "lucide-react";
 import ProductDetailDialog from "@/components/Product/product-detail-dialog";
 import ProductFormDialog from "@/components/Product/product-form-dialog";
@@ -59,6 +60,7 @@ import {
   asyncGetProduct,
   asyncUpdateProduct,
 } from "@/store/product/action";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -76,6 +78,7 @@ export default function ProductList() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.products);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -372,7 +375,7 @@ export default function ProductList() {
                   </TableHead>
                   <TableHead>Let Down Ratio</TableHead>
                   <TableHead>Cretaed Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right pr-15">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -415,20 +418,32 @@ export default function ProductList() {
                           }
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className=" justify-self-end gap-2 flex">
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            navigate(`/products/standard/${product.id}`)
+                          }
+                          className=""
+                        >
+                          <Sheet />
+                          Standard
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewDetailClick(product)}
+                        >
+                          <Eye className="h-2 w-2" />
+                        </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button variant="outline" className="h-8 w-8 p-0">
                               <span className="sr-only">Open menu</span>
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleViewDetailClick(product)}
-                            >
-                              <Eye className="mr-2 h-4 w-4" /> View Detail
-                            </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleEditProductClick(product)}
                             >
