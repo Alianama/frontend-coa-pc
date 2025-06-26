@@ -61,6 +61,7 @@ import {
   asyncUpdateProduct,
 } from "@/store/product/action";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 export default function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -374,6 +375,7 @@ export default function ProductList() {
                     </div>
                   </TableHead>
                   <TableHead>Let Down Ratio</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Cretaed Date</TableHead>
                   <TableHead className="text-right pr-15">Actions</TableHead>
                 </TableRow>
@@ -408,6 +410,19 @@ export default function ProductList() {
                         </div>
                       </TableCell>
                       <TableCell>{product.letDownRatio}</TableCell>
+                      <TableCell>
+                        {product.status === "active" ? (
+                          <Badge className="bg-green-100 text-green-800 border border-green-300">
+                            Active
+                          </Badge>
+                        ) : product.status === "draft" ? (
+                          <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300">
+                            Draft
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">{product.status}</Badge>
+                        )}
+                      </TableCell>
                       <TableCell>
                         {new Date(product.createdAt).toLocaleDateString(
                           "id-ID",

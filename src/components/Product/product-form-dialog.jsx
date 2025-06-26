@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import {
   Command,
   CommandEmpty,
@@ -33,23 +32,7 @@ ProductFormDialog.propTypes = {
     productName: PropTypes.string,
     resin: PropTypes.string,
     letDownRatio: PropTypes.string,
-    pelletLength: PropTypes.number,
-    pelletHeight: PropTypes.number,
     color: PropTypes.string,
-    dispersibility: PropTypes.string,
-    mfr: PropTypes.number,
-    density: PropTypes.number,
-    moisture: PropTypes.number,
-    carbonContent: PropTypes.number,
-    foreignMatter: PropTypes.string,
-    weightOfChips: PropTypes.number,
-    intrinsicViscosity: PropTypes.number,
-    ashContent: PropTypes.number,
-    heatStability: PropTypes.number,
-    lightFastness: PropTypes.number,
-    granule: PropTypes.string,
-    deltaE: PropTypes.number,
-    macaroni: PropTypes.number,
   }),
   isOpen: PropTypes.bool.isRequired,
   onOpenChange: PropTypes.func.isRequired,
@@ -73,23 +56,7 @@ export default function ProductFormDialog({
     productName: "",
     resin: "",
     letDownRatio: "",
-    pelletLength: 0,
-    pelletHeight: 0,
     color: "",
-    dispersibility: "",
-    mfr: 0,
-    density: 0,
-    moisture: 0,
-    carbonContent: 0,
-    foreignMatter: "",
-    weightOfChips: 0,
-    intrinsicViscosity: 0,
-    ashContent: 0,
-    heatStability: 0,
-    lightFastness: 0,
-    granule: "",
-    deltaE: 0,
-    macaroni: 0,
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -98,9 +65,6 @@ export default function ProductFormDialog({
 
   const [openResin, setOpenResin] = useState(false);
   const [openColor, setOpenColor] = useState(false);
-  const [openDispersibility, setOpenDispersibility] = useState(false);
-  const [openGranule, setOpenGranule] = useState(false);
-  const [openForeignMatter, setOpenForeignMatter] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -112,15 +76,10 @@ export default function ProductFormDialog({
   }, [product, isOpen]);
 
   const handleChange = (e) => {
-    const { id, value, type, checked } = e.target;
+    const { id, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [id]:
-        type === "number"
-          ? Number.parseFloat(value)
-          : type === "checkbox"
-          ? checked
-          : value,
+      [id]: value,
     }));
 
     if (errors[id]) {
@@ -154,22 +113,6 @@ export default function ProductFormDialog({
       newErrors.color = "Color is required";
     }
 
-    if (!formData.pelletLength || !formData.pelletHeight) {
-      newErrors.pellet = "Pellet length and height are required";
-    }
-
-    if (formData.mfr < 0) {
-      newErrors.mfr = "MFR cannot be negative";
-    }
-
-    if (formData.density <= 0) {
-      newErrors.density = "Density must be positive";
-    }
-
-    if (formData.moisture < 0 || formData.moisture > 100) {
-      newErrors.moisture = "Moisture must be between 0 and 100";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -201,9 +144,6 @@ export default function ProductFormDialog({
     "Brown",
     "Gold",
   ];
-  const dispersibilityOptions = ["Good", "Fair", "Poor"];
-  const granuleOptions = ["Uniform", "Fine", "Coarse", "Micro"];
-  const foreignMatterOptions = ["None", "Slight", "Visible"];
 
   return (
     <Dialog
@@ -214,7 +154,7 @@ export default function ProductFormDialog({
         }
       }}
     >
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Product" : "Add New Product"}
@@ -226,10 +166,8 @@ export default function ProductFormDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
-          {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Basic Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label
                   htmlFor="productName"
@@ -305,7 +243,7 @@ export default function ProductFormDialog({
                 )}
               </div>
 
-              <div className=" gap-2">
+              <div className="grid gap-2">
                 <Label
                   htmlFor="color"
                   className={errors.color ? "text-red-500" : ""}
@@ -372,348 +310,6 @@ export default function ProductFormDialog({
                   value={formData.letDownRatio}
                   onChange={handleChange}
                   placeholder="e.g. 1:100"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="pelletLength">Pellet Length (mm)</Label>
-                <Input
-                  id="pelletLength"
-                  type="number"
-                  step="0.1"
-                  value={formData.pelletLength}
-                  onChange={handleChange}
-                  placeholder="Masukkan panjang pellet"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="pelletHeight">Pellet Height (mm)</Label>
-                <Input
-                  id="pelletHeight"
-                  type="number"
-                  step="0.1"
-                  value={formData.pelletHeight}
-                  onChange={handleChange}
-                  placeholder="Masukkan tinggi pellet"
-                />
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Physical Properties */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Physical Properties</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="dispersibility">Dispersibility</Label>
-                <Popover
-                  open={openDispersibility}
-                  onOpenChange={setOpenDispersibility}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openDispersibility}
-                    >
-                      {formData.dispersibility || "Select dispersibility..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search dispersibility..." />
-                      <CommandEmpty>No dispersibility found.</CommandEmpty>
-                      <CommandGroup>
-                        {dispersibilityOptions.map((option) => (
-                          <CommandItem
-                            key={option}
-                            value={option}
-                            onSelect={(currentValue) => {
-                              handleSelectChange(
-                                "dispersibility",
-                                currentValue
-                              );
-                              setOpenDispersibility(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.dispersibility === option
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {option}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="grid gap-2">
-                <Label
-                  htmlFor="mfr"
-                  className={errors.mfr ? "text-red-500" : ""}
-                >
-                  {"MFR (g/10 min)"}
-                </Label>
-                <Input
-                  id="mfr"
-                  type="number"
-                  step="0.1"
-                  value={formData.mfr}
-                  onChange={handleChange}
-                  className={errors.mfr ? "border-red-500" : ""}
-                />
-                {errors.mfr && (
-                  <p className="text-xs text-red-500">{errors.mfr}</p>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <Label
-                  htmlFor="density"
-                  className={errors.density ? "text-red-500" : ""}
-                >
-                  {"Density (g/cm³)"}
-                </Label>
-                <Input
-                  id="density"
-                  type="number"
-                  step="0.01"
-                  value={formData.density}
-                  onChange={handleChange}
-                  className={errors.density ? "border-red-500" : ""}
-                />
-                {errors.density && (
-                  <p className="text-xs text-red-500">{errors.density}</p>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="weightOfChips">
-                  {"Weight of Chips (mm / pcs)"}
-                </Label>
-                <Input
-                  id="weightOfChips"
-                  type="number"
-                  step="0.1"
-                  value={formData.weightOfChips}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="granule">Granule</Label>
-                <Popover open={openGranule} onOpenChange={setOpenGranule}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openGranule}
-                    >
-                      {formData.granule || "Select granule type..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search granule..." />
-                      <CommandEmpty>No granule found.</CommandEmpty>
-                      <CommandGroup>
-                        {granuleOptions.map((option) => (
-                          <CommandItem
-                            key={option}
-                            value={option}
-                            onSelect={(currentValue) => {
-                              handleSelectChange("granule", currentValue);
-                              setOpenGranule(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.granule === option
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {option}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Chemical Properties */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Chemical Properties</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label
-                  htmlFor="moisture"
-                  className={errors.moisture ? "text-red-500" : ""}
-                >
-                  Moisture (%)
-                </Label>
-                <Input
-                  id="moisture"
-                  type="number"
-                  step="0.01"
-                  value={formData.moisture}
-                  onChange={handleChange}
-                  className={errors.moisture ? "border-red-500" : ""}
-                />
-                {errors.moisture && (
-                  <p className="text-xs text-red-500">{errors.moisture}</p>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="carbonContent">{"Carbon Content (%)"}</Label>
-                <Input
-                  id="carbonContent"
-                  type="number"
-                  step="0.1"
-                  value={formData.carbonContent}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="foreignMatter">Foreign Matter</Label>
-                <Popover
-                  open={openForeignMatter}
-                  onOpenChange={setOpenForeignMatter}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openForeignMatter}
-                    >
-                      {formData.foreignMatter ||
-                        "Select foreign matter status..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search foreign matter..." />
-                      <CommandEmpty>No foreign matter found.</CommandEmpty>
-                      <CommandGroup>
-                        {foreignMatterOptions.map((option) => (
-                          <CommandItem
-                            key={option}
-                            value={option}
-                            onSelect={(currentValue) => {
-                              handleSelectChange("foreignMatter", currentValue);
-                              setOpenForeignMatter(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.foreignMatter === option
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {option}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="intrinsicViscosity">
-                  {"Intrinsic Viscosity (dL/g)"}
-                </Label>
-                <Input
-                  id="intrinsicViscosity"
-                  type="number"
-                  step="0.1"
-                  value={formData.intrinsicViscosity}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="ashContent">{"Ash Content (%)"}</Label>
-                <Input
-                  id="ashContent"
-                  type="number"
-                  step="0.01"
-                  value={formData.ashContent}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Performance Properties */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Performance Properties</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="heatStability">Heat Stability (°C)</Label>
-                <Input
-                  id="heatStability"
-                  type="number"
-                  value={formData.heatStability}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="lightFastness">Light Fastness (1-8)</Label>
-                <Input
-                  id="lightFastness"
-                  type="number"
-                  min="1"
-                  max="8"
-                  value={formData.lightFastness}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="deltaE">Delta E</Label>
-                <Input
-                  id="deltaE"
-                  type="number"
-                  step="0.1"
-                  value={formData.deltaE}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="macaroni">Macaroni</Label>
-                <Input
-                  id="macaroni"
-                  type="number"
-                  step="0.1"
-                  value={formData.macaroni}
-                  onChange={handleChange}
                 />
               </div>
             </div>

@@ -121,7 +121,6 @@ export default function PrintList() {
           </div>
         </div>
 
-        {/* Results summary */}
         <div className="text-sm text-muted-foreground mb-4">
           Showing {pagination?.total || 0} prints
         </div>
@@ -164,8 +163,8 @@ export default function PrintList() {
                   </TableHead>
                   <TableHead>Lot Number</TableHead>
                   <TableHead>Quantity</TableHead>
-                  <TableHead>Color</TableHead>
-                  <TableHead>Dispersibility</TableHead>
+                  <TableHead>Approved By</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>
                     <div
                       className="flex items-center cursor-pointer"
@@ -199,9 +198,36 @@ export default function PrintList() {
                       </TableCell>
                       <TableCell>{print.productName}</TableCell>
                       <TableCell>{print.lotNumber}</TableCell>
-                      <TableCell>{print.quantity}</TableCell>
-                      <TableCell>{print.color}</TableCell>
-                      <TableCell>{print.dispersibility}</TableCell>
+                      <TableCell>{print.quantity} Kg</TableCell>
+                      <TableCell>{print.approvedBy}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <div
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
+                              print.status === "APPROVED"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : print.status === "REJECTED"
+                                ? "bg-red-50 text-red-700 border-red-200"
+                                : "bg-amber-50 text-amber-700 border-amber-200"
+                            }`}
+                          >
+                            <div
+                              className={`w-2 h-2 rounded-full mr-2 ${
+                                print.status === "APPROVED"
+                                  ? "bg-emerald-500"
+                                  : print.status === "REJECTED"
+                                  ? "bg-red-500"
+                                  : "bg-amber-500"
+                              }`}
+                            />
+                            {print.status === "APPROVED"
+                              ? "Approved"
+                              : print.status === "REJECTED"
+                              ? "Rejected"
+                              : "Requested"}
+                          </div>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {new Date(print.printedDate).toLocaleDateString(
                           "id-ID",
@@ -245,6 +271,7 @@ export default function PrintList() {
                   <SelectValue placeholder="Items per page" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="1">1 / page</SelectItem>
                   <SelectItem value="5">5 / page</SelectItem>
                   <SelectItem value="10">10 / page</SelectItem>
                   <SelectItem value="20">20 / page</SelectItem>

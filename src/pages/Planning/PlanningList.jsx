@@ -57,6 +57,9 @@ export default function PlanningList() {
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPlanningId, setSelectedPlanningId] = useState(null);
+  const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
+  const [closeDialogOpen, setCloseDialogOpen] = useState(false);
+  const [selectedPlanning, setSelectedPlanning] = useState(null);
   const authUser = useSelector((state) => state.authUser);
 
   useEffect(() => {
@@ -93,6 +96,8 @@ export default function PlanningList() {
   const handleReopenPlanning = async (id) => {
     try {
       await dispatch(asyncReopenPlanning(id));
+      setReopenDialogOpen(false);
+      setSelectedPlanning(null);
     } catch (error) {
       console.error(error.message);
     }
@@ -101,6 +106,8 @@ export default function PlanningList() {
   const handleClosePlanning = async (id) => {
     try {
       await dispatch(asyncClosePlanning(id));
+      setCloseDialogOpen(false);
+      setSelectedPlanning(null);
     } catch (error) {
       console.error(error.message);
     }
@@ -207,7 +214,10 @@ export default function PlanningList() {
                         <Button
                           variant="outline"
                           className="w-8 h-8 hover:bg-green-500 hover:text-white"
-                          onClick={() => handleReopenPlanning(planning.id)}
+                          onClick={() => {
+                            setSelectedPlanning(planning);
+                            setReopenDialogOpen(true);
+                          }}
                           title="Re-Open Planning"
                         >
                           <Repeat className="w-4 h-4" />
@@ -219,7 +229,10 @@ export default function PlanningList() {
                         <Button
                           variant="outline"
                           className="w-8 h-8 hover:bg-red-500 hover:text-white"
-                          onClick={() => handleClosePlanning(planning.id)}
+                          onClick={() => {
+                            setSelectedPlanning(planning);
+                            setCloseDialogOpen(true);
+                          }}
                           title="Close Planning"
                         >
                           <Check className="w-4 h-4" />
@@ -323,6 +336,55 @@ export default function PlanningList() {
           </select>
         </div>
       </div>
+
+      {/* Reopen Confirmation Dialog */}
+      <Dialog open={reopenDialogOpen} onOpenChange={setReopenDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Re-Open Planning Confirmation</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to re-open planning{" "}
+              <strong>{selectedPlanning?.lotNumber}</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="default"
+              onClick={() => handleReopenPlanning(selectedPlanning?.id)}
+              className="bg-green-500 hover:bg-green-600"
+            >
+              Re-Open
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Close Confirmation Dialog */}
+      <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Close Planning Confirmation</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to close planning{" "}
+              <strong>{selectedPlanning?.lotNumber}</strong>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={() => handleClosePlanning(selectedPlanning?.id)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

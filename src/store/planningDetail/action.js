@@ -3,10 +3,15 @@ import api from "@/services/api";
 import { toast } from "sonner";
 import { hideLoading, showLoading } from "react-redux-loading-bar";
 
-export function setPlanningDetailActionCreator(data, totalQtyCheck, header) {
+export function setPlanningDetailActionCreator(
+  data,
+  totalQtyCheck,
+  totalQtyPrinted,
+  header
+) {
   return {
     type: "SET_PLANNING_DETAIL",
-    payload: { data, totalQtyCheck, header },
+    payload: { data, totalQtyCheck, totalQtyPrinted, header },
   };
 }
 
@@ -19,6 +24,7 @@ export function asyncGetPlanningDetailByLot(lotNumber) {
           setPlanningDetailActionCreator(
             response.data,
             response.totalQtyCheck,
+            response.totalQtyPrinted,
             response.header
           )
         );
@@ -67,10 +73,10 @@ export function asyncDeletePlanningDetail(detailId, lotNumber) {
   };
 }
 
-export function asyncUpdatePlanningDetail(detailId, data, lotNumber) {
+export function asyncUpdatePlanningDetail({ id, data, lotNumber }) {
   return async (dispatch) => {
     try {
-      const response = await api.updatePlanningDetail(detailId, data);
+      const response = await api.updatePlanningDetail(id, data);
       if (response.status === "success") {
         toast.success(response.message || "Berhasil update detail planning");
         // Refresh data setelah update

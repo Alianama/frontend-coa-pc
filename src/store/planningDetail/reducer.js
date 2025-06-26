@@ -13,6 +13,7 @@ const planningDetailReducer = (state = initialState, action) => {
         ...state,
         data: action.payload.data,
         totalQtyCheck: action.payload.totalQtyCheck,
+        totalQtyPrinted: action.payload.totalQtyPrinted,
         header: action.payload.header,
       };
     default:

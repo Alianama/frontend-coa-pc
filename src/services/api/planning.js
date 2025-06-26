@@ -73,6 +73,7 @@ export async function getDetailPlanningByLot(lotNumber) {
     status: "success",
     data: responseJson.data,
     totalQtyCheck: responseJson.totalQtyCheck,
+    totalQtyPrinted: responseJson.totalQtyPrinted,
     header: responseJson.header,
   };
 }

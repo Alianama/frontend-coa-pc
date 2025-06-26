@@ -147,10 +147,12 @@ export default function PlanningCreateForm() {
               <div className="space-y-2">
                 <label>Product</label>
                 <Combobox
-                  items={products?.map((product) => ({
-                    value: product.id.toString(),
-                    label: product.productName,
-                  }))}
+                  items={products
+                    ?.filter((product) => product.status === "active")
+                    .map((product) => ({
+                      value: product.id.toString(),
+                      label: product.productName,
+                    }))}
                   value={formData.idProduct?.toString()}
                   onValueChange={handleProductChange}
                   placeholder="Pilih produk..."
@@ -203,6 +205,7 @@ export default function PlanningCreateForm() {
                   required
                   type="number"
                   min="0"
+                  onWheel={(e) => e.target.blur()}
                 />
               </div>
               <div className="space-y-2">

@@ -40,7 +40,6 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   asyncGetPlanningDetailByLot,
   asyncDeletePlanningDetail,
-  asyncUpdatePlanningDetail,
   asyncPrintCoa,
 } from "@/store/planningDetail/action";
 import { useParams, useNavigate } from "react-router-dom";
@@ -62,7 +61,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import PlanningDetailStandardView from "./PlanningDetailStandardView";
-import { Label } from "@/components/ui/label";
+import PlanningDetailUpdateDialog from "./PlanningDetailUpdateDialog";
+import { asyncGetCustomer } from "@/store/customer/action";
 
 export default function PlanningDetailList() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -81,32 +81,11 @@ export default function PlanningDetailList() {
   const [selectedQcDetail, setSelectedQcDetail] = useState([]);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [printQuantity, setPrintQuantity] = useState("");
-  const [updateFormData, setUpdateFormData] = useState({
-    qty: "",
-    lineNo: "",
-    deltaL: "",
-    deltaA: "",
-    deltaB: "",
-    mfr: "",
-    dispersion: "",
-    density: "",
-    pelletLength: "",
-    pelletDiameter: "",
-    analysisDate: "",
-    visualCheck: "",
-    contamination: "",
-    macaroni: "",
-    moisture: "",
-    carbonContent: "",
-    foreignMatter: "",
-    weightChips: "",
-    intrinsicViscosity: "",
-    ashContent: "",
-    heatStability: "",
-    lightFastness: "",
-    granule: "",
-    remark: "",
-  });
+
+  useEffect(() => {
+    dispatch(asyncGetPlanningDetailByLot(lot));
+    dispatch(asyncGetCustomer());
+  }, [dispatch, lot]);
 
   const handleConfirmPrint = async () => {
     if (planningDetail.header.id && printQuantity) {
@@ -143,151 +122,7 @@ export default function PlanningDetailList() {
 
   const handleEdit = (item) => {
     setEditingItem(item);
-    setUpdateFormData({
-      qty: item.qty || "",
-      lineNo: item.lineNo || "",
-      deltaL: item.deltaL || "",
-      deltaA: item.deltaA || "",
-      deltaB: item.deltaB || "",
-      mfr: item.mfr || "",
-      dispersion: item.dispersion || "",
-      density: item.density || "",
-      pelletLength: item.pelletLength || "",
-      pelletDiameter: item.pelletDiameter || "",
-      analysisDate: item.analysisDate
-        ? new Date(item.analysisDate).toISOString().split("T")[0]
-        : "",
-      visualCheck: item.visualCheck || "",
-      qcJudgment: item.qcJudgment || "",
-      contamination: item.contamination || "",
-      macaroni: item.macaroni || "",
-      moisture: item.moisture || "",
-      carbonContent: item.carbonContent || "",
-      foreignMatter: item.foreignMatter || "",
-      weightChips: item.weightChips || "",
-      intrinsicViscosity: item.intrinsicViscosity || "",
-      ashContent: item.ashContent || "",
-      heatStability: item.heatStability || "",
-      lightFastness: item.lightFastness || "",
-      granule: item.granule || "",
-      remark: item.remark || "",
-    });
     setIsUpdateOpen(true);
-  };
-
-  const handleUpdate = async () => {
-    if (editingItem) {
-      try {
-        const payload = {
-          ...updateFormData,
-          qty: updateFormData.qty === "" ? null : Number(updateFormData.qty),
-          deltaL:
-            updateFormData.deltaL === "" ? null : Number(updateFormData.deltaL),
-          deltaA:
-            updateFormData.deltaA === "" ? null : Number(updateFormData.deltaA),
-          deltaB:
-            updateFormData.deltaB === "" ? null : Number(updateFormData.deltaB),
-          mfr: updateFormData.mfr === "" ? null : Number(updateFormData.mfr),
-          dispersion:
-            updateFormData.dispersion === ""
-              ? null
-              : Number(updateFormData.dispersion),
-          density:
-            updateFormData.density === ""
-              ? null
-              : Number(updateFormData.density),
-          pelletLength:
-            updateFormData.pelletLength === ""
-              ? null
-              : Number(updateFormData.pelletLength),
-          pelletDiameter:
-            updateFormData.pelletDiameter === ""
-              ? null
-              : Number(updateFormData.pelletDiameter),
-          moisture:
-            updateFormData.moisture === ""
-              ? null
-              : Number(updateFormData.moisture),
-          carbonContent:
-            updateFormData.carbonContent === ""
-              ? null
-              : Number(updateFormData.carbonContent),
-          weightChips:
-            updateFormData.weightChips === ""
-              ? null
-              : Number(updateFormData.weightChips),
-          intrinsicViscosity:
-            updateFormData.intrinsicViscosity === ""
-              ? null
-              : Number(updateFormData.intrinsicViscosity),
-          ashContent:
-            updateFormData.ashContent === ""
-              ? null
-              : Number(updateFormData.ashContent),
-          contamination:
-            updateFormData.contamination === ""
-              ? null
-              : Number(updateFormData.contamination),
-          macaroni:
-            updateFormData.macaroni === ""
-              ? null
-              : Number(updateFormData.macaroni),
-          foreignMatter:
-            updateFormData.foreignMatter === ""
-              ? null
-              : Number(updateFormData.foreignMatter),
-          heatStability:
-            updateFormData.heatStability === ""
-              ? null
-              : Number(updateFormData.heatStability),
-          lightFastness:
-            updateFormData.lightFastness === ""
-              ? null
-              : Number(updateFormData.lightFastness),
-          granule:
-            updateFormData.granule === ""
-              ? null
-              : Number(updateFormData.granule),
-        };
-        await dispatch(asyncUpdatePlanningDetail(editingItem.id, payload, lot));
-        setIsUpdateOpen(false);
-        setEditingItem(null);
-        setUpdateFormData({
-          qty: "",
-          lineNo: "",
-          deltaL: "",
-          deltaA: "",
-          deltaB: "",
-          mfr: "",
-          dispersion: "",
-          density: "",
-          pelletLength: "",
-          pelletDiameter: "",
-          analysisDate: "",
-          visualCheck: "",
-          qcJudgment: "",
-          contamination: "",
-          macaroni: "",
-          moisture: "",
-          carbonContent: "",
-          foreignMatter: "",
-          weightChips: "",
-          intrinsicViscosity: "",
-          ashContent: "",
-          heatStability: "",
-          lightFastness: "",
-          granule: "",
-          remark: "",
-        });
-      } catch (error) {
-        console.error("Error updating planning detail:", error);
-      }
-    }
-  };
-
-  const handleUpdateFormChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleStandardView = (item) => {
@@ -299,21 +134,23 @@ export default function PlanningDetailList() {
 
   console.log(planningDetail);
 
-  useEffect(() => {
-    dispatch(asyncGetPlanningDetailByLot(lot));
-  }, [dispatch, lot]);
-
   // Definisi kolom
   const allColumns = [
     { key: "id", label: "No" },
     { key: "qty", label: "Qty Check" },
     { key: "creator", label: "Checker" },
     { key: "lineNo", label: "Line" },
-    { key: "deltaL", label: "Δ L" },
-    { key: "deltaA", label: "Δ A" },
-    { key: "deltaB", label: "Δ B" },
+    { key: "tintDeltaL", label: "Tint ΔL" },
+    { key: "tintDeltaA", label: "Tint Δa" },
+    { key: "tintDeltaB", label: "Tint Δb" },
+    { key: "tintDeltaE", label: "Tint ΔE" },
+    { key: "colorDeltaL", label: "Color ΔL" },
+    { key: "colorDeltaA", label: "Color Δa" },
+    { key: "colorDeltaB", label: "Color Δb" },
+    { key: "colorDeltaE", label: "Color ΔE" },
+    { key: "deltaP", label: "ΔP" },
     { key: "mfr", label: "MFR (gr/mnt)" },
-    { key: "dispersion", label: "Dispersion" },
+    { key: "dispersibility", label: "Dispersibility" },
     { key: "density", label: "Density" },
     { key: "pellet", label: "Pallet (L x D)" },
     { key: "contamination", label: "Contamination" },
@@ -321,7 +158,7 @@ export default function PlanningDetailList() {
     { key: "moisture", label: "Moisture (%)" },
     { key: "carbonContent", label: "Carbon Content (%)" },
     { key: "foreignMatter", label: "Foreign Matter" },
-    { key: "weightChips", label: "Weight/Chips" },
+    { key: "weightOfChips", label: "Weight Of Chips" },
     { key: "intrinsicViscosity", label: "Intrinsic Viscosity" },
     { key: "ashContent", label: "Ash Content (%)" },
     { key: "heatStability", label: "Heat Stability" },
@@ -329,6 +166,7 @@ export default function PlanningDetailList() {
     { key: "granule", label: "Granule" },
     { key: "analysisDate", label: "Checked At" },
     { key: "visualCheck", label: "Visual Check" },
+    { key: "colorCheck", label: "Color Check" },
     { key: "qcJudgment", label: "QC Judgment" },
     { key: "remark", label: "Remark" },
   ];
@@ -444,8 +282,9 @@ export default function PlanningDetailList() {
           </div>
           {planningDetail.header && (
             <DetailHeader
+              quantityPrinted={planningDetail?.totalQtyPrinted}
               quantityCheck={planningDetail?.totalQtyCheck}
-              header={planningDetail.header}
+              header={planningDetail?.header}
             />
           )}
         </CardHeader>
@@ -500,7 +339,10 @@ export default function PlanningDetailList() {
                 Clear Filters
               </Button>
             )}
-            <Button onClick={() => navigate(`/planning/check/create/${lot}`)}>
+            <Button
+              disabled={planningDetail?.header?.status === "close"}
+              onClick={() => navigate(`/planning/check/create/${lot}`)}
+            >
               Add Checking
             </Button>
           </div>
@@ -536,7 +378,9 @@ export default function PlanningDetailList() {
                         </span>
                       </TableHead>
                     ))}
-                  <TableHead>Action</TableHead>
+                  <TableHead className="sticky right-0 bg-white z-10 min-w-[120px] border-l">
+                    Action
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -565,11 +409,24 @@ export default function PlanningDetailList() {
                                 : "-")}
                             {col.key === "creator" && item.creator.fullName}
                             {col.key === "lineNo" && item.lineNo}
-                            {col.key === "deltaL" && item.deltaL}
-                            {col.key === "deltaA" && item.deltaA}
-                            {col.key === "deltaB" && item.deltaB}
+                            {col.key === "tintDeltaL" && item.tintDeltaL}
+                            {col.key === "tintDeltaA" && item.tintDeltaA}
+                            {col.key === "tintDeltaB" && item.tintDeltaB}
+                            {col.key === "tintDeltaE" &&
+                              (item.tintDeltaE != null
+                                ? Number(item.tintDeltaE).toFixed(2)
+                                : "-")}
+                            {col.key === "colorDeltaL" && item.colorDeltaL}
+                            {col.key === "colorDeltaA" && item.colorDeltaA}
+                            {col.key === "colorDeltaB" && item.colorDeltaB}
+                            {col.key === "colorDeltaE" &&
+                              (item.colorDeltaE != null
+                                ? Number(item.colorDeltaE).toFixed(2)
+                                : "-")}
+                            {col.key === "deltaP" && item.deltaP}
                             {col.key === "mfr" && item.mfr}
-                            {col.key === "dispersion" && item.dispersion}
+                            {col.key === "dispersibility" &&
+                              item.dispersibility}
                             {col.key === "density" && item.density}
                             {col.key === "pellet" &&
                               `${item.pelletLength} x ${item.pelletDiameter} mm`}
@@ -578,7 +435,7 @@ export default function PlanningDetailList() {
                             {col.key === "moisture" && item.moisture}
                             {col.key === "carbonContent" && item.carbonContent}
                             {col.key === "foreignMatter" && item.foreignMatter}
-                            {col.key === "weightChips" && item.weightChips}
+                            {col.key === "weightOfChips" && item.weightOfChips}
                             {col.key === "intrinsicViscosity" &&
                               item.intrinsicViscosity}
                             {col.key === "ashContent" && item.ashContent}
@@ -606,6 +463,16 @@ export default function PlanningDetailList() {
                                   <AlertCircle className="w-3 h-3 mr-1" /> NG
                                 </Badge>
                               ))}
+                            {col.key === "colorCheck" &&
+                              (item.colorCheck === "Ok" ? (
+                                <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
+                                  <CheckCircle2 className="w-3 h-3 mr-1" /> OK
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
+                                  <AlertCircle className="w-3 h-3 mr-1" /> NG
+                                </Badge>
+                              ))}
                             {col.key === "qcJudgment" &&
                               (item.qcJudgment === "Passed" ? (
                                 <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
@@ -622,7 +489,7 @@ export default function PlanningDetailList() {
                             {col.key === "remark" && item.remark}
                           </TableCell>
                         ))}
-                      <TableCell className="flex gap-3">
+                      <TableCell className="sticky right-0 flex gap-2 justify-center bg-white z-10 min-w-[120px] border-l">
                         <Button
                           variant="outline"
                           className="w-8 h-8"
@@ -638,13 +505,21 @@ export default function PlanningDetailList() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(item)}>
+                            <DropdownMenuItem
+                              onClick={() => handleEdit(item)}
+                              disabled={
+                                planningDetail?.header?.status === "close"
+                              }
+                            >
                               <Edit className="w-4 h-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleIsDeleteOpen(item.id)}
                               className="text-red-600"
+                              disabled={
+                                planningDetail?.header?.status === "close"
+                              }
                             >
                               <Trash className="w-4 h-4 mr-2" />
                               Delete
@@ -775,301 +650,11 @@ export default function PlanningDetailList() {
       </Dialog>
 
       {/* Update Dialog */}
-      <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Update Planning Detail</DialogTitle>
-            <DialogDescription>
-              Update data planning detail untuk lot {lot}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="qty">Quantity</Label>
-                <Input
-                  id="qty"
-                  name="qty"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.qty}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan qty check"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lineNo">Line No</Label>
-                <Input
-                  id="lineNo"
-                  name="lineNo"
-                  value={updateFormData.lineNo}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan line no"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="analysisDate">Analysis Date</Label>
-                <Input
-                  id="analysisDate"
-                  name="analysisDate"
-                  type="date"
-                  value={updateFormData.analysisDate}
-                  onChange={handleUpdateFormChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="deltaL">ΔL</Label>
-                <Input
-                  id="deltaL"
-                  name="deltaL"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.deltaL}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan delta L"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="deltaA">Δa</Label>
-                <Input
-                  id="deltaA"
-                  name="deltaA"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.deltaA}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan delta A"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="deltaB">Δb</Label>
-                <Input
-                  id="deltaB"
-                  name="deltaB"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.deltaB}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan delta B"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="density">Density</Label>
-                <Input
-                  id="density"
-                  name="density"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.density}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan density"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="mfr">MFR</Label>
-                <Input
-                  id="mfr"
-                  name="mfr"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.mfr}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan MFR"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dispersion">Dispersion</Label>
-                <Input
-                  id="dispersion"
-                  name="dispersion"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.dispersion}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan dispersion"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contamination">Contamination</Label>
-                <Input
-                  id="contamination"
-                  name="contamination"
-                  value={updateFormData.contamination}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Contamination"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="macaroni">Macaroni</Label>
-                <Input
-                  id="macaroni"
-                  name="macaroni"
-                  value={updateFormData.macaroni}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Macaroni"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pelletLength">Pellet Length</Label>
-                <Input
-                  id="pelletLength"
-                  name="pelletLength"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.pelletLength}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan pellet length"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pelletDiameter">Pellet Diameter</Label>
-                <Input
-                  id="pelletDiameter"
-                  name="pelletDiameter"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.pelletDiameter}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Masukkan pellet diameter"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="moisture">Moisture</Label>
-                <Input
-                  id="moisture"
-                  name="moisture"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.moisture}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Moisture"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="carbonContent">Carbon Content</Label>
-                <Input
-                  id="carbonContent"
-                  name="carbonContent"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.carbonContent}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Carbon Content"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="foreignMatter">Foreign Matter</Label>
-                <Input
-                  id="foreignMatter"
-                  name="foreignMatter"
-                  value={updateFormData.foreignMatter}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Foreign Matter"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="weightChips">Weight Chips</Label>
-                <Input
-                  id="weightChips"
-                  name="weightChips"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.weightChips}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Weight/Chips"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="intrinsicViscosity">Intrinsic Viscosity</Label>
-                <Input
-                  id="intrinsicViscosity"
-                  name="intrinsicViscosity"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.intrinsicViscosity}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Intrinsic Viscosity"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="ashContent">Ash Content</Label>
-                <Input
-                  id="ashContent"
-                  name="ashContent"
-                  type="number"
-                  step="0.01"
-                  value={updateFormData.ashContent}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Ash Content"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="heatStability">Heat Stability</Label>
-                <Input
-                  id="heatStability"
-                  name="heatStability"
-                  value={updateFormData.heatStability}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Heat Stability"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lightFastness">Light Fastness</Label>
-                <Input
-                  id="lightFastness"
-                  name="lightFastness"
-                  value={updateFormData.lightFastness}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Light Fastness"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="granule">Granule</Label>
-                <Input
-                  id="granule"
-                  name="granule"
-                  value={updateFormData.granule}
-                  onChange={handleUpdateFormChange}
-                  placeholder="Granule"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="visualCheck">Visual Check</Label>
-              <Select
-                value={updateFormData.visualCheck}
-                onValueChange={(value) =>
-                  setUpdateFormData((prev) => ({ ...prev, visualCheck: value }))
-                }
-              >
-                <SelectTrigger id="visualCheck">
-                  <SelectValue placeholder="Pilih visual check" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Ok">Ok</SelectItem>
-                  <SelectItem value="Not Good">Not Good</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="remark">Remark</Label>
-              <Input
-                id="remark"
-                name="remark"
-                value={updateFormData.remark}
-                onChange={handleUpdateFormChange}
-                placeholder="Remark"
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex gap-2">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={handleUpdate}>Update</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PlanningDetailUpdateDialog
+        open={isUpdateOpen}
+        onOpenChange={setIsUpdateOpen}
+        editingItem={editingItem}
+      />
 
       {/* Standard View Dialog */}
       <PlanningDetailStandardView

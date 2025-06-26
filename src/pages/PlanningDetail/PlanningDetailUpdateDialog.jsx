@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,32 +18,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  asyncAddPlanningDetail,
-  asyncGetPlanningDetailByLot,
-} from "@/store/planningDetail/action";
-import { useParams, useNavigate } from "react-router-dom";
-import DetailHeader from "./PlanningDetailHeader";
-import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
-import { asyncGetCustomer } from "@/store/customer/action";
+import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { asyncUpdatePlanningDetail } from "@/store/planningDetail/action";
 
-export default function PlanningDetailForm() {
+export default function PlanningDetailUpdateDialog({
+  open,
+  onOpenChange,
+  editingItem,
+}) {
   const dispatch = useDispatch();
   const { lot } = useParams();
-  const navigate = useNavigate();
-  const { header, totalQtyCheck } = useSelector(
-    (state) => state.planningDetail
-  );
+  const { header } = useSelector((state) => state.planningDetail);
   const customers = useSelector((state) => state.customers);
 
-  console.log(header);
-
-  // Inisialisasi formData tanpa idPlanning, akan di-set setelah header tersedia
   const [formData, setFormData] = useState({
     qty: "",
-    idPlanning: "",
     lineNo: "",
     tintDeltaL: "",
     tintDeltaA: "",
@@ -52,6 +53,7 @@ export default function PlanningDetailForm() {
     pelletLength: "",
     pelletDiameter: "",
     visualCheck: "",
+    colorCheck: "",
     moisture: "",
     carbonContent: "",
     foreignMatter: "",
@@ -64,41 +66,65 @@ export default function PlanningDetailForm() {
     analysisDate: "",
     checkedBy: "",
     remark: "",
-    letDownRatio: "",
+    // letDownRatio: "",
   });
 
-  // Ambil data planning detail berdasarkan lot
   useEffect(() => {
-    dispatch(asyncGetPlanningDetailByLot(lot));
-    dispatch(asyncGetCustomer());
-  }, [dispatch, lot]);
+    if (editingItem) {
+      const newFormData = {
+        qty: editingItem.qty || "",
+        lineNo: editingItem.lineNo || "",
+        tintDeltaL: editingItem.tintDeltaL || "",
+        tintDeltaA: editingItem.tintDeltaA || "",
+        tintDeltaB: editingItem.tintDeltaB || "",
+        colorDeltaL: editingItem.colorDeltaL || "",
+        colorDeltaA: editingItem.colorDeltaA || "",
+        colorDeltaB: editingItem.colorDeltaB || "",
+        deltaP: editingItem.deltaP || "",
+        density: editingItem.density || "",
+        mfr: editingItem.mfr || "",
+        dispersibility: editingItem.dispersibility || "",
+        contamination: editingItem.contamination || "",
+        macaroni: editingItem.macaroni || "",
+        pelletLength: editingItem.pelletLength || "",
+        pelletDiameter: editingItem.pelletDiameter || "",
+        visualCheck: editingItem.visualCheck || "",
+        colorCheck: editingItem.colorCheck || "",
+        moisture: editingItem.moisture || "",
+        carbonContent: editingItem.carbonContent || "",
+        foreignMatter: editingItem.foreignMatter || "",
+        weightOfChips: editingItem.weightOfChips || "",
+        intrinsicViscosity: editingItem.intrinsicViscosity || "",
+        ashContent: editingItem.ashContent || "",
+        heatStability: editingItem.heatStability || "",
+        lightFastness: editingItem.lightFastness || "",
+        granule: editingItem.granule || "",
+        analysisDate: editingItem.analysisDate
+          ? new Date(editingItem.analysisDate).toISOString().slice(0, 16)
+          : "",
+        checkedBy: editingItem.checkedBy || "",
+        remark: editingItem.remark || "",
+        // letDownRatio: editingItem.letDownRatio || "",
+      };
 
-  // Set idPlanning ke formData setelah header tersedia
-  useEffect(() => {
-    if (header?.id) {
-      setFormData((prev) => ({
-        ...prev,
-        idPlanning: header.id,
-      }));
-    }
-    // Cek jika customer punya mandatoryFields dan ada letDownRatio
-    if (header && customers && customers.length > 0 && header.idCustomer) {
-      const selectedCustomer = customers.find(
-        (c) => c.id === header.idCustomer
-      );
-      if (selectedCustomer && selectedCustomer.mandatoryFields) {
-        const hasLetDownRatio = selectedCustomer.mandatoryFields.some(
-          (f) => f.fieldName === "letDownRatio"
+      // Cek jika customer punya mandatoryFields dan ada letDownRatio
+      if (header && customers && customers.length > 0 && header.idCustomer) {
+        const selectedCustomer = customers.find(
+          (c) => c.id === header.idCustomer
         );
-        if (hasLetDownRatio && header.ratio !== undefined) {
-          setFormData((prev) => ({
-            ...prev,
-            letDownRatio: header.ratio,
-          }));
+        if (
+          selectedCustomer?.mandatoryFields?.some(
+            (f) => f.fieldName === "letDownRatio"
+          ) &&
+          header.ratio !== undefined
+        ) {
+          newFormData.letDownRatio = header.ratio;
         }
       }
+
+      setFormData(newFormData);
     }
-  }, [header, customers]);
+  }, [editingItem, header, customers]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -107,31 +133,27 @@ export default function PlanningDetailForm() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // Cari customer yang id-nya sama dengan header.idCustomer
+    if (!editingItem) return;
+
     let selectedCustomer = null;
     if (customers && customers.length > 0 && header?.idCustomer) {
       selectedCustomer = customers.find((c) => c.id === header.idCustomer);
     }
     const customerMandatoryFields =
-      selectedCustomer && selectedCustomer.mandatoryFields
-        ? selectedCustomer.mandatoryFields.map((f) => ({
-            key: f.fieldName,
-            label: f.fieldName
-              .replace(/([A-Z])/g, " $1")
-              .replace(/^./, (str) => str.toUpperCase()),
-          }))
-        : [];
+      selectedCustomer?.mandatoryFields?.map((f) => ({
+        key: f.fieldName,
+        label: f.fieldName
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase()),
+      })) || [];
 
-    // Jika tidak ada, fallback ke default
     const mandatoryFields = [
       { key: "qty", label: "Quantity" },
       { key: "lineNo", label: "Line" },
       { key: "analysisDate", label: "Checked At" },
-      // ...tambahan dari customerMandatoryFields jika ada dan tidak duplikat
-      // deltaE dikecualikan karena merupakan hasil kalkulasi dari backend
       ...customerMandatoryFields.filter(
         (f) =>
           ![
@@ -155,88 +177,80 @@ export default function PlanningDetailForm() {
       return;
     }
 
-    // Konversi tipe data sesuai kebutuhan
-    const dataToSubmit = {
-      ...formData,
-      qty: formData.qty === "" ? null : Number(formData.qty),
-      idPlanning:
-        formData.idPlanning === "" ? null : Number(formData.idPlanning),
-      lineNo: formData.lineNo === "" ? null : Number(formData.lineNo),
-      tintDeltaL:
-        formData.tintDeltaL === "" ? null : Number(formData.tintDeltaL),
-      tintDeltaA:
-        formData.tintDeltaA === "" ? null : Number(formData.tintDeltaA),
-      tintDeltaB:
-        formData.tintDeltaB === "" ? null : Number(formData.tintDeltaB),
-      colorDeltaL:
-        formData.colorDeltaL === "" ? null : Number(formData.colorDeltaL),
-      colorDeltaA:
-        formData.colorDeltaA === "" ? null : Number(formData.colorDeltaA),
-      colorDeltaB:
-        formData.colorDeltaB === "" ? null : Number(formData.colorDeltaB),
-      deltaP: formData.deltaP === "" ? null : Number(formData.deltaP),
-      density: formData.density === "" ? null : Number(formData.density),
-      mfr: formData.mfr === "" ? null : Number(formData.mfr),
-      dispersibility:
-        formData.dispersibility === "" ? null : Number(formData.dispersibility),
-      contamination:
-        formData.contamination === "" ? null : Number(formData.contamination),
-      macaroni: formData.macaroni === "" ? null : Number(formData.macaroni),
-      pelletLength:
-        formData.pelletLength === "" ? null : Number(formData.pelletLength),
-      pelletDiameter:
-        formData.pelletDiameter === "" ? null : Number(formData.pelletDiameter),
-      visualCheck: formData.visualCheck === "" ? null : formData.visualCheck,
-      colorCheck: formData.colorCheck === "" ? null : formData.colorCheck,
-      moisture: formData.moisture === "" ? null : Number(formData.moisture),
-      carbonContent:
-        formData.carbonContent === "" ? null : Number(formData.carbonContent),
-      foreignMatter:
-        formData.foreignMatter === "" ? null : Number(formData.foreignMatter),
-      weightOfChips:
-        formData.weightOfChips === "" ? null : Number(formData.weightOfChips),
-      intrinsicViscosity:
-        formData.intrinsicViscosity === ""
-          ? null
-          : Number(formData.intrinsicViscosity),
-      ashContent:
-        formData.ashContent === "" ? null : Number(formData.ashContent),
-      heatStability:
-        formData.heatStability === "" ? null : Number(formData.heatStability),
-      lightFastness:
-        formData.lightFastness === "" ? null : Number(formData.lightFastness),
-      granule: formData.granule === "" ? null : Number(formData.granule),
-      analysisDate:
-        formData.analysisDate === ""
-          ? null
-          : new Date(formData.analysisDate).toISOString(),
-      checkedBy: formData.checkedBy,
-      remark: formData.remark,
-      letDownRatio:
-        formData.letDownRatio === "" ? null : Number(formData.letDownRatio),
-    };
+    try {
+      const payload = Object.fromEntries(
+        Object.entries(formData).map(([key, value]) => {
+          if (value === "" || value === null) {
+            return [key, null];
+          }
+          if (
+            [
+              "qty",
+              "lineNo",
+              "tintDeltaL",
+              "tintDeltaA",
+              "tintDeltaB",
+              "colorDeltaL",
+              "colorDeltaA",
+              "colorDeltaB",
+              "deltaP",
+              "density",
+              "mfr",
+              "dispersibility",
+              "contamination",
+              "macaroni",
+              "pelletLength",
+              "pelletDiameter",
+              "moisture",
+              "carbonContent",
+              "foreignMatter",
+              "weightOfChips",
+              "intrinsicViscosity",
+              "ashContent",
+              "heatStability",
+              "lightFastness",
+              "granule",
+            ].includes(key)
+          ) {
+            return [key, Number(value)];
+          }
+          if (key === "analysisDate") {
+            return [key, new Date(value).toISOString()];
+          }
+          return [key, value];
+        })
+      );
 
-    const response = await dispatch(asyncAddPlanningDetail(dataToSubmit));
-    // Jika sukses, navigate ke /planning
-    if (response && response.status === "success") {
-      navigate(`/planning/check/${lot}`);
+      const response = await dispatch(
+        asyncUpdatePlanningDetail({
+          id: editingItem.id,
+          data: payload,
+          lotNumber: lot,
+        })
+      );
+
+      if (response && response.status === "success") {
+        onOpenChange(false);
+      } else {
+        toast.error(response?.message || "Update gagal");
+      }
+    } catch (error) {
+      toast.error(error.message || "Terjadi kesalahan saat update");
     }
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Quality Control Form</h1>
-        <p className="mt-2">Masukkan data QC dan klik Save untuk simpan</p>
-      </div>
-      {header && <DetailHeader quantityCheck={totalQtyCheck} header={header} />}
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>QC Data Entry</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Update Checking Data</DialogTitle>
+          <DialogDescription>
+            Update data QC di bawah ini. Klik update jika sudah selesai.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleUpdate}>
+          <div className="space-y-6 py-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <div className="col-span-full">
                 <div className="border rounded-lg shadow-md p-4">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
@@ -285,7 +299,7 @@ export default function PlanningDetailForm() {
                 </div>
               </div>
 
-              {/* Tint Section dibungkus border dan shadow */}
+              {/* Tint Section */}
               <div className="col-span-full pt-4">
                 <div className="border rounded-lg shadow-md p-4">
                   <h3 className="text-center font-semibold">Tint</h3>
@@ -297,7 +311,6 @@ export default function PlanningDetailForm() {
                         id="tintDeltaL"
                         type="number"
                         step="0.01"
-                        placeholder="0.35"
                         value={formData.tintDeltaL}
                         onChange={(e) =>
                           handleInputChange("tintDeltaL", e.target.value)
@@ -312,7 +325,6 @@ export default function PlanningDetailForm() {
                         id="tintDeltaA"
                         type="number"
                         step="0.01"
-                        placeholder="0.20"
                         value={formData.tintDeltaA}
                         onChange={(e) =>
                           handleInputChange("tintDeltaA", e.target.value)
@@ -327,7 +339,6 @@ export default function PlanningDetailForm() {
                         id="tintDeltaB"
                         type="number"
                         step="0.01"
-                        placeholder="0.35"
                         value={formData.tintDeltaB}
                         onChange={(e) =>
                           handleInputChange("tintDeltaB", e.target.value)
@@ -352,7 +363,6 @@ export default function PlanningDetailForm() {
                         id="colorDeltaL"
                         type="number"
                         step="0.01"
-                        placeholder="0.35"
                         value={formData.colorDeltaL}
                         onChange={(e) =>
                           handleInputChange("colorDeltaL", e.target.value)
@@ -367,7 +377,6 @@ export default function PlanningDetailForm() {
                         id="colorDeltaA"
                         type="number"
                         step="0.01"
-                        placeholder="0.20"
                         value={formData.colorDeltaA}
                         onChange={(e) =>
                           handleInputChange("colorDeltaA", e.target.value)
@@ -382,7 +391,6 @@ export default function PlanningDetailForm() {
                         id="colorDeltaB"
                         type="number"
                         step="0.01"
-                        placeholder="0.35"
                         value={formData.colorDeltaB}
                         onChange={(e) =>
                           handleInputChange("colorDeltaB", e.target.value)
@@ -406,7 +414,6 @@ export default function PlanningDetailForm() {
                   id="deltaP"
                   type="number"
                   step="0.01"
-                  placeholder="0.35"
                   value={formData.deltaP}
                   onChange={(e) => handleInputChange("deltaP", e.target.value)}
                   onWheel={(e) => e.target.blur()}
@@ -419,7 +426,6 @@ export default function PlanningDetailForm() {
                   id="density"
                   type="number"
                   step="0.1"
-                  placeholder="1.2"
                   value={formData.density}
                   onChange={(e) => handleInputChange("density", e.target.value)}
                   onWheel={(e) => e.target.blur()}
@@ -432,7 +438,6 @@ export default function PlanningDetailForm() {
                   id="mfr"
                   type="number"
                   step="0.1"
-                  placeholder="12.5"
                   value={formData.mfr}
                   onChange={(e) => handleInputChange("mfr", e.target.value)}
                   onWheel={(e) => e.target.blur()}
@@ -445,7 +450,6 @@ export default function PlanningDetailForm() {
                   id="dispersibility"
                   type="number"
                   step="0.1"
-                  placeholder="3.0"
                   value={formData.dispersibility}
                   onChange={(e) =>
                     handleInputChange("dispersibility", e.target.value)
@@ -460,7 +464,6 @@ export default function PlanningDetailForm() {
                   id="contamination"
                   type="number"
                   step="0.1"
-                  placeholder="0.0"
                   value={formData.contamination}
                   onChange={(e) =>
                     handleInputChange("contamination", e.target.value)
@@ -475,7 +478,6 @@ export default function PlanningDetailForm() {
                   id="macaroni"
                   type="number"
                   step="0.1"
-                  placeholder="0.8"
                   value={formData.macaroni}
                   onChange={(e) =>
                     handleInputChange("macaroni", e.target.value)
@@ -490,7 +492,6 @@ export default function PlanningDetailForm() {
                   id="pelletLength"
                   type="number"
                   step="0.1"
-                  placeholder="2.5"
                   value={formData.pelletLength}
                   onChange={(e) =>
                     handleInputChange("pelletLength", e.target.value)
@@ -505,7 +506,6 @@ export default function PlanningDetailForm() {
                   id="pelletDiameter"
                   type="number"
                   step="0.1"
-                  placeholder="1.1"
                   value={formData.pelletDiameter}
                   onChange={(e) =>
                     handleInputChange("pelletDiameter", e.target.value)
@@ -514,14 +514,12 @@ export default function PlanningDetailForm() {
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="moisture">Moisture</Label>
                 <Input
                   id="moisture"
                   type="number"
                   step="0.01"
-                  placeholder="0.05"
                   value={formData.moisture}
                   onChange={(e) =>
                     handleInputChange("moisture", e.target.value)
@@ -536,7 +534,6 @@ export default function PlanningDetailForm() {
                   id="carbonContent"
                   type="number"
                   step="0.1"
-                  placeholder="0.3"
                   value={formData.carbonContent}
                   onChange={(e) =>
                     handleInputChange("carbonContent", e.target.value)
@@ -551,7 +548,6 @@ export default function PlanningDetailForm() {
                   id="foreignMatter"
                   type="number"
                   step="0.1"
-                  placeholder="0.0"
                   value={formData.foreignMatter}
                   onChange={(e) =>
                     handleInputChange("foreignMatter", e.target.value)
@@ -566,7 +562,6 @@ export default function PlanningDetailForm() {
                   id="weightOfChips"
                   type="number"
                   step="0.1"
-                  placeholder="0.9"
                   value={formData.weightOfChips}
                   onChange={(e) =>
                     handleInputChange("weightOfChips", e.target.value)
@@ -581,7 +576,6 @@ export default function PlanningDetailForm() {
                   id="intrinsicViscosity"
                   type="number"
                   step="0.1"
-                  placeholder="0.7"
                   value={formData.intrinsicViscosity}
                   onChange={(e) =>
                     handleInputChange("intrinsicViscosity", e.target.value)
@@ -596,7 +590,6 @@ export default function PlanningDetailForm() {
                   id="ashContent"
                   type="number"
                   step="0.01"
-                  placeholder="0.02"
                   value={formData.ashContent}
                   onChange={(e) =>
                     handleInputChange("ashContent", e.target.value)
@@ -611,7 +604,6 @@ export default function PlanningDetailForm() {
                   id="heatStability"
                   type="number"
                   step="0.1"
-                  placeholder="4.5"
                   value={formData.heatStability}
                   onChange={(e) =>
                     handleInputChange("heatStability", e.target.value)
@@ -626,7 +618,6 @@ export default function PlanningDetailForm() {
                   id="lightFastness"
                   type="number"
                   step="0.1"
-                  placeholder="5.0"
                   value={formData.lightFastness}
                   onChange={(e) =>
                     handleInputChange("lightFastness", e.target.value)
@@ -641,16 +632,29 @@ export default function PlanningDetailForm() {
                   id="granule"
                   type="number"
                   step="0.1"
-                  placeholder="1.0"
                   value={formData.granule}
                   onChange={(e) => handleInputChange("granule", e.target.value)}
                   onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
+              {/* <div className="space-y-2">
+                <Label htmlFor="letDownRatio">Letdown Ratio</Label>
+                <Input
+                  id="letDownRatio"
+                  type="number"
+                  step="0.1"
+                  value={formData.letDownRatio}
+                  onChange={(e) =>
+                    handleInputChange("letDownRatio", e.target.value)
+                  }
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div> */}
             </div>
             <div className="flex space-x-4 border rounded-lg shadow-md p-4 mb-4 bg-white">
-              <div className="space-y-2 ">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="visualCheck">Visual Check</Label>
                 <Select
                   value={formData.visualCheck}
@@ -667,7 +671,7 @@ export default function PlanningDetailForm() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1">
                 <Label htmlFor="colorCheck">Color Check</Label>
                 <Select
                   value={formData.colorCheck}
@@ -695,12 +699,23 @@ export default function PlanningDetailForm() {
                 className="h-8 text-sm py-1 px-2"
               />
             </div>
-            <Button type="submit" className="w-full shadow-2xs" size="lg">
-              Save
-            </Button>
-          </CardContent>
-        </Card>
-      </form>
-    </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Batal
+              </Button>
+            </DialogClose>
+            <Button type="submit">Update</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
+
+PlanningDetailUpdateDialog.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onOpenChange: PropTypes.func.isRequired,
+  editingItem: PropTypes.object,
+};

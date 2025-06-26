@@ -49,15 +49,11 @@ import {
 
 // Available fields for selection
 const availableFields = [
-  // "customerId",
-  // "productName",
-  // "lotNumber",
-  // "quantity",
   "letDownRatio",
   "pelletLength",
   "pelletDiameter",
-  "pelletVisual",
-  "color",
+  "visualCheck",
+  "colorCheck",
   "dispersibility",
   "mfr",
   "density",
@@ -73,7 +69,9 @@ const availableFields = [
   "heatStability",
   "lightFastness",
   "granule",
-  "deltaE",
+  "tintDeltaE",
+  "colorDeltaE",
+  "deltaP",
   "macaroni",
 ];
 
@@ -82,7 +80,8 @@ const fieldLabels = {
   letDownRatio: "Let Down Ratio",
   pelletLength: "Pellet Length",
   pelletDiameter: "Pellet Diameter",
-  pelletVisual: "Pellet Visual",
+  visualCheck: "Visual Check",
+  colorCheck: "Color Check",
   color: "Color",
   dispersibility: "Dispersibility",
   mfr: "MFR",
@@ -99,7 +98,9 @@ const fieldLabels = {
   heatStability: "Heat Stability",
   lightFastness: "Light Fastness",
   granule: "Granule",
-  deltaE: "Delta E",
+  tintDeltaE: "Tint Delta E",
+  colorDeltaE: "Color Delta E",
+  deltaP: "Delta P",
   macaroni: "Macaroni",
 };
 
