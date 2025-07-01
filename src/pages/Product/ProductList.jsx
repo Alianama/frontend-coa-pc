@@ -98,10 +98,6 @@ export default function ProductList() {
     return Array.from(new Set(products.map((product) => product.resin)));
   }, [products]);
 
-  const uniqueColors = useMemo(() => {
-    return Array.from(new Set(products.map((product) => product.color)));
-  }, [products]);
-
   // Filter and sort products
   const filteredProducts = useMemo(() => {
     return products
@@ -111,15 +107,12 @@ export default function ProductList() {
           product.productName
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          product.color.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.resin.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesResin =
           filterResin === "all" || product.resin === filterResin;
-        const matchesColor =
-          filterColor === "all" || product.color === filterColor;
 
-        return matchesSearch && matchesResin && matchesColor;
+        return matchesSearch && matchesResin;
       })
       .sort((a, b) => {
         if (!sortField) return 0;
@@ -141,14 +134,7 @@ export default function ProductList() {
 
         return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
       });
-  }, [
-    products,
-    searchTerm,
-    filterResin,
-    filterColor,
-    sortField,
-    sortDirection,
-  ]);
+  }, [products, searchTerm, filterResin, sortField, sortDirection]);
 
   // Rest of the code remains the same...
   // Pagination
@@ -292,21 +278,6 @@ export default function ProductList() {
                   ))}
                 </SelectContent>
               </Select>
-
-              <Select value={filterColor} onValueChange={setFilterColor}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by Color" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Colors</SelectItem>
-                  {uniqueColors.map((color) => (
-                    <SelectItem key={color} value={color}>
-                      {color}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
               {(searchTerm ||
                 filterResin !== "all" ||
                 filterColor !== "all") && (
@@ -395,19 +366,7 @@ export default function ProductList() {
                       </TableCell>
                       <TableCell>{product.resin}</TableCell>
                       <TableCell>
-                        <div className="">
-                          <div
-                            className="w-4 h-4 rounded-full"
-                            style={{
-                              backgroundColor: product.color.toLowerCase(),
-                              border:
-                                product.color.toLowerCase() === "white"
-                                  ? "1px solid #e2e8f0"
-                                  : "none",
-                            }}
-                          />
-                          {product.color}
-                        </div>
+                        <div className="">{product.expiredAge} month</div>
                       </TableCell>
                       <TableCell>{product.letDownRatio}</TableCell>
                       <TableCell>

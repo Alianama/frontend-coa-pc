@@ -27,7 +27,7 @@ export default function ProductDetailDialog({ product, isOpen, onOpenChange }) {
       productName: PropTypes.string,
       resin: PropTypes.string,
       letDownRatio: PropTypes.string,
-      color: PropTypes.string,
+      expiredAge: PropTypes.number,
     }),
     isOpen: PropTypes.bool.isRequired,
     onOpenChange: PropTypes.func.isRequired,
@@ -46,11 +46,9 @@ export default function ProductDetailDialog({ product, isOpen, onOpenChange }) {
             <div
               className="w-4 h-4 rounded-full inline-block"
               style={{
-                backgroundColor: product.color?.toLowerCase(),
+                backgroundColor: product.expiredAge,
                 border:
-                  product.color?.toLowerCase() === "white"
-                    ? "1px solid #e2e8f0"
-                    : "none",
+                  product.expiredAge === "white" ? "1px solid #e2e8f0" : "none",
               }}
             />
           </DialogTitle>
@@ -65,7 +63,7 @@ export default function ProductDetailDialog({ product, isOpen, onOpenChange }) {
             <div className="space-y-1">
               {renderProperty("Product Name", product.productName)}
               {renderProperty("Resin", product.resin)}
-              {renderProperty("Color", product.color)}
+              {renderProperty("Expired Age", `${product.expiredAge} month`)}
               {renderProperty("Let Down Ratio", product.letDownRatio)}
             </div>
           </div>

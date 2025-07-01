@@ -32,7 +32,7 @@ ProductFormDialog.propTypes = {
     productName: PropTypes.string,
     resin: PropTypes.string,
     letDownRatio: PropTypes.string,
-    color: PropTypes.string,
+    expiredAge: PropTypes.number,
   }),
   isOpen: PropTypes.bool.isRequired,
   onOpenChange: PropTypes.func.isRequired,
@@ -56,7 +56,7 @@ export default function ProductFormDialog({
     productName: "",
     resin: "",
     letDownRatio: "",
-    color: "",
+    expiredAge: "",
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -64,7 +64,6 @@ export default function ProductFormDialog({
   const isEditMode = Boolean(product);
 
   const [openResin, setOpenResin] = useState(false);
-  const [openColor, setOpenColor] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -109,8 +108,8 @@ export default function ProductFormDialog({
       newErrors.resin = "Resin is required";
     }
 
-    if (!formData.color.trim()) {
-      newErrors.color = "Color is required";
+    if (!formData.expiredAge.trim()) {
+      newErrors.expiredAge = "Expired Age is required";
     }
 
     setErrors(newErrors);
@@ -124,26 +123,19 @@ export default function ProductFormDialog({
       return;
     }
 
-    const dataToSubmit = product
-      ? { ...formData, id: product.id }
-      : { ...formData };
+    const dataToSubmit = {
+      ...formData,
+      expiredAge: parseFloat(formData.expiredAge),
+    };
+
+    if (product) {
+      dataToSubmit.id = product.id;
+    }
 
     onSave(dataToSubmit);
   };
 
   const resinOptions = ["PP", "PE", "PVC", "PS", "ABS", "PET", "PC"];
-  const colorOptions = [
-    "Black",
-    "Red",
-    "Yellow",
-    "Blue",
-    "Green",
-    "White",
-    "Orange",
-    "Purple",
-    "Brown",
-    "Gold",
-  ];
 
   return (
     <Dialog
@@ -245,61 +237,34 @@ export default function ProductFormDialog({
 
               <div className="grid gap-2">
                 <Label
-                  htmlFor="color"
-                  className={errors.color ? "text-red-500" : ""}
+                  htmlFor="expiredAge"
+                  className={errors.expiredAge ? "text-red-500" : ""}
                 >
-                  Color *
+                  Expired Age (in month) *
                 </Label>
-                <Popover open={openColor} onOpenChange={setOpenColor}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openColor}
-                      className={cn(
-                        "justify-between",
-                        errors.color && "border-red-500"
-                      )}
-                    >
-                      {formData.color || "Select color..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search color..." />
-                      <CommandEmpty>No color found.</CommandEmpty>
-                      <CommandGroup>
-                        {colorOptions.map((option) => (
-                          <CommandItem
-                            key={option}
-                            value={option}
-                            onSelect={(currentValue) => {
-                              handleSelectChange("color", currentValue);
-                              setOpenColor(false);
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-3 h-3 rounded-full"
-                                style={{
-                                  backgroundColor: option.toLowerCase(),
-                                  border:
-                                    option.toLowerCase() === "white"
-                                      ? "1px solid #e2e8f0"
-                                      : "none",
-                                }}
-                              />
-                              {option}
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                {errors.color && (
-                  <p className="text-xs text-red-500">{errors.color}</p>
+                <div className="flex">
+                  <Input
+                    id="expiredAge"
+                    type="number"
+                    step="0.01"
+                    value={formData.expiredAge}
+                    onChange={handleChange}
+                    className={errors.expiredAge ? "border-red-500" : ""}
+                    required
+                    min="0"
+                    onWheel={(e) => e.target.blur()}
+                    onKeyDown={(e) => {
+                      if (e.key === "e" || e.key === "E") {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                  <span className="ml-2 text-center text-sm border-2 p-1 rounded-md">
+                    Month
+                  </span>
+                </div>
+                {errors.expiredAge && (
+                  <p className="text-xs text-red-500">{errors.expiredAge}</p>
                 )}
               </div>
 

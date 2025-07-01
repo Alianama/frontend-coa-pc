@@ -7,6 +7,38 @@ const ActionType = {
   RECEIVE_CUSTOMER: "RECEIVE_CUSTOMER",
 };
 
+// Daftar field yang dianggap mandatory (harus sama dengan di CustomerList.jsx)
+const availableFields = [
+  "pelletLength",
+  "pelletDiameter",
+  "visualCheck",
+  "colorCheck",
+  "dispersibility",
+  "mfr",
+  "density",
+  "moisture",
+  "carbonContent",
+  "mfgDate",
+  "expiryDate",
+  "analysisDate",
+  "foreignMatter",
+  "weightOfChips",
+  "intrinsicViscosity",
+  "ashContent",
+  "heatStability",
+  "lightFastness",
+  "granule",
+  "tintDeltaE",
+  "colorDeltaE",
+  "deltaP",
+  "macaroni",
+  "caCO3",
+  "odor",
+  "nucleatingAgent",
+  "hals",
+  "hiding",
+];
+
 function receiveCustomerActionCreator(customers) {
   return {
     type: ActionType.RECEIVE_CUSTOMER,
@@ -20,7 +52,16 @@ function asyncGetCustomer() {
     try {
       const response = await api.getCustomer();
       if (response.status === "success") {
-        dispatch(receiveCustomerActionCreator(response.data));
+        // Mapping: jika mandatoryFields tidak ada, buat dari field boolean di root
+        const mappedData = response.data.map((customer) => {
+          if (customer.mandatoryFields) return customer;
+          const mandatoryFields = {};
+          availableFields.forEach((field) => {
+            if (customer[field]) mandatoryFields[field] = true;
+          });
+          return { ...customer, mandatoryFields };
+        });
+        dispatch(receiveCustomerActionCreator(mappedData));
         return response;
       }
       throw new Error(response.message || "Gagal mengambil data customer");

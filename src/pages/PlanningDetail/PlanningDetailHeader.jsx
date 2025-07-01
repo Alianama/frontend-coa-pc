@@ -121,7 +121,7 @@ export default function DetailHeader({
               Customer : {header?.customerName} • Product :{" "}
               {header?.productName}
             </h1>
-            {/* <span>Created {formatDate(header?.createdAt)}</span> */}
+            <span>Created {formatDate(header?.createdAt)}</span>
           </div>
           <div className="flex items-center gap-2">
             <Package className="w-3 h-3 text-gray-400" />

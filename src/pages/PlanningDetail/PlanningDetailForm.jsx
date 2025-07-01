@@ -65,6 +65,11 @@ export default function PlanningDetailForm() {
     checkedBy: "",
     remark: "",
     letDownRatio: "",
+    caCO3: "",
+    odor: "",
+    nucleatingAgent: "",
+    hals: "",
+    hiding: "",
   });
 
   // Ambil data planning detail berdasarkan lot
@@ -87,9 +92,8 @@ export default function PlanningDetailForm() {
         (c) => c.id === header.idCustomer
       );
       if (selectedCustomer && selectedCustomer.mandatoryFields) {
-        const hasLetDownRatio = selectedCustomer.mandatoryFields.some(
-          (f) => f.fieldName === "letDownRatio"
-        );
+        // Cek jika mandatoryFields adalah object, bukan array
+        const hasLetDownRatio = !!selectedCustomer.mandatoryFields.letDownRatio;
         if (hasLetDownRatio && header.ratio !== undefined) {
           setFormData((prev) => ({
             ...prev,
@@ -115,11 +119,12 @@ export default function PlanningDetailForm() {
     if (customers && customers.length > 0 && header?.idCustomer) {
       selectedCustomer = customers.find((c) => c.id === header.idCustomer);
     }
+    // Mapping customerMandatoryFields dari object ke array
     const customerMandatoryFields =
       selectedCustomer && selectedCustomer.mandatoryFields
-        ? selectedCustomer.mandatoryFields.map((f) => ({
-            key: f.fieldName,
-            label: f.fieldName
+        ? Object.keys(selectedCustomer.mandatoryFields).map((key) => ({
+            key,
+            label: key
               .replace(/([A-Z])/g, " $1")
               .replace(/^./, (str) => str.toUpperCase()),
           }))
@@ -214,6 +219,14 @@ export default function PlanningDetailForm() {
       remark: formData.remark,
       letDownRatio:
         formData.letDownRatio === "" ? null : Number(formData.letDownRatio),
+      caCO3: formData.caCO3 === "" ? null : Number(formData.caCO3),
+      odor: formData.odor === "" ? null : Number(formData.odor),
+      nucleatingAgent:
+        formData.nucleatingAgent === ""
+          ? null
+          : Number(formData.nucleatingAgent),
+      hals: formData.hals === "" ? null : Number(formData.hals),
+      hiding: formData.hiding === "" ? null : Number(formData.hiding),
     };
 
     const response = await dispatch(asyncAddPlanningDetail(dataToSubmit));
@@ -648,6 +661,73 @@ export default function PlanningDetailForm() {
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="caCO3">CaCO3</Label>
+                <Input
+                  id="caCO3"
+                  type="number"
+                  step="0.1"
+                  placeholder="0.0"
+                  value={formData.caCO3}
+                  onChange={(e) => handleInputChange("caCO3", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="odor">Odor</Label>
+                <Input
+                  id="odor"
+                  type="number"
+                  step="0.1"
+                  placeholder="0.0"
+                  value={formData.odor}
+                  onChange={(e) => handleInputChange("odor", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nucleatingAgent">Nucleating Agent</Label>
+                <Input
+                  id="nucleatingAgent"
+                  type="number"
+                  step="0.1"
+                  placeholder="0.0"
+                  value={formData.nucleatingAgent}
+                  onChange={(e) =>
+                    handleInputChange("nucleatingAgent", e.target.value)
+                  }
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hals">HALS</Label>
+                <Input
+                  id="hals"
+                  type="number"
+                  step="0.1"
+                  placeholder="0.0"
+                  value={formData.hals}
+                  onChange={(e) => handleInputChange("hals", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hiding">Hiding</Label>
+                <Input
+                  id="hiding"
+                  type="number"
+                  step="0.1"
+                  placeholder="0.0"
+                  value={formData.hiding}
+                  onChange={(e) => handleInputChange("hiding", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
             </div>
             <div className="flex space-x-4 border rounded-lg shadow-md p-4 mb-4 bg-white">
               <div className="space-y-2 ">
@@ -695,6 +775,7 @@ export default function PlanningDetailForm() {
                 className="h-8 text-sm py-1 px-2"
               />
             </div>
+
             <Button type="submit" className="w-full shadow-2xs" size="lg">
               Save
             </Button>

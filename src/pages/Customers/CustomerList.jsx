@@ -49,7 +49,6 @@ import {
 
 // Available fields for selection
 const availableFields = [
-  "letDownRatio",
   "pelletLength",
   "pelletDiameter",
   "visualCheck",
@@ -73,16 +72,19 @@ const availableFields = [
   "colorDeltaE",
   "deltaP",
   "macaroni",
+  "caCO3",
+  "odor",
+  "nucleatingAgent",
+  "hals",
+  "hiding",
 ];
 
 // Field labels for display
 const fieldLabels = {
-  letDownRatio: "Let Down Ratio",
   pelletLength: "Pellet Length",
   pelletDiameter: "Pellet Diameter",
   visualCheck: "Visual Check",
   colorCheck: "Color Check",
-  color: "Color",
   dispersibility: "Dispersibility",
   mfr: "MFR",
   density: "Density",
@@ -102,6 +104,11 @@ const fieldLabels = {
   colorDeltaE: "Color Delta E",
   deltaP: "Delta P",
   macaroni: "Macaroni",
+  caCO3: "caCO3",
+  odor: "Odor",
+  nucleatingAgent: "Nucleating Agent",
+  hals: "HALS",
+  hiding: "Hiding",
 };
 
 export default function CustomerList() {
@@ -113,16 +120,17 @@ export default function CustomerList() {
   }, [dispatch]);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingCustomerId, setEditingCustomerId] = useState(null);
-  const [selectedFields, setSelectedFields] = useState([]);
+  const [editingCustomer, setEditingCustomer] = useState(null);
   const [expandedRows, setExpandedRows] = useState([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
-  const [newCustomerName, setNewCustomerName] = useState("");
-  const [newCustomerFields, setNewCustomerFields] = useState([]);
+  const [newCustomer, setNewCustomer] = useState({
+    name: "",
+    mandatoryFields: {},
+  });
 
-  console.log({ newCustomerFields, newCustomerName });
+  console.log({ newCustomer });
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -147,64 +155,76 @@ export default function CustomerList() {
     customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle field selection toggle
-  const handleFieldToggle = (fieldName) => {
-    setSelectedFields((prev) =>
-      prev.includes(fieldName)
-        ? prev.filter((f) => f !== fieldName)
-        : [...prev, fieldName]
-    );
-  };
-
   // Open edit dialog for a customer
   const openEditDialog = (customer) => {
-    setEditingCustomerId(customer.id);
-    setSelectedFields(customer.mandatoryFields.map((field) => field.fieldName));
-  };
-
-  // Save changes to mandatory fields
-  const handleSaveChanges = () => {
-    if (editingCustomerId === null) return;
-
-    const customer = customers.find((c) => c.id === editingCustomerId);
-    if (!customer) return;
-
-    const updatedCustomer = {
+    setEditingCustomer({
       id: customer.id,
       name: customer.name,
-      mandatoryFields: selectedFields,
-    };
-
-    dispatch(asyncUpdateCustomer(updatedCustomer));
-    setEditingCustomerId(null);
+      mandatoryFields: { ...(customer.mandatoryFields || {}) },
+    });
   };
 
-  // Handle new customer field toggle
-  const handleNewCustomerFieldToggle = (fieldName) => {
-    setNewCustomerFields((prev) =>
-      prev.includes(fieldName)
-        ? prev.filter((f) => f !== fieldName)
-        : [...prev, fieldName]
+  // Handle toggle field pada edit
+  const handleEditFieldToggle = (field) => {
+    setEditingCustomer((prev) => ({
+      ...prev,
+      mandatoryFields: {
+        ...prev.mandatoryFields,
+        [field]: !prev.mandatoryFields?.[field],
+      },
+    }));
+  };
+
+  // Save changes edit
+  const handleSaveChanges = () => {
+    if (!editingCustomer) return;
+    // Hanya kirim field yang true
+    const filteredFields = {};
+    availableFields.forEach((field) => {
+      if (editingCustomer.mandatoryFields?.[field])
+        filteredFields[field] = true;
+    });
+    dispatch(
+      asyncUpdateCustomer({
+        id: editingCustomer.id,
+        name: editingCustomer.name,
+        mandatoryFields: filteredFields,
+      })
     );
+    setEditingCustomer(null);
+  };
+
+  // Handle toggle field pada add
+  const handleNewCustomerFieldToggle = (field) => {
+    setNewCustomer((prev) => ({
+      ...prev,
+      mandatoryFields: {
+        ...prev.mandatoryFields,
+        [field]: !prev.mandatoryFields?.[field],
+      },
+    }));
+  };
+
+  // Handle input nama customer baru
+  const handleNewCustomerNameChange = (e) => {
+    setNewCustomer((prev) => ({ ...prev, name: e.target.value }));
   };
 
   // Handle adding new customer
   const handleAddCustomer = () => {
-    if (!newCustomerName.trim()) return;
-
-    const newCustomer = {
-      name: newCustomerName.trim(),
-      mandatoryFields: newCustomerFields,
-    };
-
-    dispatch(asyncAddCustomer(newCustomer));
-    resetAddCustomerForm();
-  };
-
-  // Reset add customer form
-  const resetAddCustomerForm = () => {
-    setNewCustomerName("");
-    setNewCustomerFields([]);
+    if (!newCustomer.name.trim()) return;
+    // Hanya kirim field yang true
+    const filteredFields = {};
+    availableFields.forEach((field) => {
+      if (newCustomer.mandatoryFields?.[field]) filteredFields[field] = true;
+    });
+    dispatch(
+      asyncAddCustomer({
+        name: newCustomer.name.trim(),
+        mandatoryFields: filteredFields,
+      })
+    );
+    setNewCustomer({ name: "", mandatoryFields: {} });
     setIsAddDialogOpen(false);
   };
 
@@ -287,15 +307,21 @@ export default function CustomerList() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {customer.mandatoryFields.map((field) => (
-                            <Badge
-                              key={field.id}
-                              variant="secondary"
-                              className="bg-yellow-50 text-yellow-800 border-yellow-200"
-                            >
-                              {fieldLabels[field.fieldName] || field.fieldName}
-                            </Badge>
-                          ))}
+                          {availableFields
+                            .filter((field) =>
+                              customer.mandatoryFields
+                                ? customer.mandatoryFields[field]
+                                : customer[field]
+                            )
+                            .map((field) => (
+                              <Badge
+                                key={field}
+                                variant="secondary"
+                                className="bg-yellow-50 text-yellow-800 border-yellow-200"
+                              >
+                                {fieldLabels[field] || field}
+                              </Badge>
+                            ))}
                         </div>
                       </TableCell>
                       <TableCell>{formatDate(customer.updatedAt)}</TableCell>
@@ -345,27 +371,6 @@ export default function CustomerList() {
                               <p className="text-gray-600">
                                 {formatDate(customer.createdAt)}
                               </p>
-                            </div>
-                            <div className="md:col-span-2">
-                              <span className="font-medium text-gray-700">
-                                Mandatory Fields:
-                              </span>
-                              <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
-                                {customer.mandatoryFields.map((field) => (
-                                  <div
-                                    key={field.id}
-                                    className="flex items-center"
-                                  >
-                                    <Badge
-                                      variant="secondary"
-                                      className="bg-yellow-50 text-yellow-800 border-yellow-200 mr-2"
-                                    >
-                                      {fieldLabels[field.fieldName] ||
-                                        field.fieldName}
-                                    </Badge>
-                                  </div>
-                                ))}
-                              </div>
                             </div>
                           </div>
                         </TableCell>
@@ -418,15 +423,15 @@ export default function CustomerList() {
 
       {/* Edit Dialog */}
       <Dialog
-        open={editingCustomerId !== null}
-        onOpenChange={(open) => !open && setEditingCustomerId(null)}
+        open={!!editingCustomer}
+        onOpenChange={(open) => !open && setEditingCustomer(null)}
       >
         <DialogContent className="max-w-2xl max-h-[80vh] bg-secondary overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Update Mandatory Fields</DialogTitle>
             <DialogDescription>
               Select the fields that are mandatory for{" "}
-              {customers?.find((c) => c.id === editingCustomerId)?.name ||
+              {customers?.find((c) => c.id === editingCustomer?.id)?.name ||
                 "this customer"}
             </DialogDescription>
           </DialogHeader>
@@ -435,8 +440,8 @@ export default function CustomerList() {
               <div key={field} className="flex items-center space-x-2">
                 <Checkbox
                   id={`field-${field}`}
-                  checked={selectedFields.includes(field)}
-                  onCheckedChange={() => handleFieldToggle(field)}
+                  checked={!!editingCustomer?.mandatoryFields?.[field]}
+                  onCheckedChange={() => handleEditFieldToggle(field)}
                 />
                 <label
                   htmlFor={`field-${field}`}
@@ -448,10 +453,7 @@ export default function CustomerList() {
             ))}
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditingCustomerId(null)}
-            >
+            <Button variant="outline" onClick={() => setEditingCustomer(null)}>
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
@@ -466,7 +468,9 @@ export default function CustomerList() {
       {/* Add Customer Dialog */}
       <Dialog
         open={isAddDialogOpen}
-        onOpenChange={(open) => !open && resetAddCustomerForm()}
+        onOpenChange={(open) =>
+          !open && setNewCustomer({ name: "", mandatoryFields: {} })
+        }
       >
         <DialogContent className="max-w-2xl max-h-[80vh] bg-secondary overflow-y-auto">
           <DialogHeader>
@@ -487,8 +491,8 @@ export default function CustomerList() {
               <Input
                 id="customer-name"
                 placeholder="Enter customer name..."
-                value={newCustomerName}
-                onChange={(e) => setNewCustomerName(e.target.value)}
+                value={newCustomer.name}
+                onChange={(e) => handleNewCustomerNameChange(e)}
               />
             </div>
             <div>
@@ -500,7 +504,7 @@ export default function CustomerList() {
                   <div key={field} className="flex items-center space-x-2">
                     <Checkbox
                       id={`new-field-${field}`}
-                      checked={newCustomerFields.includes(field)}
+                      checked={!!newCustomer.mandatoryFields?.[field]}
                       onCheckedChange={() =>
                         handleNewCustomerFieldToggle(field)
                       }
@@ -517,14 +521,14 @@ export default function CustomerList() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={resetAddCustomerForm}>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
             <Button
               onClick={handleAddCustomer}
               className="gap-2"
-              disabled={!newCustomerName.trim()}
+              disabled={!newCustomer.name.trim()}
             >
               <Plus className="w-4 h-4" />
               Add Customer
