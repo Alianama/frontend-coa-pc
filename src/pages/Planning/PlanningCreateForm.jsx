@@ -43,7 +43,6 @@ export default function PlanningCreateForm() {
     lotNumber: "",
     qtyPlanning: "",
     mfgDate: null,
-    expiryDate: null,
   });
 
   const customers = useSelector((state) => state.customers);
@@ -59,7 +58,6 @@ export default function PlanningCreateForm() {
           setFormData({
             ...found,
             mfgDate: found.mfgDate ? new Date(found.mfgDate) : null,
-            expiryDate: found.expiryDate ? new Date(found.expiryDate) : null,
           });
         }
       });
@@ -99,9 +97,6 @@ export default function PlanningCreateForm() {
         lotNumber: formData.lotNumber,
         qtyPlanning: Number(formData.qtyPlanning),
         mfgDate: formData.mfgDate ? formData.mfgDate.toISOString() : null,
-        expiryDate: formData.expiryDate
-          ? formData.expiryDate.toISOString()
-          : null,
       };
       if (isUpdate) {
         await dispatch(asyncUpdatePlanning(params.id, payload));
@@ -237,7 +232,7 @@ export default function PlanningCreateForm() {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label>Expiry Date</label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -265,7 +260,7 @@ export default function PlanningCreateForm() {
                     />
                   </PopoverContent>
                 </Popover>
-              </div>
+              </div> */}
             </div>
             <div className="flex justify-end">
               <Button type="submit" className="gap-2">

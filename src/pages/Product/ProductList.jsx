@@ -51,7 +51,10 @@ import {
   Sheet,
 } from "lucide-react";
 import ProductDetailDialog from "@/components/Product/product-detail-dialog";
-import ProductFormDialog from "@/components/Product/product-form-dialog";
+import {
+  ProductCreateDialog,
+  ProductUpdateDialog,
+} from "@/components/Product/product-form-dialog";
 import { Pagination } from "@/components/Product/Pagination";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -66,7 +69,8 @@ import { Badge } from "@/components/ui/badge";
 export default function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
@@ -151,12 +155,12 @@ export default function ProductList() {
 
   const handleAddProductClick = () => {
     setSelectedProduct(null);
-    setIsFormDialogOpen(true);
+    setIsCreateDialogOpen(true);
   };
 
   const handleEditProductClick = (product) => {
     setSelectedProduct(product);
-    setIsFormDialogOpen(true);
+    setIsUpdateDialogOpen(true);
   };
 
   const handleViewDetailClick = (product) => {
@@ -190,7 +194,7 @@ export default function ProductList() {
     setIsLoading(true);
     try {
       await dispatch(asyncAddProduct(product));
-      setIsFormDialogOpen(false);
+      setIsCreateDialogOpen(false);
       setSelectedProduct(null);
     } finally {
       setIsLoading(false);
@@ -200,19 +204,11 @@ export default function ProductList() {
   const handleEditProduct = async (product) => {
     setIsLoading(true);
     try {
-      await dispatch(asyncUpdateProduct(selectedProduct.id, product));
-      setIsFormDialogOpen(false);
+      await dispatch(asyncUpdateProduct(product.id, product));
+      setIsUpdateDialogOpen(false);
       setSelectedProduct(null);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSaveProduct = async (product) => {
-    if (selectedProduct) {
-      await handleEditProduct(product);
-    } else {
-      await handleAddProduct(product);
     }
   };
 
@@ -484,11 +480,18 @@ export default function ProductList() {
         onOpenChange={setIsDetailDialogOpen}
       />
 
-      <ProductFormDialog
+      <ProductCreateDialog
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSave={handleAddProduct}
+        isLoading={isLoading}
+      />
+
+      <ProductUpdateDialog
         product={selectedProduct}
-        isOpen={isFormDialogOpen}
-        onOpenChange={setIsFormDialogOpen}
-        onSave={handleSaveProduct}
+        isOpen={isUpdateDialogOpen}
+        onOpenChange={setIsUpdateDialogOpen}
+        onSave={handleEditProduct}
         isLoading={isLoading}
       />
 

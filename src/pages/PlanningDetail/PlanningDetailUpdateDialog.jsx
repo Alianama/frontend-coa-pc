@@ -66,7 +66,11 @@ export default function PlanningDetailUpdateDialog({
     analysisDate: "",
     checkedBy: "",
     remark: "",
-    // letDownRatio: "",
+    hals: "",
+    hiding: "",
+    caCO3: "",
+    odor: "",
+    nucleatingAgent: "",
   });
 
   useEffect(() => {
@@ -104,20 +108,42 @@ export default function PlanningDetailUpdateDialog({
           : "",
         checkedBy: editingItem.checkedBy || "",
         remark: editingItem.remark || "",
-        // letDownRatio: editingItem.letDownRatio || "",
+        hals: editingItem.hals || "",
+        hiding: editingItem.hiding || "",
+        caCO3: editingItem.caCO3 || "",
+        odor: editingItem.odor || "",
+        nucleatingAgent: editingItem.nucleatingAgent || "",
       };
 
       // Cek jika customer punya mandatoryFields dan ada letDownRatio
+      // Perbaiki error: .some is not a function, karena mandatoryFields bisa saja object (bukan array)
       if (header && customers && customers.length > 0 && header.idCustomer) {
         const selectedCustomer = customers.find(
           (c) => c.id === header.idCustomer
         );
-        if (
-          selectedCustomer?.mandatoryFields?.some(
-            (f) => f.fieldName === "letDownRatio"
-          ) &&
-          header.ratio !== undefined
-        ) {
+        let customerMandatoryFields = [];
+        if (selectedCustomer?.mandatoryFields) {
+          if (Array.isArray(selectedCustomer.mandatoryFields)) {
+            customerMandatoryFields = selectedCustomer.mandatoryFields.map(
+              (f) => ({
+                key: f.fieldName,
+                label: f.fieldName
+                  .replace(/([A-Z])/g, " $1")
+                  .replace(/^./, (str) => str.toUpperCase()),
+              })
+            );
+          } else if (typeof selectedCustomer.mandatoryFields === "object") {
+            customerMandatoryFields = Object.keys(
+              selectedCustomer.mandatoryFields
+            ).map((key) => ({
+              key,
+              label: key
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase()),
+            }));
+          }
+        }
+        if (customerMandatoryFields.length > 0 && header.ratio !== undefined) {
           newFormData.letDownRatio = header.ratio;
         }
       }
@@ -142,13 +168,27 @@ export default function PlanningDetailUpdateDialog({
     if (customers && customers.length > 0 && header?.idCustomer) {
       selectedCustomer = customers.find((c) => c.id === header.idCustomer);
     }
-    const customerMandatoryFields =
-      selectedCustomer?.mandatoryFields?.map((f) => ({
-        key: f.fieldName,
-        label: f.fieldName
-          .replace(/([A-Z])/g, " $1")
-          .replace(/^./, (str) => str.toUpperCase()),
-      })) || [];
+
+    let customerMandatoryFields = [];
+    if (selectedCustomer?.mandatoryFields) {
+      if (Array.isArray(selectedCustomer.mandatoryFields)) {
+        customerMandatoryFields = selectedCustomer.mandatoryFields.map((f) => ({
+          key: f.fieldName,
+          label: f.fieldName
+            .replace(/([A-Z])/g, " $1")
+            .replace(/^./, (str) => str.toUpperCase()),
+        }));
+      } else if (typeof selectedCustomer.mandatoryFields === "object") {
+        customerMandatoryFields = Object.keys(
+          selectedCustomer.mandatoryFields
+        ).map((key) => ({
+          key,
+          label: key
+            .replace(/([A-Z])/g, " $1")
+            .replace(/^./, (str) => str.toUpperCase()),
+        }));
+      }
+    }
 
     const mandatoryFields = [
       { key: "qty", label: "Quantity" },
@@ -210,6 +250,11 @@ export default function PlanningDetailUpdateDialog({
               "heatStability",
               "lightFastness",
               "granule",
+              "hals",
+              "hiding",
+              "caCO3",
+              "odor",
+              "nucleatingAgent",
             ].includes(key)
           ) {
             return [key, Number(value)];
@@ -638,20 +683,68 @@ export default function PlanningDetailUpdateDialog({
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
-              {/* <div className="space-y-2">
-                <Label htmlFor="letDownRatio">Letdown Ratio</Label>
+              <div className="space-y-2">
+                <Label htmlFor="hals">Hals</Label>
                 <Input
-                  id="letDownRatio"
+                  id="hals"
                   type="number"
                   step="0.1"
-                  value={formData.letDownRatio}
+                  value={formData.hals}
+                  onChange={(e) => handleInputChange("hals", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hiding">Hiding</Label>
+                <Input
+                  id="hiding"
+                  type="number"
+                  step="0.1"
+                  value={formData.hiding}
+                  onChange={(e) => handleInputChange("hiding", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="caCO3">CaCO3</Label>
+                <Input
+                  id="caCO3"
+                  type="number"
+                  step="0.1"
+                  value={formData.caCO3}
+                  onChange={(e) => handleInputChange("caCO3", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="odor">Odor</Label>
+                <Input
+                  id="odor"
+                  type="number"
+                  step="0.1"
+                  value={formData.odor}
+                  onChange={(e) => handleInputChange("odor", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nucleatingAgent">Nucleating Agent</Label>
+                <Input
+                  id="nucleatingAgent"
+                  type="number"
+                  step="0.1"
+                  value={formData.nucleatingAgent}
                   onChange={(e) =>
-                    handleInputChange("letDownRatio", e.target.value)
+                    handleInputChange("nucleatingAgent", e.target.value)
                   }
                   onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
-              </div> */}
+              </div>
             </div>
             <div className="flex space-x-4 border rounded-lg shadow-md p-4 mb-4 bg-white">
               <div className="space-y-2 flex-1">

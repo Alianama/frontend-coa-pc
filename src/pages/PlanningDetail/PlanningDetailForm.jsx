@@ -64,7 +64,6 @@ export default function PlanningDetailForm() {
     analysisDate: "",
     checkedBy: "",
     remark: "",
-    letDownRatio: "",
     caCO3: "",
     odor: "",
     nucleatingAgent: "",
@@ -217,8 +216,6 @@ export default function PlanningDetailForm() {
           : new Date(formData.analysisDate).toISOString(),
       checkedBy: formData.checkedBy,
       remark: formData.remark,
-      letDownRatio:
-        formData.letDownRatio === "" ? null : Number(formData.letDownRatio),
       caCO3: formData.caCO3 === "" ? null : Number(formData.caCO3),
       odor: formData.odor === "" ? null : Number(formData.odor),
       nucleatingAgent:

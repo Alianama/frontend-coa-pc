@@ -182,7 +182,7 @@ export default function PlanningList() {
                   </TableCell>
                   <TableCell>
                     {planning.status === "open" && (
-                      <Badge className="bg-blue-100 text-blue-800 border border-blue-300">
+                      <Badge className="bg-red-100 text-red-800 border border-red-300">
                         Open
                       </Badge>
                     )}

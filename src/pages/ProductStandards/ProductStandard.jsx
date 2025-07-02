@@ -29,11 +29,14 @@ import { useParams } from "react-router-dom";
 
 // Daftar field valid dan label yang lebih enak dibaca
 const VALID_FIELDS = [
-  "lineNo",
-  "deltaL",
-  "deltaA",
-  "deltaB",
-  "deltaE",
+  "colorDeltaL",
+  "colorDeltaA",
+  "colorDeltaB",
+  "colorDeltaE",
+  "tintDeltaL",
+  "tintDeltaA",
+  "tintDeltaB",
+  "tintDeltaE",
   "density",
   "mfr",
   "dispersion",
@@ -53,15 +56,22 @@ const VALID_FIELDS = [
   "granule",
   "qcJudgment",
   "analysisDate",
-  "remark",
+  "caCO3",
+  "odor",
+  "nucleatingAgent",
+  "hals",
+  "hiding",
 ];
 
 const FIELD_LABELS = {
-  lineNo: "Line No",
-  deltaL: "ΔL",
-  deltaA: "ΔA",
-  deltaB: "ΔB",
-  deltaE: "ΔE",
+  colorDeltaL: "Color ΔL",
+  colorDeltaA: "Color ΔA",
+  colorDeltaB: "Color ΔB",
+  colorDeltaE: "Color ΔE",
+  tintDeltaL: "Tint ΔL",
+  tintDeltaA: "Tint ΔA",
+  tintDeltaB: "Tint ΔB",
+  tintDeltaE: "Tint ΔE",
   density: "Density",
   mfr: "MFR",
   dispersion: "Dispersion",
@@ -81,7 +91,11 @@ const FIELD_LABELS = {
   granule: "Granule",
   qcJudgment: "QC Judgment",
   analysisDate: "Analysis Date",
-  remark: "Remark",
+  caCO3: "CaCO3",
+  odor: "Odor",
+  nucleatingAgent: "Nucleating Agent",
+  hals: "Hals",
+  hiding: "Hiding",
 };
 
 // Enum Operator
@@ -124,6 +138,15 @@ export default function ProductStandard() {
   const filtered = standards.filter((item) =>
     item.property_name.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Filter field yang sudah dipakai, kecuali jika sedang edit, property yang sedang diedit tetap muncul
+  const usedFields = standards.map((item) => item.property_name);
+  const availableFields = editItem
+    ? VALID_FIELDS.filter(
+        (field) =>
+          !usedFields.includes(field) || field === editItem.property_name
+      )
+    : VALID_FIELDS.filter((field) => !usedFields.includes(field));
 
   useEffect(() => {
     dispatch(asyncGetProductStandard(id));
@@ -316,7 +339,7 @@ export default function ProductStandard() {
                   required
                 >
                   <option value="">Pilih Properti</option>
-                  {VALID_FIELDS.map((field) => (
+                  {availableFields.map((field) => (
                     <option key={field} value={field}>
                       {FIELD_LABELS[field] || field}
                     </option>

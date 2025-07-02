@@ -164,6 +164,11 @@ export default function PlanningDetailList() {
     { key: "heatStability", label: "Heat Stability" },
     { key: "lightFastness", label: "Light Fastness" },
     { key: "granule", label: "Granule" },
+    { key: "caCO3", label: "CaCO3" },
+    { key: "odor", label: "Odor" },
+    { key: "nucleatingAgent", label: "Nucleating Agent" },
+    { key: "hals", label: "Hals" },
+    { key: "hiding", label: "Hiding" },
     { key: "analysisDate", label: "Checked At" },
     { key: "visualCheck", label: "Visual Check" },
     { key: "colorCheck", label: "Color Check" },
@@ -363,6 +368,7 @@ export default function PlanningDetailList() {
                     .filter(Boolean)
                     .map((col) => (
                       <TableHead
+                        className="cursor-pointer border-1 border-gray-200 text-center"
                         key={col.key}
                         onClick={() => handleSort(col.key)}
                       >
@@ -378,7 +384,10 @@ export default function PlanningDetailList() {
                         </span>
                       </TableHead>
                     ))}
-                  <TableHead className="sticky right-0 bg-white z-10 min-w-[120px] border-l">
+                  <TableHead
+                    key="Action"
+                    className="sticky right-0 bg-white z-10  border-1 border-gray-200 text-center min-w-[120px] "
+                  >
                     Action
                   </TableHead>
                 </TableRow>
@@ -400,7 +409,10 @@ export default function PlanningDetailList() {
                         .map((key) => allColumns.find((col) => col.key === key))
                         .filter(Boolean)
                         .map((col) => (
-                          <TableCell key={col.key}>
+                          <TableCell
+                            className="border-1 border-gray-200 text-center"
+                            key={col.key}
+                          >
                             {/* Render value sesuai key */}
                             {col.key === "id" && index + 1}
                             {col.key === "qty" &&
@@ -442,6 +454,12 @@ export default function PlanningDetailList() {
                             {col.key === "heatStability" && item.heatStability}
                             {col.key === "lightFastness" && item.lightFastness}
                             {col.key === "granule" && item.granule}
+                            {col.key === "caCO3" && item.caCO3}
+                            {col.key === "odor" && item.odor}
+                            {col.key === "nucleatingAgent" &&
+                              item.nucleatingAgent}
+                            {col.key === "hals" && item.hals}
+                            {col.key === "hiding" && item.hiding}
                             {col.key === "analysisDate" &&
                               (item.analysisDate
                                 ? new Date(item.analysisDate).toLocaleString(
@@ -489,7 +507,7 @@ export default function PlanningDetailList() {
                             {col.key === "remark" && item.remark}
                           </TableCell>
                         ))}
-                      <TableCell className="sticky right-0 flex gap-2 justify-center bg-white z-10 min-w-[120px] border-l">
+                      <TableCell className="sticky  border-b-1 border-gray-200 text-center right-0 flex gap-2 justify-center bg-white z-10 min-w-[120px] border-l">
                         <Button
                           variant="outline"
                           className="w-8 h-8"
@@ -538,11 +556,6 @@ export default function PlanningDetailList() {
           {filteredData.length > 0 && (
             <div className="mt-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {/* <div className="text-sm text-muted-foreground">
-                  Menampilkan {(currentPage - 1) * itemsPerPage + 1} sampai{" "}
-                  {Math.min(currentPage * itemsPerPage, filteredData.length)}{" "}
-                  dari {filteredData.length} detail
-                </div> */}
                 <Select
                   value={itemsPerPage.toString()}
                   onValueChange={(value) => {

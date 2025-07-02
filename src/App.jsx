@@ -11,11 +11,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { asyncPreloadProcess } from "@/store/isPreload/action";
 import Loading from "@/components/ui/loading";
-import COADetailLayout from "./pages/CoaDetail/CoaDetailLayout";
-import COACreateLayout from "./pages/Coa/CoaCreateLayout";
 import CustomerLayout from "./pages/Customers/CustomerLayout";
 import ProductsLayout from "./pages/Product/ProductLayout";
-import COAUpdateLayout from "./pages/Coa/CoaUpdateLayout";
 import PropTypes from "prop-types";
 import PrintListLayout from "./pages/Print/PrintListLayout";
 import PlanningLayout from "./pages/Planning/PlanningLayout";
@@ -103,30 +100,6 @@ function App() {
           element={
             <ProtectedRoute>
               <PlanningDetailFormLayout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/COA/create"
-          element={
-            <ProtectedRoute>
-              <COACreateLayout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/COA/update/:id"
-          element={
-            <ProtectedRoute>
-              <COAUpdateLayout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/COA/detail/:id"
-          element={
-            <ProtectedRoute>
-              <COADetailLayout />
             </ProtectedRoute>
           }
         />

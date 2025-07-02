@@ -123,27 +123,12 @@ function asyncUpdateProduct(productId, updatedData) {
       (p) => p.id === productId
     );
 
-    // Pastikan semua field yang diperlukan ada
+    // Kirim hanya field yang diperlukan
     const productData = {
       productName: updatedData.productName,
       resin: updatedData.resin,
       letDownRatio: updatedData.letDownRatio,
-      pellet: updatedData.pellet,
-      color: updatedData.color,
-      dispersibility: updatedData.dispersibility,
-      mfr: Number(updatedData.mfr),
-      density: Number(updatedData.density),
-      moisture: Number(updatedData.moisture),
-      carbonContent: Number(updatedData.carbonContent),
-      foreignMatter: updatedData.foreignMatter,
-      weightOfChips: Number(updatedData.weightOfChips),
-      intrinsicViscosity: Number(updatedData.intrinsicViscosity),
-      ashContent: Number(updatedData.ashContent),
-      heatStability: Number(updatedData.heatStability),
-      lightFastness: Number(updatedData.lightFastness),
-      granule: updatedData.granule,
-      deltaE: Number(updatedData.deltaE),
-      macaroni: Number(updatedData.macaroni),
+      expiredAge: Number(updatedData.expiredAge),
     };
 
     // Optimistic update
