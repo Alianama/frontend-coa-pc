@@ -23,12 +23,118 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ArrowUpDown, EyeIcon } from "lucide-react";
+import { Search, ArrowUpDown, Eye, X, Check, Printer } from "lucide-react";
 import { Pagination } from "@/components/Product/Pagination";
 import { useSelector, useDispatch } from "react-redux";
-import { asyncGetAllPrint } from "@/store/print/action";
+import {
+  asyncGetAllPrint,
+  asyncApprovePrintCoa,
+  asyncRejectPrintCoa,
+} from "@/store/print/action";
+import PropTypes from "prop-types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
+
+// Komponen kecil untuk badge status
+function StatusBadge({ status }) {
+  const statusMap = {
+    APPROVED: {
+      text: "Approved",
+      bg: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      dot: "bg-emerald-500",
+    },
+    REJECTED: {
+      text: "Rejected",
+      bg: "bg-red-50 text-red-700 border-red-200",
+      dot: "bg-red-500",
+    },
+    REQUESTED: {
+      text: "Requested",
+      bg: "bg-amber-50 text-amber-700 border-amber-200",
+      dot: "bg-amber-500",
+    },
+  };
+  const { text, bg, dot } = statusMap[status] || statusMap.REQUESTED;
+  return (
+    <div
+      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${bg}`}
+    >
+      <div className={`w-2 h-2 rounded-full mr-2 ${dot}`} />
+      {text}
+    </div>
+  );
+}
+
+StatusBadge.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
+// Komponen kecil untuk tombol aksi
+function ActionButtons({ onApprove, onReject, onView, onPrint, status }) {
+  const authUser = useSelector((state) => state.authUser);
+  const isAdmin =
+    authUser?.role?.name === "ADMIN" || authUser?.role?.name === "SUPER_ADMIN";
+  return (
+    <div className="flex gap-2 justify-end">
+      {isAdmin && status !== "APPROVED" && status !== "REJECTED" && (
+        <Button
+          className="w-8 h-8"
+          variant="destructive"
+          title="Reject"
+          onClick={onReject}
+        >
+          <X />
+        </Button>
+      )}
+      {isAdmin && status !== "REJECTED" && status !== "APPROVED" && (
+        <Button
+          className="w-8 h-8"
+          variant="default"
+          title="Approve"
+          onClick={onApprove}
+        >
+          <Check />
+        </Button>
+      )}
+      <Button
+        variant="outline"
+        className="w-8 h-8"
+        title="View"
+        onClick={onView}
+      >
+        <Eye className="w-4 h-4" />
+      </Button>
+
+      {isAdmin && status === "APPROVED" && (
+        <Button
+          className="w-8 h-8"
+          variant="default"
+          title="Print"
+          onClick={onPrint}
+        >
+          <Printer />
+        </Button>
+      )}
+    </div>
+  );
+}
+
+ActionButtons.propTypes = {
+  onApprove: PropTypes.func.isRequired,
+  onReject: PropTypes.func.isRequired,
+  onView: PropTypes.func.isRequired,
+  status: PropTypes.string.isRequired,
+  onPrint: PropTypes.func.isRequired,
+};
 
 export default function PrintList() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState("createdAt");
@@ -36,6 +142,9 @@ export default function PrintList() {
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const dispatch = useDispatch();
   const { data: prints, pagination } = useSelector((state) => state.prints);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState(""); // "approve" atau "reject"
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const fetchPrints = async () => {
@@ -90,6 +199,33 @@ export default function PrintList() {
     setCurrentPage(1);
   };
 
+  const openDialog = (type, id) => {
+    setDialogType(type);
+    setSelectedId(id);
+    setDialogOpen(true);
+  };
+
+  const handleDialogConfirm = () => {
+    if (dialogType === "approve") {
+      dispatch(asyncApprovePrintCoa(selectedId));
+    } else if (dialogType === "reject") {
+      dispatch(asyncRejectPrintCoa(selectedId));
+    }
+    setDialogOpen(false);
+  };
+
+  const handleApprove = (id) => {
+    openDialog("approve", id);
+  };
+  const handleReject = (id) => {
+    openDialog("reject", id);
+  };
+  const handleView = (id) => {
+    alert(id);
+  };
+  const handlePrint = (id) => {
+    navigate(`/print/print/${id}`);
+  };
   return (
     <Card className="w-full">
       <CardHeader>
@@ -126,131 +262,109 @@ export default function PrintList() {
         </div>
 
         {/* Table */}
-        <div className="rounded-md border">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
+        <div className="rounded-md border overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">
+                  <div
+                    className="flex items-center cursor-pointer"
+                    onClick={() => handleSort("costumerName")}
+                  >
+                    Customer Name
+                    {sortField === "costumerName" && (
+                      <ArrowUpDown
+                        className={`ml-2 h-4 w-4 ${
+                          sortDirection === "desc" ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead>
+                  <div
+                    className="flex items-center cursor-pointer"
+                    onClick={() => handleSort("productName")}
+                  >
+                    Product Name
+                    {sortField === "productName" && (
+                      <ArrowUpDown
+                        className={`ml-2 h-4 w-4 ${
+                          sortDirection === "desc" ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead>Lot Number</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Responsible By</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>
+                  <div
+                    className="flex items-center cursor-pointer"
+                    onClick={() => handleSort("printedDate")}
+                  >
+                    Print Date
+                    {sortField === "printedDate" && (
+                      <ArrowUpDown
+                        className={`ml-2 h-4 w-4 ${
+                          sortDirection === "desc" ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead>Remarks</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {!filteredPrints.length ? (
                 <TableRow>
-                  <TableHead className="w-[200px]">
-                    <div
-                      className="flex items-center cursor-pointer"
-                      onClick={() => handleSort("costumerName")}
-                    >
-                      Customer Name
-                      {sortField === "costumerName" && (
-                        <ArrowUpDown
-                          className={`ml-2 h-4 w-4 ${
-                            sortDirection === "desc" ? "rotate-180" : ""
-                          }`}
-                        />
-                      )}
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div
-                      className="flex items-center cursor-pointer"
-                      onClick={() => handleSort("productName")}
-                    >
-                      Product Name
-                      {sortField === "productName" && (
-                        <ArrowUpDown
-                          className={`ml-2 h-4 w-4 ${
-                            sortDirection === "desc" ? "rotate-180" : ""
-                          }`}
-                        />
-                      )}
-                    </div>
-                  </TableHead>
-                  <TableHead>Lot Number</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Approved By</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>
-                    <div
-                      className="flex items-center cursor-pointer"
-                      onClick={() => handleSort("printedDate")}
-                    >
-                      Print Date
-                      {sortField === "printedDate" && (
-                        <ArrowUpDown
-                          className={`ml-2 h-4 w-4 ${
-                            sortDirection === "desc" ? "rotate-180" : ""
-                          }`}
-                        />
-                      )}
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-right pr-6">Actions</TableHead>
+                  <TableCell colSpan={8} className="h-24 text-center">
+                    No prints found.
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {!filteredPrints.length ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center">
-                      No prints found.
+              ) : (
+                filteredPrints.map((print) => (
+                  <TableRow key={print.id}>
+                    <TableCell className="font-medium">
+                      {print.costumerName}
+                    </TableCell>
+                    <TableCell>{print.productName}</TableCell>
+                    <TableCell>{print.lotNumber}</TableCell>
+                    <TableCell>{print.quantity} Kg</TableCell>
+                    <TableCell>
+                      {print.approvedByName || print.rejectedByName}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={print.status} />
+                    </TableCell>
+                    <TableCell>
+                      {new Date(print.printedDate).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell>{print.remarks}</TableCell>
+                    <TableCell>
+                      <ActionButtons
+                        onApprove={() => handleApprove(print.id)}
+                        onReject={() => handleReject(print.id)}
+                        onView={() => handleView(print.id)}
+                        onPrint={() => handlePrint(print.id)}
+                        status={print.status}
+                      />
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filteredPrints.map((print) => (
-                    <TableRow key={print.id}>
-                      <TableCell className="font-medium">
-                        {print.costumerName}
-                      </TableCell>
-                      <TableCell>{print.productName}</TableCell>
-                      <TableCell>{print.lotNumber}</TableCell>
-                      <TableCell>{print.quantity} Kg</TableCell>
-                      <TableCell>{print.approvedBy}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <div
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
-                              print.status === "APPROVED"
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : print.status === "REJECTED"
-                                ? "bg-red-50 text-red-700 border-red-200"
-                                : "bg-amber-50 text-amber-700 border-amber-200"
-                            }`}
-                          >
-                            <div
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                print.status === "APPROVED"
-                                  ? "bg-emerald-500"
-                                  : print.status === "REJECTED"
-                                  ? "bg-red-500"
-                                  : "bg-amber-500"
-                              }`}
-                            />
-                            {print.status === "APPROVED"
-                              ? "Approved"
-                              : print.status === "REJECTED"
-                              ? "Rejected"
-                              : "Requested"}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(print.printedDate).toLocaleDateString(
-                          "id-ID",
-                          {
-                            day: "numeric",
-                            month: "numeric",
-                            year: "numeric",
-                            hour: "numeric",
-                            minute: "numeric",
-                          }
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button className="text-[10px]" variant="outline">
-                          <EyeIcon /> Preview
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination */}
@@ -271,12 +385,11 @@ export default function PrintList() {
                   <SelectValue placeholder="Items per page" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">1 / page</SelectItem>
-                  <SelectItem value="5">5 / page</SelectItem>
-                  <SelectItem value="10">10 / page</SelectItem>
-                  <SelectItem value="20">20 / page</SelectItem>
-                  <SelectItem value="50">50 / page</SelectItem>
-                  <SelectItem value="100">100 / page</SelectItem>
+                  {[1, 5, 10, 20, 50, 100].map((num) => (
+                    <SelectItem key={num} value={num.toString()}>
+                      {num} / page
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -287,6 +400,33 @@ export default function PrintList() {
             />
           </div>
         )}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {dialogType === "approve"
+                  ? "Konfirmasi Approve"
+                  : "Konfirmasi Reject"}
+              </DialogTitle>
+            </DialogHeader>
+            <div>
+              {dialogType === "approve"
+                ? "Apakah Anda yakin ingin APPROVE data ini?"
+                : "Apakah Anda yakin ingin REJECT data ini?"}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                Batal
+              </Button>
+              <Button
+                variant={dialogType === "approve" ? "default" : "destructive"}
+                onClick={handleDialogConfirm}
+              >
+                Ya
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

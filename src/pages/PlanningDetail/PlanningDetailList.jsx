@@ -40,8 +40,8 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   asyncGetPlanningDetailByLot,
   asyncDeletePlanningDetail,
-  asyncPrintCoa,
 } from "@/store/planningDetail/action";
+import { asyncPrintCoa } from "@/store/print/action";
 import { useParams, useNavigate } from "react-router-dom";
 import DetailHeader from "./PlanningDetailHeader";
 import {
@@ -81,6 +81,7 @@ export default function PlanningDetailList() {
   const [selectedQcDetail, setSelectedQcDetail] = useState([]);
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [printQuantity, setPrintQuantity] = useState("");
+  const [printRemarks, setPrintRemarks] = useState("");
 
   useEffect(() => {
     dispatch(asyncGetPlanningDetailByLot(lot));
@@ -91,12 +92,11 @@ export default function PlanningDetailList() {
     if (planningDetail.header.id && printQuantity) {
       try {
         await dispatch(
-          asyncPrintCoa(planningDetail.header.id, {
-            quantity: Number(printQuantity),
-          })
+          asyncPrintCoa(planningDetail.header.id, printQuantity, printRemarks)
         );
         setIsPrintDialogOpen(false);
         setPrintQuantity("");
+        setPrintRemarks("");
       } catch (error) {
         console.error("Error printing COA:", error);
       }
@@ -497,7 +497,8 @@ export default function PlanningDetailList() {
                                   <CheckCircle2 className="w-3 h-3 mr-1" />{" "}
                                   Passed
                                 </Badge>
-                              ) : item.qcJudgment === "NG" ? (
+                              ) : !item.qcJudgment ||
+                                item.qcJudgment === "NG" ? (
                                 <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
                                   <AlertCircle className="w-3 h-3 mr-1" /> NG
                                 </Badge>
@@ -686,7 +687,7 @@ export default function PlanningDetailList() {
               number <strong>{planningDetail?.header?.lotNumber}</strong>.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
+          <div className="pt-4">
             <label htmlFor="quantity" className="text-sm font-medium">
               Quantity
             </label>
@@ -696,6 +697,18 @@ export default function PlanningDetailList() {
               value={printQuantity}
               onChange={(e) => setPrintQuantity(e.target.value)}
               placeholder="Contoh: 10"
+            />
+          </div>
+          <div className="pb-2">
+            <label htmlFor="remarks" className="text-sm font-medium">
+              Remarks
+            </label>
+            <Input
+              id="remarks"
+              type="text"
+              value={printRemarks}
+              onChange={(e) => setPrintRemarks(e.target.value)}
+              placeholder="Catatan Print"
             />
           </div>
           <DialogFooter className="flex gap-5">

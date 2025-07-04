@@ -20,6 +20,7 @@ import PlanningCreateLayout from "./pages/Planning/PlanningCreateFormLayout";
 import PlanningDetailLayout from "./pages/PlanningDetail/PlanningDetailLayout";
 import PlanningDetailFormLayout from "./pages/PlanningDetail/PlanningDetailFormLayout";
 import ProductStandardsLayout from "./pages/ProductStandards/ProductStandardLayout";
+import PrintLayout from "./pages/Print/PrintLayout";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
@@ -132,6 +133,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PrintListLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/print/print/:id"
+          element={
+            <ProtectedRoute>
+              <PrintLayout />
             </ProtectedRoute>
           }
         />

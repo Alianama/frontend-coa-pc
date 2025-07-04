@@ -88,8 +88,6 @@ const fieldLabels = {
   density: "Density",
   moisture: "Moisture",
   carbonContent: "Carbon Content",
-  // mfgDate: "Mfg Date", // removed
-  // expiryDate: "Expiry Date", // removed
   analysisDate: "Analysis Date",
   foreignMatter: "Foreign Matter",
   weightOfChips: "Weight of Chips",

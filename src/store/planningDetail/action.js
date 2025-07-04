@@ -1,7 +1,6 @@
 // Menggunakan API terpusat
 import api from "@/services/api";
 import { toast } from "sonner";
-import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 export function setPlanningDetailActionCreator(
   data,
@@ -87,25 +86,6 @@ export function asyncUpdatePlanningDetail({ id, data, lotNumber }) {
     } catch (error) {
       toast.error(error.message || "Gagal update detail planning");
       throw error;
-    }
-  };
-}
-
-export function asyncPrintCoa(planningId, quantitiy) {
-  return async (dispatch) => {
-    dispatch(showLoading());
-    try {
-      const response = await api.printCoa(planningId, quantitiy);
-      if (response.status === "success") {
-        toast.success(response.message || "COA berhasil dicetak");
-        return response;
-      }
-      throw new Error(response.message || "Gagal mencetak COA");
-    } catch (error) {
-      toast.error(error.message || "Terjadi kesalahan saat mencetak COA");
-      throw error;
-    } finally {
-      dispatch(hideLoading());
     }
   };
 }

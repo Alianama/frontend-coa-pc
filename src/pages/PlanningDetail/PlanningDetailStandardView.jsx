@@ -16,10 +16,17 @@ export default function PlanningDetailStandardView({
   qcDetail = [],
 }) {
   return (
-    <Dialog open={open} onClose={onClose} title="Detail Standar QC">
+    <Dialog
+      className="w-10/12"
+      open={open}
+      onClose={onClose}
+      title="Detail Standar QC"
+    >
       <DialogContent>
-        <DialogTitle>Standard Check</DialogTitle>
-        <div style={{ minWidth: 400 }}>
+        <DialogTitle className="text-xl font-bold mb-4">
+          Standard Check
+        </DialogTitle>
+        <div className="overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -34,8 +41,14 @@ export default function PlanningDetailStandardView({
             <TableBody>
               {qcDetail.map((qc, idx) => (
                 <TableRow key={idx}>
-                  <TableCell>{qc.property_name}</TableCell>
-                  <TableCell>{qc.actual}</TableCell>
+                  <TableCell className="font-medium">
+                    {qc.property_name}
+                  </TableCell>
+                  <TableCell>
+                    {typeof qc.actual === "number"
+                      ? qc.actual.toFixed(2)
+                      : qc.actual}
+                  </TableCell>
                   <TableCell>{qc.target_value}</TableCell>
                   <TableCell>
                     {qc.tolerance !== null ? qc.tolerance : "-"}
@@ -55,10 +68,9 @@ export default function PlanningDetailStandardView({
                     ].includes(qc.operator) && qc.operator}
                   </TableCell>
                   <TableCell
-                    style={{
-                      color: qc.result === "Passed" ? "green" : "red",
-                      fontWeight: "bold",
-                    }}
+                    className={`font-bold ${
+                      qc.result === "Passed" ? "text-green-600" : "text-red-600"
+                    }`}
                   >
                     {qc.result}
                   </TableCell>
@@ -66,8 +78,10 @@ export default function PlanningDetailStandardView({
               ))}
             </TableBody>
           </Table>
-          <div style={{ marginTop: 16, textAlign: "right" }}>
-            <Button onClick={onClose}>Tutup</Button>
+          <div className="flex justify-end mt-6">
+            <Button onClick={onClose} className="px-6">
+              Tutup
+            </Button>
           </div>
         </div>
       </DialogContent>
