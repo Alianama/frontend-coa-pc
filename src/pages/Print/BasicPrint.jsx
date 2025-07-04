@@ -1,6 +1,6 @@
 import { useReactToPrint } from "react-to-print";
-import ComponentToPrint from "./Template/TampletePrint1";
-import ComponentToPrintTable from "./Template/TemplatePrint2";
+import Template2 from "./Template/TampletePrint-2";
+import Template1 from "./Template/TemplatePrint-1";
 import { Button } from "@/components/ui/button";
 import { asyncGetPrintByID } from "@/store/print/action";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Printer } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-ComponentToPrintTable.displayName = "ComponentToPrintTable";
+// ComponentToPrintTable.displayName = "ComponentToPrintTable";
 
 const BasicComponent = () => {
   const [tab, setTab] = useState("template1");
@@ -80,10 +80,10 @@ const BasicComponent = () => {
         </div>
         <TabsContent value="template1">
           {/* Template lama tetap dipakai di sini */}
-          <ComponentToPrint data={detail} ref={componentRef1} />
+          <Template1 data={detail} ref={componentRef1} />
         </TabsContent>
         <TabsContent value="template2">
-          <ComponentToPrintTable data={detail} ref={componentRef2} />
+          <Template2 data={detail} ref={componentRef2} />
         </TabsContent>
       </Tabs>
     </div>
