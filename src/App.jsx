@@ -21,6 +21,8 @@ import PlanningDetailLayout from "./pages/PlanningDetail/PlanningDetailLayout";
 import PlanningDetailFormLayout from "./pages/PlanningDetail/PlanningDetailFormLayout";
 import ProductStandardsLayout from "./pages/ProductStandards/ProductStandardLayout";
 import PrintLayout from "./pages/Print/PrintLayout";
+import ColorTrendLayout from "./pages/Trend/TrendColorLayout";
+import PreviewLayout from "./pages/Print/PreviewLayout";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
@@ -129,7 +131,7 @@ function App() {
           }
         />
         <Route
-          path="/printHistory"
+          path="/coa-history"
           element={
             <ProtectedRoute>
               <PrintListLayout />
@@ -141,6 +143,22 @@ function App() {
           element={
             <ProtectedRoute>
               <PrintLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/print/preview/:id"
+          element={
+            <ProtectedRoute>
+              <PreviewLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trend"
+          element={
+            <ProtectedRoute>
+              <ColorTrendLayout />
             </ProtectedRoute>
           }
         />

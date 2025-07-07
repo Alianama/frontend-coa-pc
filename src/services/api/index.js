@@ -6,6 +6,7 @@ import * as printApi from "./print";
 import * as productApi from "./product";
 import * as productStandardApi from "./productStandard";
 import * as userApi from "./user";
+import * as trendApi from "./trend";
 import {
   putAccessToken,
   getAccessToken,
@@ -23,6 +24,7 @@ const api = {
   ...productApi,
   ...productStandardApi,
   ...userApi,
+  ...trendApi,
   putAccessToken,
   getAccessToken,
   putRefreshToken,

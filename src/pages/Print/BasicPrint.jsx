@@ -46,8 +46,21 @@ const BasicComponent = () => {
     onBeforePrint: handleBeforePrint,
   });
 
-  // Event listener Ctrl+P untuk tab aktif
+  // Cek apakah status APPROVED
+  const isApproved = detail?.status === "APPROVED";
+  const printedRef = useRef(false);
+
   useEffect(() => {
+    if (!printedRef.current && isApproved && detail) {
+      if (tab === "template1") printFn1();
+      else printFn2();
+      printedRef.current = true;
+    }
+  }, [detail, isApproved, tab, printFn1, printFn2]);
+
+  // Event listener Ctrl+P untuk tab aktif, hanya aktif jika APPROVED
+  useEffect(() => {
+    if (!isApproved) return;
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
         e.preventDefault();
@@ -57,7 +70,7 @@ const BasicComponent = () => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [printFn1, printFn2, tab]);
+  }, [printFn1, printFn2, tab, isApproved]);
 
   return (
     <div className="p-10">
@@ -69,11 +82,29 @@ const BasicComponent = () => {
           </TabsList>
           {/* Button print di kanan */}
           {tab === "template1" ? (
-            <Button className="ml-5" onClick={printFn1}>
+            <Button
+              className="ml-5"
+              onClick={isApproved ? printFn1 : undefined}
+              disabled={!isApproved}
+              title={
+                !isApproved
+                  ? "Print hanya bisa dilakukan jika status APPROVED"
+                  : ""
+              }
+            >
               <Printer /> Print (CTRL + P)
             </Button>
           ) : (
-            <Button className="ml-5" onClick={printFn2}>
+            <Button
+              className="ml-5"
+              onClick={isApproved ? printFn2 : undefined}
+              disabled={!isApproved}
+              title={
+                !isApproved
+                  ? "Print hanya bisa dilakukan jika status APPROVED"
+                  : ""
+              }
+            >
               <Printer /> Print (CTRL + P)
             </Button>
           )}

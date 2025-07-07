@@ -82,6 +82,7 @@ export default function PlanningDetailList() {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [printQuantity, setPrintQuantity] = useState("");
   const [printRemarks, setPrintRemarks] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(asyncGetPlanningDetailByLot(lot));
@@ -91,12 +92,15 @@ export default function PlanningDetailList() {
   const handleConfirmPrint = async () => {
     if (planningDetail.header.id && printQuantity) {
       try {
-        await dispatch(
+        const response = await dispatch(
           asyncPrintCoa(planningDetail.header.id, printQuantity, printRemarks)
         );
+        console.log(response.data);
+
         setIsPrintDialogOpen(false);
         setPrintQuantity("");
         setPrintRemarks("");
+        navigate(`/print/preview/${response.data.id}`);
       } catch (error) {
         console.error("Error printing COA:", error);
       }
@@ -126,14 +130,9 @@ export default function PlanningDetailList() {
   };
 
   const handleStandardView = (item) => {
-    // Konversi data item menjadi format yang sesuai dengan PlanningDetailStandardView
-
     setSelectedQcDetail(item.qcDetail);
     setIsStandardViewOpen(true);
   };
-
-  console.log(planningDetail);
-
   // Definisi kolom
   const allColumns = [
     { key: "id", label: "No" },
@@ -255,8 +254,6 @@ export default function PlanningDetailList() {
   const resetColumns = () => {
     location.reload();
   };
-
-  const navigate = useNavigate();
 
   // updateVisibleColumns hanya update state
   const updateVisibleColumns = (newColumns) => {

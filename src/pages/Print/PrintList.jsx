@@ -111,7 +111,7 @@ function ActionButtons({ onApprove, onReject, onView, onPrint, status }) {
         <Eye className="w-4 h-4" />
       </Button>
 
-      {isAdmin && status === "APPROVED" && (
+      {status === "APPROVED" && (
         <Button
           className="w-8 h-8"
           variant="default"
@@ -221,7 +221,7 @@ export default function PrintList() {
     openDialog("reject", id);
   };
   const handleView = (id) => {
-    alert(id);
+    navigate(`/print/preview/${id}`);
   };
   const handlePrint = (id) => {
     navigate(`/print/print/${id}`);
@@ -231,8 +231,8 @@ export default function PrintList() {
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <CardTitle className="text-2xl font-bold">Print List</CardTitle>
-            <CardDescription>View available print records.</CardDescription>
+            <CardTitle className="text-2xl font-bold">COA List</CardTitle>
+            <CardDescription>View available COA records.</CardDescription>
           </div>
         </div>
       </CardHeader>

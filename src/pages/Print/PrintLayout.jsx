@@ -7,7 +7,7 @@ export default function PrintLayout() {
       title="Print Preview"
       items={[
         { label: "Home", href: "/" },
-        { label: "Print List", href: "/printHistory" },
+        { label: "COA List", href: "/coa-history" },
       ]}
     >
       <BasicComponent />

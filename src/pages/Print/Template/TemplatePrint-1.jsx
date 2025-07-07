@@ -60,8 +60,9 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
       analysisDate: data.analysisDate || data.date || "-",
       issuedBy: data.issuedBy || "-",
       approvedBy: data.approvedBy || "-",
-      documentNumber: data.documentNumber || "-",
-      revisionStatus: data.revisionStatus || "-",
+      resin: data.resin || "-",
+      moulding: data.moulding || "-",
+      letDownRatio: data.letDownRatio || "_",
       pageInfo: "1 dari 1",
       noDucument: "FRM / III / PC_QC /09",
       tanggalTerbit: "02 Januari 2024",
@@ -102,76 +103,94 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
           </div>
         </div>
         {/* Data Customer & Produk */}
-        <div className="px-10">
-          <div className="mb-10 ">
-            <div className="flex flex-row mb-10">
-              <div className="w-40 font-bold">Customer Name</div>
-              <div className="w-4">:</div>
-              <div className="flex-1 font-bold">
-                {certificateData.customerName}
+        <div className="flex px-10 flex-row mb-5">
+          <div className="w-40 font-bold">Customer Name</div>
+          <div className="w-4">:</div>
+          <div className="flex-1 font-bold">{certificateData.customerName}</div>
+        </div>
+        <div className="px-10 ">
+          <div className="flex gap-15 ">
+            <div className="mb-10  pr-10 border-black">
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Product Name</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">{certificateData.productName}</div>
+              </div>
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Lot Number</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">{certificateData.lotNo}</div>
+              </div>
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Resin</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">{certificateData.resin}</div>
+              </div>
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Quantity</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">{certificateData.quantity} Kg</div>
               </div>
             </div>
-            <div className="flex flex-row mb-1">
-              <div className="w-40">Product Name</div>
-              <div className="w-4">:</div>
-              <div className="flex-1">{certificateData.productName}</div>
-            </div>
-            <div className="flex flex-row mb-1">
-              <div className="w-40">Lot Number</div>
-              <div className="w-4">:</div>
-              <div className="flex-1">{certificateData.lotNo}</div>
-            </div>
-            <div className="flex flex-row mb-1">
-              <div className="w-40">Quantity</div>
-              <div className="w-4">:</div>
-              <div className="flex-1">{certificateData.quantity} Kg</div>
-            </div>
-            <div className="flex flex-row mb-1">
-              <div className="w-40">Mfg Date</div>
-              <div className="w-4">:</div>
-              <div className="flex-1">
-                {certificateData.mfgDate
-                  ? new Date(certificateData.mfgDate).toLocaleDateString(
-                      "id-ID",
-                      {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      }
-                    )
-                  : "-"}
+            <div className="mb-10 ">
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Moulding</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">{certificateData.moulding}</div>
               </div>
-            </div>
-            <div className="flex flex-row mb-1">
-              <div className="w-40">Exp Date</div>
-              <div className="w-4">:</div>
-              <div className="flex-1">
-                {certificateData.expDate
-                  ? new Date(certificateData.expDate).toLocaleDateString(
-                      "id-ID",
-                      {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      }
-                    )
-                  : "-"}
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Let Down Ratio</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">{certificateData.letDownRatio}</div>
               </div>
-            </div>
-            <div className="flex flex-row mb-1">
-              <div className="w-40">Analysis Date</div>
-              <div className="w-4">:</div>
-              <div className="flex-1">
-                {certificateData.analysisDate
-                  ? new Date(certificateData.analysisDate).toLocaleDateString(
-                      "id-ID",
-                      {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      }
-                    )
-                  : "-"}
+
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Mfg Date</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">
+                  {certificateData.mfgDate
+                    ? new Date(certificateData.mfgDate).toLocaleDateString(
+                        "id-ID",
+                        {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }
+                      )
+                    : "-"}
+                </div>
+              </div>
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Exp Date</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">
+                  {certificateData.expDate
+                    ? new Date(certificateData.expDate).toLocaleDateString(
+                        "id-ID",
+                        {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }
+                      )
+                    : "-"}
+                </div>
+              </div>
+              <div className="flex flex-row mb-1">
+                <div className="w-40">Analysis Date</div>
+                <div className="w-4">:</div>
+                <div className="flex-1">
+                  {certificateData.analysisDate
+                    ? new Date(certificateData.analysisDate).toLocaleDateString(
+                        "id-ID",
+                        {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }
+                      )
+                    : "-"}
+                </div>
               </div>
             </div>
           </div>
@@ -214,7 +233,7 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
             </tbody>
           </table>
           {/* Footer signature */}
-          <div className="flex flex-row justify-between mt-50 mb-10">
+          <div className="flex flex-row justify-between mt-20 mb-10">
             <div className="w-1/2" />
             <div className="flex flex-row w-1/2">
               <div className="flex flex-col items-center w-1/2">

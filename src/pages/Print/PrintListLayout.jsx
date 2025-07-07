@@ -3,7 +3,7 @@ import PrintList from "./PrintList";
 
 export default function PrintListLayout() {
   return (
-    <Layout title="Print History" items={[{ label: "Home", href: "/" }]}>
+    <Layout title="COA History" items={[{ label: "Home", href: "/" }]}>
       <PrintList />
     </Layout>
   );

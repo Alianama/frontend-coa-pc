@@ -21,6 +21,7 @@ import {
   Contact,
   History,
   BadgeDollarSign,
+  Paperclip,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -41,8 +42,8 @@ const sidebarConfig = {
       icon: FileText,
     },
     {
-      path: "/printHistory",
-      label: "Print History",
+      path: "/coa-history",
+      label: "COA History",
       icon: History,
     },
     {
@@ -57,9 +58,14 @@ const sidebarConfig = {
       icon: Contact,
     },
     {
+      path: "/trend",
+      label: "Color Trend",
+      icon: BarChart3,
+    },
+    {
       path: "/reports",
       label: "Reports",
-      icon: BarChart3,
+      icon: Paperclip,
     },
   ],
   admin: [
