@@ -116,12 +116,22 @@ export default function DetailHeader({
         </div>
 
         <div className="flex items-center gap-10 text-sm">
-          <div className="border-r-2 pr-5 font-semibold flex justify-between items-center text-sm">
-            <h1 className="text-sm">
-              Customer : {header?.customerName} • Product :{" "}
-              {header?.productName}
-            </h1>
-            <span>Created {formatDate(header?.createdAt)}</span>
+          <div className="border-r-2 pr-5 font-semibold flex flex-col justify-between items-start text-sm min-w-[220px]">
+            <div className="flex items-center w-full">
+              <span className="w-20 text-sm">Customer</span>
+              <span className="mx-1">:</span>
+              <span className="flex-1">{header?.customerName}</span>
+            </div>
+            <div className="flex items-center w-full">
+              <span className="w-20">Product</span>
+              <span className="mx-1">:</span>
+              <span className="flex-1">{header?.productName}</span>
+            </div>
+            <div className="flex items-center w-full">
+              <span className="w-20">Created</span>
+              <span className="mx-1">:</span>
+              <span className="flex-1">{formatDate(header?.createdAt)}</span>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Package className="w-3 h-3 text-gray-400" />

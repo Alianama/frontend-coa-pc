@@ -129,7 +129,7 @@ export default function PlanningList() {
             </div>
             <Button onClick={() => navigate("/planning/create")}>
               <FilePlus className="mr-2 h-4 w-4" />
-              Tambah Planning
+              Add Planning
             </Button>
           </div>
         </CardContent>

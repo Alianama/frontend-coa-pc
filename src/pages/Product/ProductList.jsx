@@ -48,7 +48,7 @@ import {
   Trash2,
   Search,
   ArrowUpDown,
-  Sheet,
+  Handshake,
 } from "lucide-react";
 import ProductDetailDialog from "@/components/Product/product-detail-dialog";
 import {
@@ -331,7 +331,7 @@ export default function ProductList() {
                       className="flex items-center cursor-pointer"
                       onClick={() => handleSort("color")}
                     >
-                      Color
+                      Expired Age
                       {sortField === "color" && (
                         <ArrowUpDown
                           className={`ml-2 h-4 w-4 ${
@@ -343,7 +343,7 @@ export default function ProductList() {
                   </TableHead>
                   <TableHead>Let Down Ratio</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Cretaed Date</TableHead>
+                  <TableHead>Created Date</TableHead>
                   <TableHead className="text-right pr-15">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -396,7 +396,7 @@ export default function ProductList() {
                           }
                           className=""
                         >
-                          <Sheet />
+                          <Handshake />
                           Standard
                         </Button>
                         <Button
