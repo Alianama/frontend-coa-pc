@@ -31,4 +31,29 @@ export async function getLotProgress(startDate, endDate) {
   };
 }
 
-export default { getLotProgress };
+// Fungsi untuk mengambil data total planning per bulan dalam satu tahun
+export async function getPlanningYearly(year) {
+  // year wajib diisi, default ke tahun sekarang jika tidak ada
+  const tahun = year || new Date().getFullYear();
+  const params = new URLSearchParams();
+  params.append("year", tahun);
+
+  const url = `${BASE_URL}/dashboard/total-planning-perbulan?${params.toString()}`;
+
+  const response = await _fetchWithAuth(url);
+  const responseJson = await response.json();
+
+  const { status, message, data } = responseJson;
+
+  if (status !== "success") {
+    throw new Error(message || "Gagal mengambil data planning per tahun");
+  }
+
+  return {
+    status,
+    message,
+    data,
+  };
+}
+
+export default { getLotProgress, getPlanningYearly };

@@ -2,6 +2,7 @@ import { ActionType } from "./action";
 
 const initialState = {
   lotProgress: [],
+  planningYearly: {},
 };
 
 function dashboardReducer(state = initialState, action = {}) {
@@ -11,7 +12,11 @@ function dashboardReducer(state = initialState, action = {}) {
         ...state,
         lotProgress: action.payload,
       };
-
+    case ActionType.RECEIVE_PLANNING_YEARLY:
+      return {
+        ...state,
+        planningYearly: action.payload,
+      };
     default:
       return state;
   }

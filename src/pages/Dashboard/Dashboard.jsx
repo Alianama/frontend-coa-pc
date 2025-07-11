@@ -9,11 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, CheckCircle2, Clock, FileText, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import ProductionChart from "./Component/ProductionChart";
+import ProductionChart from "./Chart/LotProgress";
+import TotalPlanningYear from "./Chart/TotalPlanningYear";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-
   return (
     <div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -96,18 +96,17 @@ export default function DashboardPage() {
 
       <Tabs defaultValue="overview" className="mt-6">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="recent">Recent COAs</TabsTrigger>
+          <TabsTrigger value="overview">Lot Overviews</TabsTrigger>
+          <TabsTrigger value="recent">Planning Yearly</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="">
             <Card className="col-span-4">
               <CardHeader>
-                <CardTitle>COA Production Overview</CardTitle>
+                <CardTitle>{`Lot's Overview`}</CardTitle>
                 <CardDescription>
-                  Statistik produksi COA per lot dengan trend planning,
-                  checking, dan printing
+                  Statistik lot dengan trend planning, checking, dan printing
                 </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
@@ -121,16 +120,13 @@ export default function DashboardPage() {
         <TabsContent value="recent">
           <Card>
             <CardHeader>
-              <CardTitle>Recent COAs</CardTitle>
-              <CardDescription>COA terbaru akan tampil di sini</CardDescription>
+              <CardTitle>Total Planning Yearly</CardTitle>
+              <CardDescription>
+                Kalkulasi Planning Perbulan dalam 1 tahun
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {/* Data COA terbaru kosong, data menyusul */}
-                <div className="text-center text-muted-foreground text-sm">
-                  Belum ada data.
-                </div>
-              </div>
+              <TotalPlanningYear />
             </CardContent>
           </Card>
         </TabsContent>
