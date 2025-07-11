@@ -62,25 +62,22 @@ import {
   Trash2,
   Shield,
   Users,
-  Settings,
+  KeyIcon,
 } from "lucide-react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { asyncGetAllUsers, asyncAddUser } from "@/store/users/action";
+import {
+  asyncGetAllUsers,
+  asyncAddUser,
+  asyncDeleteUser,
+  asyncUpdateUser,
+  asyncResetPassword,
+} from "@/store/users/action";
 import { toast } from "sonner";
-
-const initialRoles = [
-  {
-    id: 1,
-    name: "SUPER_ADMIN",
-    description: "Super Administrator dengan akses penuh",
-  },
-  { id: 2, name: "ADMIN", description: "Administrator dengan akses terbatas" },
-  { id: 3, name: "USER", description: "Pengguna biasa" },
-];
+import RolesManagement from "./Roles";
 
 export default function UserManagement() {
-  const [roles] = useState(initialRoles);
+  const roles = useSelector((state) => state.roles);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
@@ -94,6 +91,11 @@ export default function UserManagement() {
     password: "",
     roleId: "",
   });
+  const [editUser, setEditUser] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [resetUserId, setResetUserId] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
     try {
@@ -109,14 +111,20 @@ export default function UserManagement() {
       user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.username.toLowerCase().includes(searchTerm.toLowerCase());
+    // Ganti SUPER_ADMIN jadi SUPERADMIN di filter
+    const userRoleName =
+      user.role.name === "SUPER_ADMIN" ? "SUPERADMIN" : user.role.name;
+    const selectedRoleName =
+      selectedRole === "SUPER_ADMIN" ? "SUPERADMIN" : selectedRole;
     const matchesRole =
-      selectedRole === "all" || user.role.name === selectedRole;
+      selectedRole === "all" || userRoleName === selectedRoleName;
     return matchesSearch && matchesRole;
   });
 
   const getRoleBadgeVariant = (roleName) => {
-    switch (roleName) {
-      case "SUPER_ADMIN":
+    // Ganti SUPER_ADMIN jadi SUPERADMIN di switch
+    switch (roleName === "SUPER_ADMIN" ? "SUPERADMIN" : roleName) {
+      case "SUPERADMIN":
         return "destructive";
       case "ADMIN":
         return "default";
@@ -135,8 +143,12 @@ export default function UserManagement() {
     });
   };
 
-  const handleDeleteUser = (userId) => {
-    alert(userId);
+  const handleDeleteUser = async (userId) => {
+    try {
+      await dispatch(asyncDeleteUser(userId));
+    } catch (error) {
+      console.error("Gagal menghapus user:", error);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -173,6 +185,48 @@ export default function UserManagement() {
       password: "",
       roleId: "",
     });
+  };
+
+  const handleEditUserOpen = (user) => {
+    setEditUser({ ...user, roleId: user.role?.id?.toString() });
+    setIsEditDialogOpen(true);
+  };
+  const handleEditUserChange = (e) => {
+    const { id, value } = e.target;
+    setEditUser((prev) => ({ ...prev, [id]: value }));
+  };
+  const handleEditRoleChange = (value) => {
+    setEditUser((prev) => ({ ...prev, roleId: value }));
+  };
+  const handleEditUserSave = async () => {
+    if (
+      !editUser.fullName ||
+      !editUser.username ||
+      !editUser.email ||
+      !editUser.roleId
+    ) {
+      toast.error("Semua field harus diisi!");
+      return;
+    }
+    await dispatch(asyncUpdateUser(editUser));
+    setIsEditDialogOpen(false);
+    setEditUser(null);
+  };
+
+  const handleResetPasswordOpen = (userId) => {
+    setResetUserId(userId);
+    setIsResetDialogOpen(true);
+    setNewPassword("");
+  };
+  const handleResetPassword = async () => {
+    if (!newPassword) {
+      toast.error("Password baru wajib diisi!");
+      return;
+    }
+    await dispatch(asyncResetPassword(resetUserId, newPassword));
+    setIsResetDialogOpen(false);
+    setResetUserId(null);
+    setNewPassword("");
   };
 
   return (
@@ -292,7 +346,10 @@ export default function UserManagement() {
                     <SelectContent>
                       {roles.map((role) => (
                         <SelectItem key={role.id} value={role.id.toString()}>
-                          {role.name}
+                          {/* Ganti SUPER_ADMIN jadi SUPERADMIN di dropdown */}
+                          {role.name === "SUPER_ADMIN"
+                            ? "SUPERADMIN"
+                            : role.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -336,8 +393,14 @@ export default function UserManagement() {
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
                 {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.name}>
-                    {role.name}
+                  <SelectItem
+                    key={role.id}
+                    value={
+                      role.name === "SUPER_ADMIN" ? "SUPERADMIN" : role.name
+                    }
+                  >
+                    {/* Ganti SUPER_ADMIN jadi SUPERADMIN di filter dropdown */}
+                    {role.name === "SUPER_ADMIN" ? "SUPERADMIN" : role.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -381,7 +444,10 @@ export default function UserManagement() {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
                       <Badge variant={getRoleBadgeVariant(user.role.name)}>
-                        {user.role.name}
+                        {/* Ganti SUPER_ADMIN jadi SUPERADMIN di badge */}
+                        {user.role.name === "SUPER_ADMIN"
+                          ? "SUPERADMIN"
+                          : user.role.name}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDate(user.createdAt)}</TableCell>
@@ -394,17 +460,19 @@ export default function UserManagement() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem className="gap-2">
+                          <DropdownMenuItem
+                            className="gap-2"
+                            onClick={() => handleEditUserOpen(user)}
+                          >
                             <Edit className="h-4 w-4" />
                             Edit User
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Shield className="h-4 w-4" />
-                            Change Role
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Settings className="h-4 w-4" />
-                            Permissions
+                          <DropdownMenuItem
+                            className="gap-2"
+                            onClick={() => handleResetPasswordOpen(user.id)}
+                          >
+                            <KeyIcon className="h-4 w-4" />
+                            Reset Password
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <AlertDialog>
@@ -452,61 +520,110 @@ export default function UserManagement() {
       </Card>
 
       {/* Roles Management */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Roles Management
-          </CardTitle>
-          <CardDescription>Kelola peran dan izin dalam sistem</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {roles.map((role) => (
-              <Card key={role.id} className="relative">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={getRoleBadgeVariant(role.name)}>
-                      {role.name}
-                    </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="gap-2">
-                          <Edit className="h-4 w-4" />
-                          Edit Role
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2">
-                          <Settings className="h-4 w-4" />
-                          Manage Permissions
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                          Delete Role
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {role.description}
-                  </p>
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    {users.filter((user) => user.roleId === role.id).length}{" "}
-                    users assigned
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      <RolesManagement />
+
+      {/* Dialog edit user global, render di luar map */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>Ubah data pengguna berikut.</DialogDescription>
+          </DialogHeader>
+          {editUser && (
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="fullName" className="block text-sm font-medium">
+                  Nama Lengkap
+                </label>
+                <Input
+                  id="fullName"
+                  value={editUser.fullName}
+                  onChange={handleEditUserChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium">
+                  Username
+                </label>
+                <Input
+                  id="username"
+                  value={editUser.username}
+                  onChange={handleEditUserChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  value={editUser.email}
+                  onChange={handleEditUserChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="roleId" className="block text-sm font-medium">
+                  Role
+                </label>
+                <Select
+                  value={editUser.roleId}
+                  onValueChange={handleEditRoleChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role.id} value={role.id.toString()}>
+                        {/* Ganti SUPER_ADMIN jadi SUPERADMIN di edit user */}
+                        {role.name === "SUPER_ADMIN" ? "SUPERADMIN" : role.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              Batal
+            </Button>
+            <Button onClick={handleEditUserSave}>Simpan Perubahan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Reset Password */}
+      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Masukkan password baru untuk user ini.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              type="password"
+              placeholder="Password baru"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
           </div>
-        </CardContent>
-      </Card>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsResetDialogOpen(false)}
+            >
+              Batal
+            </Button>
+            <Button onClick={handleResetPassword}>Reset Password</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

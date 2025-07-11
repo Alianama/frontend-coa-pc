@@ -23,7 +23,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ArrowUpDown, Eye, X, Check, Printer } from "lucide-react";
+import {
+  Search,
+  ArrowUpDown,
+  Eye,
+  X,
+  Check,
+  Printer,
+  RefreshCcwIcon,
+} from "lucide-react";
 import { Pagination } from "@/components/Product/Pagination";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -40,6 +48,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { Calendar } from "@/components/ui/calendar";
+import { Combobox } from "@/components/ui/combo-box";
+import { addDays, isAfter, isBefore } from "date-fns";
+import { asyncGetCustomer } from "@/store/customer/action";
+import { asyncGetProduct } from "@/store/product/action";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 // Komponen kecil untuk badge status
 function StatusBadge({ status }) {
@@ -139,12 +157,23 @@ export default function PrintList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState("desc");
-  const [itemsPerPage, setItemsPerPage] = useState(100);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const dispatch = useDispatch();
   const { data: prints, pagination } = useSelector((state) => state.prints);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState(""); // "approve" atau "reject"
   const [selectedId, setSelectedId] = useState(null);
+  const customers = useSelector((state) => state.customers);
+  const { products } = useSelector((state) => state.products);
+  const [filterCustomer, setFilterCustomer] = useState("");
+  const [filterProduct, setFilterProduct] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterDate, setFilterDate] = useState({ from: null, to: null });
+
+  useEffect(() => {
+    dispatch(asyncGetCustomer());
+    dispatch(asyncGetProduct());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchPrints = async () => {
@@ -160,28 +189,65 @@ export default function PrintList() {
   // Filter and sort prints
   const filteredPrints = useMemo(() => {
     if (!prints) return [];
-
-    return [...prints].sort((a, b) => {
-      if (!sortField) return 0;
-
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-
-      if (sortField === "createdAt" || sortField === "printedDate") {
-        return sortDirection === "asc"
-          ? new Date(aValue) - new Date(bValue)
-          : new Date(bValue) - new Date(aValue);
-      }
-
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return sortDirection === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      }
-
-      return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-    });
-  }, [prints, sortField, sortDirection]);
+    const safeDate =
+      filterDate && typeof filterDate === "object"
+        ? filterDate
+        : { from: null, to: null };
+    const from = safeDate?.from ?? null;
+    const to = safeDate?.to ?? null;
+    return [...prints]
+      .filter((item) => {
+        // Filter customer
+        if (
+          filterCustomer &&
+          String(item.costumerName) !==
+            customers?.find((c) => c.id.toString() === filterCustomer)?.name
+        )
+          return false;
+        // Filter product
+        if (
+          filterProduct &&
+          String(item.productName) !==
+            products?.find((p) => p.id.toString() === filterProduct)
+              ?.productName
+        )
+          return false;
+        // Filter status
+        if (filterStatus && item.status !== filterStatus) return false;
+        // Filter date (printedDate)
+        if (from && to) {
+          const d = new Date(item.printedDate);
+          if (isBefore(d, from) || isAfter(d, addDays(to, 1))) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (!sortField) return 0;
+        const aValue = a[sortField];
+        const bValue = b[sortField];
+        if (sortField === "createdAt" || sortField === "printedDate") {
+          return sortDirection === "asc"
+            ? new Date(aValue) - new Date(bValue)
+            : new Date(bValue) - new Date(aValue);
+        }
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortDirection === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      });
+  }, [
+    prints,
+    sortField,
+    sortDirection,
+    filterCustomer,
+    filterProduct,
+    filterStatus,
+    filterDate,
+    customers,
+    products,
+  ]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -192,8 +258,12 @@ export default function PrintList() {
     }
   };
 
-  const resetFilters = () => {
+  const resetAllFilters = () => {
     setSearchTerm("");
+    setFilterCustomer("");
+    setFilterProduct("");
+    setFilterStatus("");
+    setFilterDate({ from: null, to: null });
     setSortField("createdAt");
     setSortDirection("desc");
     setCurrentPage(1);
@@ -237,23 +307,112 @@ export default function PrintList() {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Search */}
-        <div className="mb-6 space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search prints..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+        {/* Search & Filters */}
+        <div className="mb-2">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-wrap gap-2 w-full">
+              {/* Search */}
+              <div className="relative min-w-[120px] max-w-[200px] flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cari..."
+                  className="pl-8 h-8 text-xs"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              {/* Customer & Produk */}
+              <Combobox
+                items={customers?.map((customer) => ({
+                  value: customer.id.toString(),
+                  label:
+                    customer.name.length > 22
+                      ? customer.name.slice(0, 20) + "..."
+                      : customer.name,
+                  fullLabel: customer.name,
+                }))}
+                value={filterCustomer}
+                onValueChange={setFilterCustomer}
+                placeholder="Customer"
+                searchPlaceholder="Cari customer..."
+                emptyMessage="Customer tidak ditemukan."
+                className="flex h-8 text-xs min-w-[150px] max-w-[200px]"
+                renderItem={(item) => (
+                  <span title={item.fullLabel || item.label}>{item.label}</span>
+                )}
               />
-            </div>
-            {searchTerm && (
-              <Button variant="outline" onClick={resetFilters}>
-                Clear Filter
+              <Combobox
+                items={products?.map((product) => ({
+                  value: product.id.toString(),
+                  label:
+                    product.productName.length > 22
+                      ? product.productName.slice(0, 20) + "..."
+                      : product.productName,
+                  fullLabel: product.productName,
+                }))}
+                value={filterProduct}
+                onValueChange={setFilterProduct}
+                placeholder="Produk"
+                searchPlaceholder="Cari produk..."
+                emptyMessage="Produk tidak ditemukan."
+                className="flex h-8 text-xs min-w-[120px] max-w-[180px]"
+                renderItem={(item) => (
+                  <span title={item.fullLabel || item.label}>{item.label}</span>
+                )}
+              />
+              {/* Status */}
+              <div className="min-w-[120px] max-w-[160px]">
+                <Select
+                  value={filterStatus || "ALL"}
+                  onValueChange={(v) => setFilterStatus(v === "ALL" ? "" : v)}
+                >
+                  <SelectTrigger className="h-8 text-xs w-full">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All</SelectItem>
+                    <SelectItem value="APPROVED">Approved</SelectItem>
+                    <SelectItem value="REJECTED">Rejected</SelectItem>
+                    <SelectItem value="REQUESTED">Requested</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Tanggal Print */}
+              <div className="min-w-[140px] max-w-[200px]">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="h-8 w-full text-xs justify-start"
+                    >
+                      {filterDate && filterDate.from && filterDate.to
+                        ? `${filterDate.from.toLocaleDateString(
+                            "id-ID"
+                          )} - ${filterDate.to.toLocaleDateString("id-ID")}`
+                        : "Tanggal Print"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0" align="end">
+                    <Calendar
+                      mode="range"
+                      selected={filterDate}
+                      onSelect={setFilterDate}
+                      className="border rounded-md"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              {/* Reset */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 p-0"
+                onClick={resetAllFilters}
+                title="Reset Filter"
+              >
+                <RefreshCcwIcon />
               </Button>
-            )}
+            </div>
           </div>
         </div>
 
@@ -271,8 +430,23 @@ export default function PrintList() {
                     className="flex items-center cursor-pointer"
                     onClick={() => handleSort("costumerName")}
                   >
-                    Customer Name
+                    Customer Template
                     {sortField === "costumerName" && (
+                      <ArrowUpDown
+                        className={`ml-2 h-4 w-4 ${
+                          sortDirection === "desc" ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead className="w-[200px]">
+                  <div
+                    className="flex items-center cursor-pointer"
+                    onClick={() => handleSort("shippedToCustomerName")}
+                  >
+                    Shipped To{" "}
+                    {sortField === "shippedToCustomerName" && (
                       <ArrowUpDown
                         className={`ml-2 h-4 w-4 ${
                           sortDirection === "desc" ? "rotate-180" : ""
@@ -316,7 +490,9 @@ export default function PrintList() {
                   </div>
                 </TableHead>
                 <TableHead>Remarks</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right sticky right-0 bg-white z-10 min-w-[120px]">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -331,6 +507,9 @@ export default function PrintList() {
                   <TableRow key={print.id}>
                     <TableCell className="font-medium">
                       {print.costumerName}
+                    </TableCell>
+                    <TableCell>
+                      {print.shippedToCustomerName || "Same as Template"}
                     </TableCell>
                     <TableCell>{print.productName}</TableCell>
                     <TableCell>{print.lotNumber}</TableCell>
@@ -351,7 +530,7 @@ export default function PrintList() {
                       })}
                     </TableCell>
                     <TableCell>{print.remarks}</TableCell>
-                    <TableCell>
+                    <TableCell className="sticky right-0 bg-white z-10 min-w-[120px]">
                       <ActionButtons
                         onApprove={() => handleApprove(print.id)}
                         onReject={() => handleReject(print.id)}

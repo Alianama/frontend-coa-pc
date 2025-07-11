@@ -7,6 +7,8 @@ import * as productApi from "./product";
 import * as productStandardApi from "./productStandard";
 import * as userApi from "./user";
 import * as trendApi from "./trend";
+import * as rolesApi from "./roles";
+import * as dashboardApi from "./dashboard";
 import {
   putAccessToken,
   getAccessToken,
@@ -25,6 +27,8 @@ const api = {
   ...productStandardApi,
   ...userApi,
   ...trendApi,
+  ...rolesApi,
+  ...dashboardApi,
   putAccessToken,
   getAccessToken,
   putRefreshToken,

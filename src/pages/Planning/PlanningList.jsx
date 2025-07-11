@@ -149,7 +149,9 @@ export default function PlanningList() {
               <TableHead>Mfg Date</TableHead>
               <TableHead>Expiry Date</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Action</TableHead>
+              <TableHead className="sticky right-0 bg-white z-10 min-w-[120px]">
+                Action
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -172,12 +174,23 @@ export default function PlanningList() {
                   <TableCell>{planning.qtyPlanning} Kg</TableCell>
                   <TableCell>
                     {planning.mfgDate
-                      ? new Date(planning.mfgDate).toLocaleDateString()
+                      ? new Date(planning.mfgDate).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })
                       : ""}
                   </TableCell>
                   <TableCell>
                     {planning.expiryDate
-                      ? new Date(planning.expiryDate).toLocaleDateString()
+                      ? new Date(planning.expiryDate).toLocaleDateString(
+                          "id-ID",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          }
+                        )
                       : ""}
                   </TableCell>
                   <TableCell>
@@ -197,7 +210,7 @@ export default function PlanningList() {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell className="flex gap-3">
+                  <TableCell className="flex gap-3 sticky right-0 bg-white z-10 min-w-[120px]">
                     <Button
                       variant="outline"
                       className="w-8 h-8"

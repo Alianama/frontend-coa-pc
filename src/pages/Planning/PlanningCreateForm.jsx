@@ -232,35 +232,6 @@ export default function PlanningCreateForm() {
                   </PopoverContent>
                 </Popover>
               </div>
-              {/* <div className="space-y-2">
-                <label>Expiry Date</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !formData.expiryDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.expiryDate ? (
-                        formData.expiryDate.toLocaleDateString()
-                      ) : (
-                        <span>Pilih tanggal</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={formData.expiryDate}
-                      onSelect={handleDateChange("expiryDate")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div> */}
             </div>
             <div className="flex justify-end">
               <Button type="submit" className="gap-2">

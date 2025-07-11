@@ -69,6 +69,7 @@ export default function PlanningDetailForm() {
     nucleatingAgent: "",
     hals: "",
     hiding: "",
+    dispersion: "",
   });
 
   // Ambil data planning detail berdasarkan lot
@@ -182,7 +183,7 @@ export default function PlanningDetailForm() {
       density: formData.density === "" ? null : Number(formData.density),
       mfr: formData.mfr === "" ? null : Number(formData.mfr),
       dispersibility:
-        formData.dispersibility === "" ? null : Number(formData.dispersibility),
+        formData.dispersibility === "" ? null : formData.dispersibility,
       contamination:
         formData.contamination === "" ? null : Number(formData.contamination),
       macaroni: formData.macaroni === "" ? null : Number(formData.macaroni),
@@ -217,13 +218,12 @@ export default function PlanningDetailForm() {
       checkedBy: formData.checkedBy,
       remark: formData.remark,
       caCO3: formData.caCO3 === "" ? null : Number(formData.caCO3),
-      odor: formData.odor === "" ? null : Number(formData.odor),
+      odor: formData.odor === "" ? null : formData.odor,
       nucleatingAgent:
-        formData.nucleatingAgent === ""
-          ? null
-          : Number(formData.nucleatingAgent),
-      hals: formData.hals === "" ? null : Number(formData.hals),
-      hiding: formData.hiding === "" ? null : Number(formData.hiding),
+        formData.nucleatingAgent === "" ? null : formData.nucleatingAgent,
+      hals: formData.hals === "" ? null : formData.hals,
+      hiding: formData.hiding === "" ? null : formData.hiding,
+      dispersion: formData.dispersion === "" ? null : formData.dispersion,
     };
 
     const response = await dispatch(asyncAddPlanningDetail(dataToSubmit));
@@ -453,14 +453,11 @@ export default function PlanningDetailForm() {
                 <Label htmlFor="dispersibility">Dispersibility</Label>
                 <Input
                   id="dispersibility"
-                  type="number"
-                  step="0.1"
-                  placeholder="3.0"
+                  placeholder="Dispersibility"
                   value={formData.dispersibility}
                   onChange={(e) =>
                     handleInputChange("dispersibility", e.target.value)
                   }
-                  onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -672,30 +669,14 @@ export default function PlanningDetailForm() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="odor">Odor</Label>
-                <Input
-                  id="odor"
-                  type="number"
-                  step="0.1"
-                  placeholder="0.0"
-                  value={formData.odor}
-                  onChange={(e) => handleInputChange("odor", e.target.value)}
-                  onWheel={(e) => e.target.blur()}
-                  className="h-8 text-sm py-1 px-2"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="nucleatingAgent">Nucleating Agent</Label>
                 <Input
                   id="nucleatingAgent"
-                  type="number"
-                  step="0.1"
-                  placeholder="0.0"
+                  placeholder="Nucleating Agent"
                   value={formData.nucleatingAgent}
                   onChange={(e) =>
                     handleInputChange("nucleatingAgent", e.target.value)
                   }
-                  onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -703,12 +684,9 @@ export default function PlanningDetailForm() {
                 <Label htmlFor="hals">HALS</Label>
                 <Input
                   id="hals"
-                  type="number"
-                  step="0.1"
-                  placeholder="0.0"
+                  placeholder="HALS"
                   value={formData.hals}
                   onChange={(e) => handleInputChange("hals", e.target.value)}
-                  onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -716,12 +694,21 @@ export default function PlanningDetailForm() {
                 <Label htmlFor="hiding">Hiding</Label>
                 <Input
                   id="hiding"
-                  type="number"
-                  step="0.1"
-                  placeholder="0.0"
+                  placeholder="Hiding"
                   value={formData.hiding}
                   onChange={(e) => handleInputChange("hiding", e.target.value)}
-                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dispersion">Dispersion</Label>
+                <Input
+                  id="dispersion"
+                  placeholder="Dispersion"
+                  value={formData.dispersion}
+                  onChange={(e) =>
+                    handleInputChange("dispersion", e.target.value)
+                  }
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -739,11 +726,12 @@ export default function PlanningDetailForm() {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Ok">Ok</SelectItem>
-                    <SelectItem value="Not Good">Not Good</SelectItem>
+                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="colorCheck">Color Check</Label>
                 <Select
@@ -756,8 +744,23 @@ export default function PlanningDetailForm() {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Ok">Ok</SelectItem>
-                    <SelectItem value="Not Good">Not Good</SelectItem>
+                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="odor">Odor</Label>
+                <Select
+                  value={formData.odor}
+                  onValueChange={(value) => handleInputChange("odor", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

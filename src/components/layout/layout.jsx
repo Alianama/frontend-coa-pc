@@ -67,6 +67,10 @@ export default function Layout({ children, title, items = [] }) {
           </Breadcrumb>
           <div className="container mx-auto py-6 animate-in">{children}</div>
         </main>
+        <footer className="w-full text-center py-4 border-t bg-background text-xs text-muted-foreground">
+          © {new Date().getFullYear()} PT. Toyo Ink Indoensia. All rights
+          reserved.
+        </footer>
       </SidebarInset>
     </SidebarProvider>
   );

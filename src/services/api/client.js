@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:3000/api";
+export const BASE_URL = "http://172.27.52.29:3000/api";
 
 export function putAccessToken(token) {
   localStorage.setItem("accessToken", token);
@@ -32,7 +32,6 @@ export async function _fetchWithAuth(url, options = {}) {
     });
 
     if (response.status === 401) {
-      // Token expired, coba refresh
       const refreshToken = getRefreshToken();
       if (!refreshToken) {
         throw new Error("No refresh token available");

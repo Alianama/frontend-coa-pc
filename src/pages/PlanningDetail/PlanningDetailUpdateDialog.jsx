@@ -68,6 +68,7 @@ export default function PlanningDetailUpdateDialog({
     remark: "",
     hals: "",
     hiding: "",
+    dispersion: "",
     caCO3: "",
     odor: "",
     nucleatingAgent: "",
@@ -76,47 +77,47 @@ export default function PlanningDetailUpdateDialog({
   useEffect(() => {
     if (editingItem) {
       const newFormData = {
-        qty: editingItem.qty || "",
-        lineNo: editingItem.lineNo || "",
-        tintDeltaL: editingItem.tintDeltaL || "",
-        tintDeltaA: editingItem.tintDeltaA || "",
-        tintDeltaB: editingItem.tintDeltaB || "",
-        colorDeltaL: editingItem.colorDeltaL || "",
-        colorDeltaA: editingItem.colorDeltaA || "",
-        colorDeltaB: editingItem.colorDeltaB || "",
-        deltaP: editingItem.deltaP || "",
-        density: editingItem.density || "",
-        mfr: editingItem.mfr || "",
-        dispersibility: editingItem.dispersibility || "",
-        contamination: editingItem.contamination || "",
-        macaroni: editingItem.macaroni || "",
-        pelletLength: editingItem.pelletLength || "",
-        pelletDiameter: editingItem.pelletDiameter || "",
-        visualCheck: editingItem.visualCheck || "",
-        colorCheck: editingItem.colorCheck || "",
-        moisture: editingItem.moisture || "",
-        carbonContent: editingItem.carbonContent || "",
-        foreignMatter: editingItem.foreignMatter || "",
-        weightOfChips: editingItem.weightOfChips || "",
-        intrinsicViscosity: editingItem.intrinsicViscosity || "",
-        ashContent: editingItem.ashContent || "",
-        heatStability: editingItem.heatStability || "",
-        lightFastness: editingItem.lightFastness || "",
-        granule: editingItem.granule || "",
+        qty: editingItem.qty ?? "",
+        lineNo: editingItem.lineNo ?? "",
+        tintDeltaL: editingItem.tintDeltaL ?? "",
+        tintDeltaA: editingItem.tintDeltaA ?? "",
+        tintDeltaB: editingItem.tintDeltaB ?? "",
+        colorDeltaL: editingItem.colorDeltaL ?? "",
+        colorDeltaA: editingItem.colorDeltaA ?? "",
+        colorDeltaB: editingItem.colorDeltaB ?? "",
+        deltaP: editingItem.deltaP ?? "",
+        density: editingItem.density ?? "",
+        mfr: editingItem.mfr ?? "",
+        dispersibility: editingItem.dispersibility ?? "",
+        contamination: editingItem.contamination ?? "",
+        macaroni: editingItem.macaroni ?? "",
+        pelletLength: editingItem.pelletLength ?? "",
+        pelletDiameter: editingItem.pelletDiameter ?? "",
+        visualCheck: editingItem.visualCheck ?? "",
+        colorCheck: editingItem.colorCheck ?? "",
+        moisture: editingItem.moisture ?? "",
+        carbonContent: editingItem.carbonContent ?? "",
+        foreignMatter: editingItem.foreignMatter ?? "",
+        weightOfChips: editingItem.weightOfChips ?? "",
+        intrinsicViscosity: editingItem.intrinsicViscosity ?? "",
+        ashContent: editingItem.ashContent ?? "",
+        heatStability: editingItem.heatStability ?? "",
+        lightFastness: editingItem.lightFastness ?? "",
+        granule: editingItem.granule ?? "",
         analysisDate: editingItem.analysisDate
           ? new Date(editingItem.analysisDate).toISOString().slice(0, 16)
           : "",
-        checkedBy: editingItem.checkedBy || "",
-        remark: editingItem.remark || "",
-        hals: editingItem.hals || "",
-        hiding: editingItem.hiding || "",
-        caCO3: editingItem.caCO3 || "",
-        odor: editingItem.odor || "",
-        nucleatingAgent: editingItem.nucleatingAgent || "",
+        checkedBy: editingItem.checkedBy ?? "",
+        remark: editingItem.remark ?? "",
+        hals: editingItem.hals ?? "",
+        hiding: editingItem.hiding ?? "",
+        dispersion: editingItem.dispersion ?? "",
+        caCO3: editingItem.caCO3 ?? "",
+        odor: editingItem.odor ?? "",
+        nucleatingAgent: editingItem.nucleatingAgent ?? "",
       };
 
       // Cek jika customer punya mandatoryFields dan ada letDownRatio
-      // Perbaiki error: .some is not a function, karena mandatoryFields bisa saja object (bukan array)
       if (header && customers && customers.length > 0 && header.idCustomer) {
         const selectedCustomer = customers.find(
           (c) => c.id === header.idCustomer
@@ -217,59 +218,75 @@ export default function PlanningDetailUpdateDialog({
       return;
     }
 
-    try {
-      const payload = Object.fromEntries(
-        Object.entries(formData).map(([key, value]) => {
-          if (value === "" || value === null) {
-            return [key, null];
-          }
-          if (
-            [
-              "qty",
-              "lineNo",
-              "tintDeltaL",
-              "tintDeltaA",
-              "tintDeltaB",
-              "colorDeltaL",
-              "colorDeltaA",
-              "colorDeltaB",
-              "deltaP",
-              "density",
-              "mfr",
-              "dispersibility",
-              "contamination",
-              "macaroni",
-              "pelletLength",
-              "pelletDiameter",
-              "moisture",
-              "carbonContent",
-              "foreignMatter",
-              "weightOfChips",
-              "intrinsicViscosity",
-              "ashContent",
-              "heatStability",
-              "lightFastness",
-              "granule",
-              "hals",
-              "hiding",
-              "caCO3",
-              "odor",
-              "nucleatingAgent",
-            ].includes(key)
-          ) {
-            return [key, Number(value)];
-          }
-          if (key === "analysisDate") {
-            return [key, new Date(value).toISOString()];
-          }
-          return [key, value];
-        })
-      );
+    // Konversi tipe data sesuai kebutuhan (mirip dengan Form)
+    const dataToSubmit = {
+      ...formData,
+      qty: formData.qty === "" ? null : Number(formData.qty),
+      lineNo: formData.lineNo === "" ? null : Number(formData.lineNo),
+      tintDeltaL:
+        formData.tintDeltaL === "" ? null : Number(formData.tintDeltaL),
+      tintDeltaA:
+        formData.tintDeltaA === "" ? null : Number(formData.tintDeltaA),
+      tintDeltaB:
+        formData.tintDeltaB === "" ? null : Number(formData.tintDeltaB),
+      colorDeltaL:
+        formData.colorDeltaL === "" ? null : Number(formData.colorDeltaL),
+      colorDeltaA:
+        formData.colorDeltaA === "" ? null : Number(formData.colorDeltaA),
+      colorDeltaB:
+        formData.colorDeltaB === "" ? null : Number(formData.colorDeltaB),
+      deltaP: formData.deltaP === "" ? null : Number(formData.deltaP),
+      density: formData.density === "" ? null : Number(formData.density),
+      mfr: formData.mfr === "" ? null : Number(formData.mfr),
+      dispersibility:
+        formData.dispersibility === "" ? null : formData.dispersibility,
+      contamination:
+        formData.contamination === "" ? null : Number(formData.contamination),
+      macaroni: formData.macaroni === "" ? null : Number(formData.macaroni),
+      pelletLength:
+        formData.pelletLength === "" ? null : Number(formData.pelletLength),
+      pelletDiameter:
+        formData.pelletDiameter === "" ? null : Number(formData.pelletDiameter),
+      visualCheck: formData.visualCheck === "" ? null : formData.visualCheck,
+      colorCheck: formData.colorCheck === "" ? null : formData.colorCheck,
+      moisture: formData.moisture === "" ? null : Number(formData.moisture),
+      carbonContent:
+        formData.carbonContent === "" ? null : Number(formData.carbonContent),
+      foreignMatter:
+        formData.foreignMatter === "" ? null : Number(formData.foreignMatter),
+      weightOfChips:
+        formData.weightOfChips === "" ? null : Number(formData.weightOfChips),
+      intrinsicViscosity:
+        formData.intrinsicViscosity === ""
+          ? null
+          : Number(formData.intrinsicViscosity),
+      ashContent:
+        formData.ashContent === "" ? null : Number(formData.ashContent),
+      heatStability:
+        formData.heatStability === "" ? null : Number(formData.heatStability),
+      lightFastness:
+        formData.lightFastness === "" ? null : Number(formData.lightFastness),
+      granule: formData.granule === "" ? null : Number(formData.granule),
+      analysisDate:
+        formData.analysisDate === ""
+          ? null
+          : new Date(formData.analysisDate).toISOString(),
+      checkedBy: formData.checkedBy,
+      remark: formData.remark,
+      caCO3: formData.caCO3 === "" ? null : Number(formData.caCO3),
+      odor: formData.odor === "" ? null : formData.odor,
+      nucleatingAgent:
+        formData.nucleatingAgent === "" ? null : formData.nucleatingAgent,
+      hals: formData.hals === "" ? null : formData.hals,
+      hiding: formData.hiding === "" ? null : formData.hiding,
+      dispersion: formData.dispersion === "" ? null : formData.dispersion,
+    };
 
+    try {
       const response = await dispatch(
         asyncUpdatePlanningDetail({
           id: editingItem.id,
-          data: payload,
+          data: dataToSubmit,
           lotNumber: lot,
         })
       );
@@ -493,13 +510,11 @@ export default function PlanningDetailUpdateDialog({
                 <Label htmlFor="dispersibility">Dispersibility</Label>
                 <Input
                   id="dispersibility"
-                  type="number"
-                  step="0.1"
+                  placeholder="Dispersibility"
                   value={formData.dispersibility}
                   onChange={(e) =>
                     handleInputChange("dispersibility", e.target.value)
                   }
-                  onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -684,14 +699,24 @@ export default function PlanningDetailUpdateDialog({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="hals">Hals</Label>
+                <Label htmlFor="nucleatingAgent">Nucleating Agent</Label>
+                <Input
+                  id="nucleatingAgent"
+                  placeholder="Nucleating Agent"
+                  value={formData.nucleatingAgent}
+                  onChange={(e) =>
+                    handleInputChange("nucleatingAgent", e.target.value)
+                  }
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hals">HALS</Label>
                 <Input
                   id="hals"
-                  type="number"
-                  step="0.1"
+                  placeholder="HALS"
                   value={formData.hals}
                   onChange={(e) => handleInputChange("hals", e.target.value)}
-                  onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -699,11 +724,21 @@ export default function PlanningDetailUpdateDialog({
                 <Label htmlFor="hiding">Hiding</Label>
                 <Input
                   id="hiding"
-                  type="number"
-                  step="0.1"
+                  placeholder="Hiding"
                   value={formData.hiding}
                   onChange={(e) => handleInputChange("hiding", e.target.value)}
-                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dispersion">Dispersion</Label>
+                <Input
+                  id="dispersion"
+                  placeholder="Dispersion"
+                  value={formData.dispersion}
+                  onChange={(e) =>
+                    handleInputChange("dispersion", e.target.value)
+                  }
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -715,32 +750,6 @@ export default function PlanningDetailUpdateDialog({
                   step="0.1"
                   value={formData.caCO3}
                   onChange={(e) => handleInputChange("caCO3", e.target.value)}
-                  onWheel={(e) => e.target.blur()}
-                  className="h-8 text-sm py-1 px-2"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="odor">Odor</Label>
-                <Input
-                  id="odor"
-                  type="number"
-                  step="0.1"
-                  value={formData.odor}
-                  onChange={(e) => handleInputChange("odor", e.target.value)}
-                  onWheel={(e) => e.target.blur()}
-                  className="h-8 text-sm py-1 px-2"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="nucleatingAgent">Nucleating Agent</Label>
-                <Input
-                  id="nucleatingAgent"
-                  type="number"
-                  step="0.1"
-                  value={formData.nucleatingAgent}
-                  onChange={(e) =>
-                    handleInputChange("nucleatingAgent", e.target.value)
-                  }
                   onWheel={(e) => e.target.blur()}
                   className="h-8 text-sm py-1 px-2"
                 />
@@ -759,8 +768,23 @@ export default function PlanningDetailUpdateDialog({
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Ok">Ok</SelectItem>
-                    <SelectItem value="Not Good">Not Good</SelectItem>
+                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 flex-1">
+                <Label htmlFor="odor">Odor</Label>
+                <Select
+                  value={formData.odor}
+                  onValueChange={(value) => handleInputChange("odor", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -776,8 +800,8 @@ export default function PlanningDetailUpdateDialog({
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Ok">Ok</SelectItem>
-                    <SelectItem value="Not Good">Not Good</SelectItem>
+                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

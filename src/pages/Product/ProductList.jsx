@@ -342,7 +342,21 @@ export default function ProductList() {
                     </div>
                   </TableHead>
                   <TableHead>Let Down Ratio</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={() => handleSort("status")}
+                    >
+                      Status
+                      {sortField === "status" && (
+                        <ArrowUpDown
+                          className={`ml-2 h-4 w-4 ${
+                            sortDirection === "desc" ? "rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                    </div>
+                  </TableHead>
                   <TableHead>Created Date</TableHead>
                   <TableHead className="text-right pr-15">Actions</TableHead>
                 </TableRow>

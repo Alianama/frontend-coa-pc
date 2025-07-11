@@ -23,11 +23,16 @@ function receivePrintDetailActionCreator(detail) {
   };
 }
 
-function asyncPrintCoa(planningId, quantitiy, remarks) {
+function asyncPrintCoa(planningId, quantitiy, remarks, shippedToCustomerId) {
   return async (dispatch) => {
     dispatch(showLoading());
     try {
-      const response = await api.printCoa(planningId, quantitiy, remarks);
+      const response = await api.printCoa(
+        planningId,
+        quantitiy,
+        remarks,
+        shippedToCustomerId
+      );
       if (response.status === "success") {
         toast.success(response.message || "COA berhasil dicetak");
         return response;

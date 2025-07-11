@@ -26,11 +26,20 @@ export async function getAllPrint(page = 1, limit = 100, search = "") {
   };
 }
 
-export async function printCoa(planningId, quantity, remarks) {
+export async function printCoa(
+  planningId,
+  quantity,
+  remarks,
+  shippedToCustomerId
+) {
+  const body = { quantity, remarks };
+  if (shippedToCustomerId) {
+    body.shippedToCustomerId = shippedToCustomerId;
+  }
   const response = await _fetchWithAuth(`${BASE_URL}/print/${planningId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ quantity, remarks }),
+    body: JSON.stringify(body),
   });
   const responseJson = await response.json();
   if (responseJson.status !== "success") {

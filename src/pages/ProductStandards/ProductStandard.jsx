@@ -324,7 +324,7 @@ export default function ProductStandard() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <form
               onSubmit={handleSave}
-              className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md"
+              className=" bg-secondary rounded-lg shadow-lg p-6 w-full max-w-md"
             >
               <h3 className="text-lg font-bold mb-4">
                 {editItem ? "Edit Standard" : "Add Standard"}

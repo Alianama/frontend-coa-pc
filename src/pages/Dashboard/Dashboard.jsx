@@ -9,11 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, CheckCircle2, Clock, FileText, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import ProductionChart from "./Component/ProductionChart";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
 
-  // Template kosong, data akan diisi kemudian
   return (
     <div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -101,112 +101,18 @@ export default function DashboardPage() {
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <div className="">
             <Card className="col-span-4">
               <CardHeader>
-                <CardTitle>COA Creation Overview</CardTitle>
+                <CardTitle>COA Production Overview</CardTitle>
                 <CardDescription>
-                  Statistik pembuatan COA bulanan
+                  Statistik produksi COA per lot dengan trend planning,
+                  checking, dan printing
                 </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <div className="h-[200px] w-full flex items-end gap-2">
-                  {/* Chart kosong, data menyusul */}
-                  {[...Array(12)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="relative h-full flex-1 flex items-end"
-                    >
-                      <div
-                        className="w-full bg-primary/20 rounded-sm"
-                        style={{ height: `10%` }}
-                      />
-                      <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-muted-foreground">
-                        {
-                          [
-                            "Jan",
-                            "Feb",
-                            "Mar",
-                            "Apr",
-                            "May",
-                            "Jun",
-                            "Jul",
-                            "Aug",
-                            "Sep",
-                            "Oct",
-                            "Nov",
-                            "Dec",
-                          ][i]
-                        }
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>COA Status</CardTitle>
-                <CardDescription>Distribusi status COA</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Approved</span>
-                        <span className="text-sm text-muted-foreground">-</span>
-                      </div>
-                      <div className="mt-1 h-2 w-full bg-secondary rounded-full">
-                        <div
-                          className="h-2 bg-green-500 rounded-full"
-                          style={{ width: `0%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Pending</span>
-                        <span className="text-sm text-muted-foreground">-</span>
-                      </div>
-                      <div className="mt-1 h-2 w-full bg-secondary rounded-full">
-                        <div
-                          className="h-2 bg-yellow-500 rounded-full"
-                          style={{ width: `0%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Draft</span>
-                        <span className="text-sm text-muted-foreground">-</span>
-                      </div>
-                      <div className="mt-1 h-2 w-full bg-secondary rounded-full">
-                        <div
-                          className="h-2 bg-blue-500 rounded-full"
-                          style={{ width: `0%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Deleted</span>
-                        <span className="text-sm text-muted-foreground">-</span>
-                      </div>
-                      <div className="mt-1 h-2 w-full bg-secondary rounded-full">
-                        <div
-                          className="h-2 bg-red-500 rounded-full"
-                          style={{ width: `0%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                <div className="w-full">
+                  <ProductionChart />
                 </div>
               </CardContent>
             </Card>

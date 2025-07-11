@@ -63,6 +63,7 @@ import {
 import PlanningDetailStandardView from "./PlanningDetailStandardView";
 import PlanningDetailUpdateDialog from "./PlanningDetailUpdateDialog";
 import { asyncGetCustomer } from "@/store/customer/action";
+import { Combobox } from "@/components/ui/combo-box";
 
 export default function PlanningDetailList() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,6 +84,8 @@ export default function PlanningDetailList() {
   const [printQuantity, setPrintQuantity] = useState("");
   const [printRemarks, setPrintRemarks] = useState("");
   const navigate = useNavigate();
+  const customers = useSelector((state) => state.customers);
+  const [printShippedToCustomerId, setPrintShippedToCustomerId] = useState("");
 
   useEffect(() => {
     dispatch(asyncGetPlanningDetailByLot(lot));
@@ -93,13 +96,20 @@ export default function PlanningDetailList() {
     if (planningDetail.header.id && printQuantity) {
       try {
         const response = await dispatch(
-          asyncPrintCoa(planningDetail.header.id, printQuantity, printRemarks)
+          asyncPrintCoa(
+            planningDetail.header.id,
+            printQuantity,
+            printRemarks,
+            printShippedToCustomerId
+              ? Number(printShippedToCustomerId)
+              : undefined
+          )
         );
         console.log(response.data);
-
         setIsPrintDialogOpen(false);
         setPrintQuantity("");
         setPrintRemarks("");
+        setPrintShippedToCustomerId("");
         navigate(`/print/preview/${response.data.id}`);
       } catch (error) {
         console.error("Error printing COA:", error);
@@ -164,11 +174,11 @@ export default function PlanningDetailList() {
     { key: "lightFastness", label: "Light Fastness" },
     { key: "granule", label: "Granule" },
     { key: "caCO3", label: "CaCO3" },
-    { key: "odor", label: "Odor" },
     { key: "nucleatingAgent", label: "Nucleating Agent" },
     { key: "hals", label: "Hals" },
     { key: "hiding", label: "Hiding" },
     { key: "analysisDate", label: "Checked At" },
+    { key: "odor", label: "Odor" },
     { key: "visualCheck", label: "Visual Check" },
     { key: "colorCheck", label: "Color Check" },
     { key: "qcJudgment", label: "QC Judgment" },
@@ -188,7 +198,7 @@ export default function PlanningDetailList() {
         // Filter global
         if (searchTerm) {
           const search = searchTerm.toLowerCase();
-          const visualCheckText = item.visualCheck === 1 ? "ok" : "not good";
+          const visualCheckText = item.visualCheck === "Pass" ? "Pass" : "NG";
           if (
             String(item.creator.fullName).toLowerCase().includes(search) ||
             String(item.qty).toLowerCase().includes(search) ||
@@ -452,7 +462,6 @@ export default function PlanningDetailList() {
                             {col.key === "lightFastness" && item.lightFastness}
                             {col.key === "granule" && item.granule}
                             {col.key === "caCO3" && item.caCO3}
-                            {col.key === "odor" && item.odor}
                             {col.key === "nucleatingAgent" &&
                               item.nucleatingAgent}
                             {col.key === "hals" && item.hals}
@@ -468,10 +477,20 @@ export default function PlanningDetailList() {
                                     }
                                   )
                                 : "-")}
-                            {col.key === "visualCheck" &&
-                              (item.visualCheck === "Ok" ? (
+                            {col.key === "odor" &&
+                              (item.odor === "Pass" ? (
                                 <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <CheckCircle2 className="w-3 h-3 mr-1" /> OK
+                                  <CheckCircle2 className="w-3 h-3 mr-1" /> Pass
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
+                                  <AlertCircle className="w-3 h-3 mr-1" /> NG
+                                </Badge>
+                              ))}
+                            {col.key === "visualCheck" &&
+                              (item.visualCheck === "Pass" ? (
+                                <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
+                                  <CheckCircle2 className="w-3 h-3 mr-1" /> Pass
                                 </Badge>
                               ) : (
                                 <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
@@ -479,9 +498,9 @@ export default function PlanningDetailList() {
                                 </Badge>
                               ))}
                             {col.key === "colorCheck" &&
-                              (item.colorCheck === "Ok" ? (
+                              (item.colorCheck === "Pass" ? (
                                 <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <CheckCircle2 className="w-3 h-3 mr-1" /> OK
+                                  <CheckCircle2 className="w-3 h-3 mr-1" /> Pass
                                 </Badge>
                               ) : (
                                 <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
@@ -706,6 +725,22 @@ export default function PlanningDetailList() {
               value={printRemarks}
               onChange={(e) => setPrintRemarks(e.target.value)}
               placeholder="Catatan Print"
+            />
+          </div>
+          <div className="pb-2">
+            <label htmlFor="shippedToCustomer" className="text-sm font-medium">
+              Shipped To Customer (Opsional)
+            </label>
+            <Combobox
+              items={customers?.map((customer) => ({
+                value: customer.id.toString(),
+                label: customer.name,
+              }))}
+              value={printShippedToCustomerId}
+              onValueChange={setPrintShippedToCustomerId}
+              placeholder="Pilih customer tujuan..."
+              searchPlaceholder="Cari customer..."
+              emptyMessage="Customer tidak ditemukan."
             />
           </div>
           <DialogFooter className="flex gap-5">

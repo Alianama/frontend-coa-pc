@@ -138,13 +138,11 @@ const ColorTrendChart = () => {
   }
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg">
+    <div className="p-6 bg-secondary rounded-lg shadow-lg">
       {/* Filters */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Product
-          </label>
+          <label className="block text-sm font-medium mb-1">Product</label>
           <Combobox
             items={products
               ?.filter((product) => product.status === "active")
@@ -161,13 +159,11 @@ const ColorTrendChart = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Parameter
-          </label>
+          <label className="block text-sm font-medium  mb-1">Parameter</label>
           <select
             value={filters.parameter}
             onChange={(e) => handleFilterChange("parameter", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border bg-secondary border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {parameters.map((param) => (
               <option key={param.value} value={param.value}>
@@ -178,7 +174,7 @@ const ColorTrendChart = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium  mb-1">
             Lot Number (Optional)
           </label>
           <input
@@ -191,7 +187,7 @@ const ColorTrendChart = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium  mb-1">
             Start Date (Optional)
           </label>
           <input
@@ -203,7 +199,7 @@ const ColorTrendChart = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium  mb-1">
             End Date (Optional)
           </label>
           <input
@@ -334,34 +330,34 @@ const ColorTrendChart = () => {
             {/* Statistics */}
             {data.series && data.series[0] && data.series[0].data && (
               <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <div className="bg-secondary p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-blue-600">
                     {(
                       data.series[0].data.reduce((a, b) => a + b, 0) /
                       data.series[0].data.length
                     ).toFixed(2)}
                   </div>
-                  <div className="text-sm text-gray-600">Rata-rata</div>
+                  <div className="text-sm ">Rata-rata</div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <div className="bg-secondary p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-green-600">
                     {Math.min(...data.series[0].data).toFixed(2)}
                   </div>
-                  <div className="text-sm text-gray-600">Minimum</div>
+                  <div className="text-sm ">Minimum</div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <div className="bg-secondary p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-red-600">
                     {Math.max(...data.series[0].data).toFixed(2)}
                   </div>
-                  <div className="text-sm text-gray-600">Maksimum</div>
+                  <div className="text-sm ">Maksimum</div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <div className="bg-secondary p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-purple-600">
                     {data.series[0].data.length}
                   </div>
-                  <div className="text-sm text-gray-600">Total Data</div>
+                  <div className="text-sm ">Total Data</div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <div className="bg-secondary p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-orange-600">
                     {(() => {
                       const values = data.series[0].data;
@@ -373,7 +369,7 @@ const ColorTrendChart = () => {
                       return Math.sqrt(variance).toFixed(2);
                     })()}
                   </div>
-                  <div className="text-sm text-gray-600">Std Dev</div>
+                  <div className="text-sm ">Std Dev</div>
                 </div>
               </div>
             )}

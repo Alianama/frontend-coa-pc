@@ -15,9 +15,9 @@ export async function login(username, password) {
   });
 
   const responseJson = await response.json();
-  const { message, data } = responseJson;
+  const { status, message, data } = responseJson;
 
-  if (message === "success") {
+  if (status === "success") {
     putAccessToken(data.accessToken);
     putRefreshToken(data.refreshToken);
     return {
@@ -37,7 +37,7 @@ export async function login(username, password) {
 }
 
 export async function getOwnProfile() {
-  const response = await _fetchWithAuth(`${BASE_URL}/auth/profile`);
+  const response = await _fetchWithAuth(`${BASE_URL}/users/me`);
   const responseJson = await response.json();
   const { status, data } = responseJson;
 
