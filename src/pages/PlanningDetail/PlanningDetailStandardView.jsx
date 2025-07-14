@@ -56,7 +56,11 @@ export default function PlanningDetailStandardView({
                 {qcDetail.map((qc, idx) => (
                   <TableRow key={idx}>
                     <TableCell className="font-medium">
-                      {qc.property_name}
+                      {qc.property_name
+                        .replace(/([A-Z])/g, " $1")
+                        .replace(/([0-9]+)/g, " $1")
+                        .replace(/^./, (str) => str.toUpperCase())
+                        .trim()}
                     </TableCell>
                     <TableCell>
                       {typeof qc.actual === "number"
