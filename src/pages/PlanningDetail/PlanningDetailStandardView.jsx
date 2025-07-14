@@ -1,4 +1,9 @@
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -9,15 +14,6 @@ import {
   TableCell,
 } from "../../components/ui/table";
 import PropTypes from "prop-types";
-
-// Fungsi utilitas untuk memformat nama property
-// function formatPropertyName(name) {
-//   return name
-//     .replace(/([A-Z])/g, " $1")
-//     .replace(/([0-9]+)/g, " $1")
-//     .replace(/^./, (str) => str.toUpperCase())
-//     .trim();
-// }
 
 export default function PlanningDetailStandardView({
   open,
@@ -32,13 +28,12 @@ export default function PlanningDetailStandardView({
       title="Detail Standar QC"
     >
       <DialogContent>
-        <DialogTitle className="text-xl font-bold mb-4">
+        <DialogTitle className="text-xl font-bold m-0 p-0">
           Standard Check
         </DialogTitle>
-        {/* 
-          Tambahkan max-h dan overflow-y-auto pada wrapper tabel agar bisa di-scroll
-          ketika data banyak.
-        */}
+        <DialogDescription className="mb-5">
+          Detailed standard check compared with actual data
+        </DialogDescription>
         <div className="overflow-x-auto">
           <div className="max-h-[60vh] overflow-y-auto">
             <Table>

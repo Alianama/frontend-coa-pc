@@ -10,6 +10,10 @@ import { DownloadIcon } from "lucide-react";
 const ColorTrendChart = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const data = useSelector((state) => state.trend.trendData);
+  const { products } = useSelector((state) => state.products);
+  const chartRef = useRef(null);
   const [filters, setFilters] = useState({
     productId: 1,
     parameter: "colorDeltaE",
@@ -17,12 +21,6 @@ const ColorTrendChart = () => {
     startDate: "",
     endDate: "",
   });
-  const dispatch = useDispatch();
-  const data = useSelector((state) => state.trend.trendData);
-  const { products } = useSelector((state) => state.products);
-  const chartRef = useRef(null);
-
-  console.log(data);
 
   useEffect(() => {
     dispatch(asyncGetProduct());

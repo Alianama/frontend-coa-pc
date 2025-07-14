@@ -24,6 +24,7 @@ import PrintLayout from "./pages/Print/PrintLayout";
 import ColorTrendLayout from "./pages/Trend/TrendColorLayout";
 import PreviewLayout from "./pages/Print/PreviewLayout";
 import UsersLayout from "./pages/Users/UsersLayout";
+import ReportLayout from "./pages/Report/ReportLayout";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
@@ -168,6 +169,14 @@ function App() {
           element={
             <ProtectedRoute>
               <UsersLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <ReportLayout />
             </ProtectedRoute>
           }
         />

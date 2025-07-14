@@ -138,7 +138,6 @@ export default function PlanningList() {
         <Table>
           <TableHeader>
             <TableRow>
-              {/* <TableHead>No</TableHead> */}
               <TableHead>Lot No</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Product</TableHead>
@@ -156,15 +155,17 @@ export default function PlanningList() {
           </TableHeader>
           <TableBody>
             {plannings.length === 0 ? (
-              <TableRow>
+              <TableRow key="no-data">
                 <TableCell colSpan={9} className="text-center">
                   Tidak ada data planning.
                 </TableCell>
               </TableRow>
             ) : (
               plannings.map((planning) => (
-                <TableRow className="cursor-pointer" key={planning.id_header}>
-                  {/* <TableCell>{idx + 1}</TableCell> */}
+                <TableRow
+                  className="cursor-pointer"
+                  key={planning.id_header || planning.id || planning.lotNumber}
+                >
                   <TableCell>{planning.lotNumber}</TableCell>
                   <TableCell>{planning?.customer?.name}</TableCell>
                   <TableCell>{planning?.product?.productName}</TableCell>

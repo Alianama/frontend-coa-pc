@@ -9,6 +9,7 @@ import * as userApi from "./user";
 import * as trendApi from "./trend";
 import * as rolesApi from "./roles";
 import * as dashboardApi from "./dashboard";
+import * as reportApi from "./report";
 import {
   putAccessToken,
   getAccessToken,
@@ -29,6 +30,7 @@ const api = {
   ...trendApi,
   ...rolesApi,
   ...dashboardApi,
+  ...reportApi,
   putAccessToken,
   getAccessToken,
   putRefreshToken,

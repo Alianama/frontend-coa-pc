@@ -15,6 +15,7 @@ import productStandardReducer from "./productStandard/reducer";
 import trendReducer from "./trend/reducer";
 import rolesReducer from "./roles/reducer";
 import dashboardReducer from "./dashboard/reducer";
+import reportReducer from "./report/reducer";
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +32,7 @@ export const store = configureStore({
     trend: trendReducer,
     roles: rolesReducer,
     dashboard: dashboardReducer,
+    report: reportReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

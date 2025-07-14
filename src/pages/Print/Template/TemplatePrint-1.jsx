@@ -109,8 +109,8 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
           <div className="flex-1 font-bold">{certificateData.customerName}</div>
         </div>
         <div className="px-10 ">
-          <div className="flex gap-15 ">
-            <div className="mb-10  pr-10 border-black">
+          <div className="flex gap-15 text-[12px]">
+            <div className="mb-10 pr-10 border-black">
               <div className="flex flex-row mb-1">
                 <div className="w-40">Product Name</div>
                 <div className="w-4">:</div>
@@ -132,7 +132,7 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
                 <div className="flex-1">{certificateData.quantity} Kg</div>
               </div>
             </div>
-            <div className="mb-10 ">
+            <div className="mb-10">
               <div className="flex flex-row mb-1">
                 <div className="w-40">Moulding</div>
                 <div className="w-4">:</div>
@@ -143,7 +143,6 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
                 <div className="w-4">:</div>
                 <div className="flex-1">{certificateData.letDownRatio}</div>
               </div>
-
               <div className="flex flex-row mb-1">
                 <div className="w-40">Mfg Date</div>
                 <div className="w-4">:</div>
@@ -211,29 +210,30 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
               certificateData.testItems.length > 0 ? (
                 certificateData.testItems.map((item, idx) => (
                   <tr key={idx}>
-                    <td className="border border-black p-1">
+                    <td className="border text-[12px] py-1 border-black">
                       {item.parameter || "-"}
                     </td>
-                    <td className="border border-black p-1">
+                    <td className="border text-[12px] py-1 border-black">
                       {item.standard || "-"}
                     </td>
-                    <td className="border border-black p-1">
+                    <td className="border text-[12px] py-1 border-black">
                       {item.result || "-"}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td className="border border-black p-1">-</td>
-                  <td className="border border-black p-1">-</td>
-                  <td className="border border-black p-1">-</td>
-                  <td className="border border-black p-1">-</td>
+                  <td className="border border-black ">-</td>
+                  <td className="border border-black ">-</td>
+                  <td className="border border-black ">-</td>
+                  <td className="border border-black ">-</td>
                 </tr>
               )}
             </tbody>
           </table>
+          <h1 className="text-[10px] pt-5">*Notes : </h1>
           {/* Footer signature */}
-          <div className="flex flex-row justify-between mt-20 mb-10">
+          <div className="flex flex-row justify-between mt-40 mb-10">
             <div className="w-1/2" />
             <div className="flex flex-row w-1/2">
               <div className="flex flex-col items-center w-1/2">

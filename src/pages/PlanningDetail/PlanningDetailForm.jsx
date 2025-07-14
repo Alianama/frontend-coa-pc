@@ -30,9 +30,6 @@ export default function PlanningDetailForm() {
   );
   const customers = useSelector((state) => state.customers);
 
-  console.log(header);
-
-  // Inisialisasi formData tanpa idPlanning, akan di-set setelah header tersedia
   const [formData, setFormData] = useState({
     qty: "",
     idPlanning: "",

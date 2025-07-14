@@ -133,8 +133,6 @@ export default function ProductStandard() {
   });
   const [deleteId, setDeleteId] = useState(null);
 
-  console.log(standards);
-
   const filtered = standards.filter((item) =>
     item.property_name.toLowerCase().includes(search.toLowerCase())
   );

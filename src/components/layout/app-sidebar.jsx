@@ -24,11 +24,9 @@ import {
   Paperclip,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import Logout from "@/components/common/logout";
-
-// Konfigurasi menu sidebar
+import { useState } from "react";
+import { useSelector } from "react-redux";
 const sidebarConfig = {
   main: [
     {
@@ -88,13 +86,6 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const authUser = useSelector((state) => state.authUser);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    if (authUser) {
-      setUser(authUser);
-    }
-  }, [authUser]);
 
   const isActive = (path) => {
     return (
@@ -157,12 +148,6 @@ export function AppSidebar() {
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton>
-                <User className="h-4 w-4" />
-                <span>{user?.fullName}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/80

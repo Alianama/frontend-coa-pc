@@ -16,9 +16,23 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import UserPopover from "../common/UserPopover";
+import ChangePasswordDialog from "../common/ChangePasswordDialog";
 
 export default function Layout({ children, title, items = [] }) {
   const navigate = useNavigate();
+  const authUser = useSelector((state) => state.authUser);
+  const [user, setUser] = useState(null);
+  const [isChangePassOpen, setIsChangePassOpen] = useState(false);
+
+  useEffect(() => {
+    if (authUser) {
+      setUser(authUser);
+    }
+  }, [authUser]);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -28,7 +42,12 @@ export default function Layout({ children, title, items = [] }) {
           <div className="flex-1">
             <h1 className="text-sm font-semibold">{title}</h1>
           </div>
+
           <div className="flex items-center gap-2">
+            <UserPopover
+              user={user}
+              onChangePassword={() => setIsChangePassOpen(true)}
+            />
             <ModeToggle />
           </div>
         </header>
@@ -66,6 +85,11 @@ export default function Layout({ children, title, items = [] }) {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="container mx-auto py-6 animate-in">{children}</div>
+          {/* Modal Ganti Password */}
+          <ChangePasswordDialog
+            open={isChangePassOpen}
+            onOpenChange={setIsChangePassOpen}
+          />
         </main>
         <footer className="w-full text-center py-4 border-t bg-background text-xs text-muted-foreground">
           © {new Date().getFullYear()} PT. Toyo Ink Indoensia. All rights

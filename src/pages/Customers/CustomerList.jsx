@@ -46,6 +46,7 @@ import {
   asyncAddCustomer,
   asyncDeleteCustomer,
 } from "@/store/customer/action";
+import React from "react";
 
 // Available fields for selection
 const availableFields = [
@@ -125,8 +126,6 @@ export default function CustomerList() {
     name: "",
     mandatoryFields: {},
   });
-
-  console.log({ newCustomer });
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -282,7 +281,7 @@ export default function CustomerList() {
             <TableBody>
               {filteredCustomers?.length > 0 ? (
                 filteredCustomers.map((customer) => (
-                  <>
+                  <React.Fragment key={customer.id}>
                     <TableRow key={customer.id} className="hover:bg-gray-50">
                       <TableCell>
                         <Button
@@ -351,7 +350,7 @@ export default function CustomerList() {
                       </TableCell>
                     </TableRow>
                     {expandedRows.includes(customer.id) && (
-                      <TableRow>
+                      <TableRow key={customer.id + "-expand"}>
                         <TableCell colSpan={5} className="bg-gray-50 p-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
@@ -372,7 +371,7 @@ export default function CustomerList() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                 ))
               ) : (
                 <TableRow>

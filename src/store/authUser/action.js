@@ -59,10 +59,33 @@ function asyncUnsetAuthUser() {
   };
 }
 
+function asyncChangePassword({ oldPassword, newPassword }, navigate) {
+  return async (dispatch) => {
+    dispatch(showLoading());
+    try {
+      const response = await api.changePassword({ oldPassword, newPassword });
+      if (response.status === "success") {
+        toast.success(response.message);
+        if (typeof navigate === "function") {
+          navigate("/login");
+        }
+      } else {
+        toast.error(response.message);
+      }
+    } catch (err) {
+      toast.error(err.message || "Terjadi kesalahan saat mengubah password");
+      console.error(err);
+    } finally {
+      dispatch(hideLoading());
+    }
+  };
+}
+
 export {
   setAuthUserActionCreator,
   unsetAuthUserActionCreator,
   asyncSetAuthUser,
   asyncUnsetAuthUser,
   ActionType,
+  asyncChangePassword,
 };

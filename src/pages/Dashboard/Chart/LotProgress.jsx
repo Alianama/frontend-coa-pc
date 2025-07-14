@@ -137,7 +137,9 @@ const ProductionChart = () => {
 
   // Fungsi untuk handle resize
   const handleResize = () => {
-    lineChartInstance.current?.resize();
+    if (lineChartInstance.current && !lineChartInstance.current.isDisposed()) {
+      lineChartInstance.current.resize();
+    }
   };
 
   // Fetch data berdasarkan date range
@@ -173,7 +175,10 @@ const ProductionChart = () => {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      lineChartInstance.current?.dispose();
+      if (lineChartInstance.current) {
+        lineChartInstance.current.dispose();
+        lineChartInstance.current = null;
+      }
     };
   }, [lotProgress]);
 

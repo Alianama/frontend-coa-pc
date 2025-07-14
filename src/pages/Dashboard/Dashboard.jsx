@@ -25,8 +25,6 @@ export default function DashboardPage() {
     dispatch(asyncGetDashboardSummary());
   }, [dispatch]);
 
-  console.log(summary);
-
   return (
     <div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -35,7 +33,10 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Card onClick={() => navigate("/planning")}>
+          <Card
+            className="hover:scale-103 transition-all ease-in-out"
+            onClick={() => navigate("/planning")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Planning Monthly
@@ -54,7 +55,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <Card>
+          <Card className="hover:scale-103 transition-all ease-in-out">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Planning Closed Monthly
@@ -75,7 +76,10 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
         >
-          <Card>
+          <Card
+            className="hover:scale-103 transition-all ease-in-out"
+            onClick={() => navigate("/coa-history")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 COA Printed Mothly
