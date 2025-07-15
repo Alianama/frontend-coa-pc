@@ -10,6 +10,7 @@ export default function ProductStandardsLayout() {
         { label: "Product List", href: "/products" },
       ]}
     >
+      <title>QC | Product Standard</title>
       <ProductStandard />
     </Layout>
   );

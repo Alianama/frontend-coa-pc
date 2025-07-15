@@ -13,6 +13,7 @@ export default function PlanningDetailFormLayout() {
         { label: "Checking List", href: `/planning/check/${lot}` },
       ]}
     >
+      <title>QC | Planning Detail Form</title>
       <PlanningDetailForm />
     </Layout>
   );

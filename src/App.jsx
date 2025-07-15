@@ -4,9 +4,9 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "@/pages/Login";
+import Login from "@/pages/Login/Login";
 import Dashboard from "@/pages/Dashboard/DashboardLayout";
-import NotFound from "@/pages/NotFound";
+import NotFound from "@/pages/NotFound/NotFound";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { asyncPreloadProcess } from "@/store/isPreload/action";

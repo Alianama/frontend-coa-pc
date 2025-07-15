@@ -47,6 +47,7 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
+        <title>Login</title>
         <Card className="border-primary/20 shadow-lg">
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-2">

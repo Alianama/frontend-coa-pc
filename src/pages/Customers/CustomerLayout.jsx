@@ -4,6 +4,7 @@ import CustomerList from "./CustomerList";
 export default function CustomerLayout() {
   return (
     <Layout title="Customer List" items={[{ label: "Home", href: "/" }]}>
+      <title>QC | Customer List</title>
       <CustomerList />
     </Layout>
   );

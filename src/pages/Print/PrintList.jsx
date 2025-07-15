@@ -32,7 +32,7 @@ import {
   Printer,
   RefreshCcwIcon,
 } from "lucide-react";
-import { Pagination } from "@/components/Product/Pagination";
+import Pagination from "../Product/Components/pagination";
 import { useSelector, useDispatch } from "react-redux";
 import {
   asyncGetAllPrint,
@@ -301,7 +301,9 @@ export default function PrintList() {
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <CardTitle className="text-2xl font-bold">COA List</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              COA Print History
+            </CardTitle>
             <CardDescription>View available COA records.</CardDescription>
           </div>
         </div>

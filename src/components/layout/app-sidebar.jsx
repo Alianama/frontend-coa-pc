@@ -52,12 +52,12 @@ const sidebarConfig = {
 
     {
       path: "/customers",
-      label: "Customers List",
+      label: "Customers",
       icon: Contact,
     },
     {
       path: "/trend",
-      label: "Color Trend",
+      label: "Trend Color",
       icon: BarChart3,
     },
     {
@@ -122,10 +122,10 @@ export function AppSidebar() {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 px-4 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <span className="font-bold text-primary-foreground">C</span>
+            <div className="flex h-6 w-6 items-center justify-center rounded-md">
+              <img src="./favicon.png" alt="" />
             </div>
-            <div className="font-semibold">COA Creator</div>
+            <div className="font-semibold text-sm">Color Inspection System</div>
           </div>
         </SidebarHeader>
         <SidebarContent>

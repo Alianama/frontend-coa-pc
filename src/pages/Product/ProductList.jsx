@@ -50,12 +50,12 @@ import {
   ArrowUpDown,
   Handshake,
 } from "lucide-react";
-import ProductDetailDialog from "@/components/Product/product-detail-dialog";
+import ProductDetailDialog from "@/pages/Product/Components/product-detail-dialog";
 import {
   ProductCreateDialog,
   ProductUpdateDialog,
-} from "@/components/Product/product-form-dialog";
-import { Pagination } from "@/components/Product/Pagination";
+} from "@/pages/Product/Components/product-form-dialog";
+import Pagination from "./Components/pagination";
 import { useSelector, useDispatch } from "react-redux";
 import {
   asyncAddProduct,
@@ -235,9 +235,7 @@ export default function ProductList() {
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <CardTitle className="text-2xl font-bold">
-              Product Management
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold">Product Master</CardTitle>
             <CardDescription>
               Manage your plastic colorant products.
             </CardDescription>

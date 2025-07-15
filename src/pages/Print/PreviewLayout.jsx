@@ -124,6 +124,7 @@ const PreviewComponent = () => {
   return (
     <div className="p-10">
       {/* Header status dan tabs */}
+      <title>QC - Print Preview</title>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-start gap-2 flex-col">
           <div className="flex flex-row gap-4">

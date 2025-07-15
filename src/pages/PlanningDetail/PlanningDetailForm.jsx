@@ -248,12 +248,12 @@ export default function PlanningDetailForm() {
                 <div className="border rounded-lg shadow-md p-4">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
                     <div className="space-y-2">
-                      <Label htmlFor="qty">Quantity</Label>
+                      <Label htmlFor="qty">Quantity (Kg)</Label>
                       <Input
                         id="qty"
                         type="number"
                         step="0.001"
-                        placeholder="102.036"
+                        placeholder="102.036 kg"
                         value={formData.qty}
                         onChange={(e) =>
                           handleInputChange("qty", e.target.value)
@@ -278,15 +278,38 @@ export default function PlanningDetailForm() {
                     </div>
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="analysisDate">Analysis Date</Label>
-                      <Input
-                        id="analysisDate"
-                        type="datetime-local"
-                        value={formData.analysisDate}
-                        onChange={(e) =>
-                          handleInputChange("analysisDate", e.target.value)
-                        }
-                        className="h-8 text-sm py-1 px-2"
-                      />
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          className="h-8 text-xs px-2"
+                          onClick={() => {
+                            const now = new Date();
+                            const pad = (n) => n.toString().padStart(2, "0");
+                            const formatted =
+                              now.getFullYear() +
+                              "-" +
+                              pad(now.getMonth() + 1) +
+                              "-" +
+                              pad(now.getDate()) +
+                              "T" +
+                              pad(now.getHours()) +
+                              ":" +
+                              pad(now.getMinutes());
+                            handleInputChange("analysisDate", formatted);
+                          }}
+                        >
+                          Today
+                        </Button>
+                        <Input
+                          id="analysisDate"
+                          type="datetime-local"
+                          value={formData.analysisDate}
+                          onChange={(e) =>
+                            handleInputChange("analysisDate", e.target.value)
+                          }
+                          className="h-8 text-sm py-1 px-2"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -443,18 +466,6 @@ export default function PlanningDetailForm() {
                   value={formData.mfr}
                   onChange={(e) => handleInputChange("mfr", e.target.value)}
                   onWheel={(e) => e.target.blur()}
-                  className="h-8 text-sm py-1 px-2"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dispersibility">Dispersibility</Label>
-                <Input
-                  id="dispersibility"
-                  placeholder="Dispersibility"
-                  value={formData.dispersibility}
-                  onChange={(e) =>
-                    handleInputChange("dispersibility", e.target.value)
-                  }
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
@@ -662,6 +673,18 @@ export default function PlanningDetailForm() {
                   value={formData.caCO3}
                   onChange={(e) => handleInputChange("caCO3", e.target.value)}
                   onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dispersibility">Dispersibility</Label>
+                <Input
+                  id="dispersibility"
+                  placeholder="Dispersibility"
+                  value={formData.dispersibility}
+                  onChange={(e) =>
+                    handleInputChange("dispersibility", e.target.value)
+                  }
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>

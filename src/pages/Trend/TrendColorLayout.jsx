@@ -7,9 +7,10 @@ export default function ColorTrendLayout() {
       title="Trend Color"
       items={[
         { label: "Home", href: "/" },
-        { label: "Product List", href: "/trend-list" },
+        { label: "Product List", href: "/products" },
       ]}
     >
+      <title>QC | Trend Color</title>
       <ColorTrendChart />
     </Layout>
   );

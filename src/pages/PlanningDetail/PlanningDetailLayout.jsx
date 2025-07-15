@@ -10,6 +10,7 @@ export default function PlanningDetailLayout() {
         { label: "Planning", href: "/planning" },
       ]}
     >
+      <title>QC | Planning Detail List</title>
       <PlanningDetailList />
     </Layout>
   );
