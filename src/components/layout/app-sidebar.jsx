@@ -68,16 +68,16 @@ const sidebarConfig = {
   ],
   admin: [
     {
-      path: "/roles",
-      label: "Role Management",
-      icon: ShieldCheck,
-      permission: "manage:roles",
-    },
-    {
       path: "/users",
       label: "User Management",
       icon: User,
       permission: "manage:users",
+    },
+    {
+      path: "/roles",
+      label: "Role Management",
+      icon: ShieldCheck,
+      permission: "manage:roles",
     },
   ],
 };

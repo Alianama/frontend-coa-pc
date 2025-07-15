@@ -25,6 +25,7 @@ import ColorTrendLayout from "./pages/Trend/TrendColorLayout";
 import PreviewLayout from "./pages/Print/PreviewLayout";
 import UsersLayout from "./pages/Users/UsersLayout";
 import ReportLayout from "./pages/Report/ReportLayout";
+import UnderConstructionLayout from "./pages/UnderConstructionLayout/UnderConstructionLayout";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.authUser);
@@ -177,6 +178,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ReportLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/roles"
+          element={
+            <ProtectedRoute>
+              <UnderConstructionLayout />
             </ProtectedRoute>
           }
         />
