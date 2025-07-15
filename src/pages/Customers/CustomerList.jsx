@@ -74,6 +74,8 @@ const availableFields = [
   "nucleatingAgent",
   "hals",
   "hiding",
+  "dispersion",
+  "contamination",
 ];
 
 // Field labels for display
@@ -104,6 +106,8 @@ const fieldLabels = {
   nucleatingAgent: "Nucleating Agent",
   hals: "HALS",
   hiding: "Hiding",
+  dispersion: "Dispersion",
+  contamination: "Contamination",
 };
 
 export default function CustomerList() {

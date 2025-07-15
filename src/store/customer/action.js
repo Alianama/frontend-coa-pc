@@ -37,6 +37,8 @@ const availableFields = [
   "nucleatingAgent",
   "hals",
   "hiding",
+  "dispersion",
+  "contamination",
 ];
 
 function receiveCustomerActionCreator(customers) {

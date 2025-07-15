@@ -84,9 +84,9 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
       style={{ fontFamily: "Arial, sans-serif", fontSize: 14 }}
     >
       {/* Header dokumen */}
-      <div className="border pt-10 border-black ">
+      <div className="border pt-5 border-black ">
         <div className="flex flex-col justify-center items-center">
-          <h1 className="text-2xl font-bold mb-7">CERTIFICATE of ANALYSIS</h1>
+          <h1 className="text-2xl font-bold mb-4">CERTIFICATE of ANALYSIS</h1>
         </div>
         <div className="flex flex-row  text-[10px] justify-between border border-black border-r-0 border-l-0 px-2 mb-10 ">
           <div className="flex-1 text-center py-1">
@@ -231,7 +231,9 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
               )}
             </tbody>
           </table>
-          <h1 className="text-[10px] pt-5">*Notes : </h1>
+          <h1 className="text-[11px] pt-5">
+            *Notes : {certificateData.remarks}{" "}
+          </h1>
           {/* Footer signature */}
           <div className="flex flex-row justify-between mt-40 mb-10">
             <div className="w-1/2" />

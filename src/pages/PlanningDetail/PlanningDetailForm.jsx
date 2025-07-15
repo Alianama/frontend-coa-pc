@@ -220,7 +220,8 @@ export default function PlanningDetailForm() {
         formData.nucleatingAgent === "" ? null : formData.nucleatingAgent,
       hals: formData.hals === "" ? null : formData.hals,
       hiding: formData.hiding === "" ? null : formData.hiding,
-      dispersion: formData.dispersion === "" ? null : formData.dispersion,
+      dispersion:
+        formData.dispersion === "" ? null : Number(formData.dispersion),
     };
 
     const response = await dispatch(asyncAddPlanningDetail(dataToSubmit));
@@ -677,6 +678,21 @@ export default function PlanningDetailForm() {
                 />
               </div>
               <div className="space-y-2">
+                <Label htmlFor="dispersion">Dispersion</Label>
+                <Input
+                  id="dispersion"
+                  type="number"
+                  step="0.1"
+                  placeholder="0.0"
+                  value={formData.dispersion}
+                  onChange={(e) =>
+                    handleInputChange("dispersion", e.target.value)
+                  }
+                  onWheel={(e) => e.target.blur()}
+                  className="h-8 text-sm py-1 px-2"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="dispersibility">Dispersibility</Label>
                 <Input
                   id="dispersibility"
@@ -717,18 +733,6 @@ export default function PlanningDetailForm() {
                   placeholder="Hiding"
                   value={formData.hiding}
                   onChange={(e) => handleInputChange("hiding", e.target.value)}
-                  className="h-8 text-sm py-1 px-2"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dispersion">Dispersion</Label>
-                <Input
-                  id="dispersion"
-                  placeholder="Dispersion"
-                  value={formData.dispersion}
-                  onChange={(e) =>
-                    handleInputChange("dispersion", e.target.value)
-                  }
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
