@@ -92,7 +92,7 @@ export default function Layout({ children, title, items = [] }) {
           />
         </main>
         <footer className="w-full text-center py-4 border-t bg-background text-xs text-muted-foreground">
-          © {new Date().getFullYear()} PT. Toyo Ink Indoensia. All rights
+          © {new Date().getFullYear()} PT. Toyo Ink Indonesia. All rights
           reserved.
         </footer>
       </SidebarInset>

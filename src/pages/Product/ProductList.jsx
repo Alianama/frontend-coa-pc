@@ -64,7 +64,7 @@ import {
   asyncUpdateProduct,
 } from "@/store/product/action";
 import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
+import { getBadge } from "@/components/common/statusBedge";
 
 export default function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -378,17 +378,7 @@ export default function ProductList() {
                       </TableCell>
                       <TableCell>{product.letDownRatio}</TableCell>
                       <TableCell>
-                        {product.status === "active" ? (
-                          <Badge className="bg-green-100 text-green-800 border border-green-300">
-                            Active
-                          </Badge>
-                        ) : product.status === "draft" ? (
-                          <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300">
-                            Draft
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline">{product.status}</Badge>
-                        )}
+                        {getBadge({ value: product.status, type: "product" })}
                       </TableCell>
                       <TableCell>
                         {new Date(product.createdAt).toLocaleDateString(

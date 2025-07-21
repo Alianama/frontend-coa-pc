@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Factory,
@@ -10,6 +9,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { getBadge } from "@/components/common/statusBedge";
 
 export default function DetailHeader({
   quantityPrinted,
@@ -95,23 +95,11 @@ export default function DetailHeader({
             </div>
           </div>
           <div className="flex flex-row-reverse w-1/3">
-            <Badge
-              variant="outline"
-              className={`text-xs px-2 py-1 ${
-                header?.status === "progress"
-                  ? "border-blue-200 text-blue-700 bg-blue-50"
-                  : header?.status === "open"
-                  ? "border-red-200 text-red-700 bg-red-50"
-                  : header?.status === "completed"
-                  ? "border-green-200 text-green-700 bg-green-50"
-                  : "border-gray-200 text-gray-700 bg-gray-50"
-              }`}
-            >
-              <div className="flex items-center gap-1">
-                {getStatusIcon(header?.status)}
-                <span className="capitalize">{header?.status}</span>
-              </div>
-            </Badge>
+            {getBadge({
+              value: header?.status,
+              type: "planning",
+              icon: getStatusIcon(header?.status),
+            })}
           </div>
         </div>
 

@@ -23,18 +23,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
-  Search,
-  ArrowUpDown,
-  CheckCircle2,
-  AlertCircle,
-  Trash,
-  Edit,
   Eye,
   MoreHorizontal,
-  RotateCcw,
-  PrinterIcon,
+  FileEdit,
+  Trash2,
+  Plus,
+  RefreshCcw,
+  Search,
+  Printer,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -64,6 +61,7 @@ import PlanningDetailStandardView from "./PlanningDetailStandardView";
 import PlanningDetailUpdateDialog from "./PlanningDetailUpdateDialog";
 import { asyncGetCustomer } from "@/store/customer/action";
 import { Combobox } from "@/components/ui/combo-box";
+import { getBadge } from "@/components/common/statusBedge";
 
 export default function PlanningDetailList() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -159,7 +157,6 @@ export default function PlanningDetailList() {
     { key: "colorDeltaE", label: "Color ΔE" },
     { key: "deltaP", label: "ΔP" },
     { key: "mfr", label: "MFR (gr/mnt)" },
-    { key: "dispersibility", label: "Dispersibility" },
     { key: "density", label: "Density" },
     { key: "pellet", label: "Pallet (L x D)" },
     { key: "contamination", label: "Contamination" },
@@ -178,6 +175,8 @@ export default function PlanningDetailList() {
     { key: "hals", label: "Hals" },
     { key: "hiding", label: "Hiding" },
     { key: "analysisDate", label: "Checked At" },
+    { key: "dispersibility", label: "Dispersibility" },
+    { key: "pelletVisual", label: "Pellet Visual" },
     { key: "odor", label: "Odor" },
     { key: "visualCheck", label: "Visual Check" },
     { key: "colorCheck", label: "Color Check" },
@@ -288,7 +287,7 @@ export default function PlanningDetailList() {
               onClick={() => setIsPrintDialogOpen(true)}
               className="bg-green-500 text-white hover:bg-green-800"
             >
-              <PrinterIcon />
+              <Printer />
               Print
             </Button>
           </div>
@@ -332,10 +331,8 @@ export default function PlanningDetailList() {
               onClick={resetColumns}
               title="Reset Column & Reload"
             >
-              <RotateCcw />
+              <RefreshCcw />
             </Button>
-            {/* ... tombol Add Checking, search global, clear filter ... */}
-
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -355,7 +352,7 @@ export default function PlanningDetailList() {
               disabled={planningDetail?.header?.status === "close"}
               onClick={() => navigate(`/planning/check/create/${lot}`)}
             >
-              Add Checking
+              <Plus /> Add Checking
             </Button>
           </div>
 
@@ -382,7 +379,7 @@ export default function PlanningDetailList() {
                         <span className="inline-flex items-center">
                           {col.label}
                           {sortField === col.key && (
-                            <ArrowUpDown
+                            <FileEdit
                               className={`ml-1 h-3 w-3 ${
                                 sortDirection === "desc" ? "rotate-180" : ""
                               }`}
@@ -444,8 +441,9 @@ export default function PlanningDetailList() {
                                 : "-")}
                             {col.key === "deltaP" && item.deltaP}
                             {col.key === "mfr" && item.mfr}
-                            {col.key === "dispersibility" &&
+                            {/* {col.key === "dispersibility" &&
                               item.dispersibility}
+                            {col.key === "pelletVisual" && item.pelletVisual} */}
                             {col.key === "density" && item.density}
                             {col.key === "pellet" &&
                               `${item.pelletLength} x ${item.pelletDiameter} mm`}
@@ -477,50 +475,45 @@ export default function PlanningDetailList() {
                                     }
                                   )
                                 : "-")}
+                            {col.key === "dispersibility" &&
+                              getBadge({
+                                value:
+                                  item.dispersibility == null
+                                    ? "empty"
+                                    : item.dispersibility,
+                                type: "dispersibility",
+                              })}
+                            {col.key === "pelletVisual" &&
+                              getBadge({
+                                value:
+                                  item.pelletVisual == null
+                                    ? "empty"
+                                    : item.pelletVisual,
+                                type: "pelletVisual",
+                              })}
                             {col.key === "odor" &&
-                              (item.odor === "Pass" ? (
-                                <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <CheckCircle2 className="w-3 h-3 mr-1" /> Pass
-                                </Badge>
-                              ) : (
-                                <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <AlertCircle className="w-3 h-3 mr-1" /> NG
-                                </Badge>
-                              ))}
+                              getBadge({
+                                value: item.odor == null ? "empty" : item.odor,
+                                type: "odor",
+                              })}
                             {col.key === "visualCheck" &&
-                              (item.visualCheck === "Pass" ? (
-                                <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <CheckCircle2 className="w-3 h-3 mr-1" /> Pass
-                                </Badge>
-                              ) : (
-                                <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <AlertCircle className="w-3 h-3 mr-1" /> NG
-                                </Badge>
-                              ))}
+                              getBadge({
+                                value: item.visualCheck,
+                                type: "visualCheck",
+                              })}
                             {col.key === "colorCheck" &&
-                              (item.colorCheck === "Pass" ? (
-                                <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <CheckCircle2 className="w-3 h-3 mr-1" /> Pass
-                                </Badge>
-                              ) : (
-                                <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <AlertCircle className="w-3 h-3 mr-1" /> NG
-                                </Badge>
-                              ))}
+                              getBadge({
+                                value: item.colorCheck,
+                                type: "colorCheck",
+                              })}
                             {col.key === "qcJudgment" &&
-                              (item.qcJudgment === "Passed" ? (
-                                <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <CheckCircle2 className="w-3 h-3 mr-1" />{" "}
-                                  Passed
-                                </Badge>
-                              ) : !item.qcJudgment ||
-                                item.qcJudgment === "NG" ? (
-                                <Badge className="bg-red-100 text-red-800 border border-red-300 flex items-center gap-1 px-1 py-0.5 text-xs">
-                                  <AlertCircle className="w-3 h-3 mr-1" /> NG
-                                </Badge>
-                              ) : (
-                                <span>-</span>
-                              ))}
+                              getBadge({
+                                value:
+                                  !item.qcJudgment || item.qcJudgment === "NG"
+                                    ? "NG"
+                                    : item.qcJudgment,
+                                type: "qcJudgment",
+                              })}
                             {col.key === "remark" && item.remark}
                           </TableCell>
                         ))}
@@ -546,7 +539,7 @@ export default function PlanningDetailList() {
                                 planningDetail?.header?.status === "close"
                               }
                             >
-                              <Edit className="w-4 h-4 mr-2" />
+                              <FileEdit className="w-4 h-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -556,7 +549,7 @@ export default function PlanningDetailList() {
                                 planningDetail?.header?.status === "close"
                               }
                             >
-                              <Trash className="w-4 h-4 mr-2" />
+                              <Trash2 className="w-4 h-4 mr-2" />
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>

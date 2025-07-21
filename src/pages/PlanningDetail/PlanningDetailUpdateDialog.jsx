@@ -72,6 +72,7 @@ export default function PlanningDetailUpdateDialog({
     caCO3: "",
     odor: "",
     nucleatingAgent: "",
+    pelletVisual: "",
   });
 
   useEffect(() => {
@@ -115,6 +116,7 @@ export default function PlanningDetailUpdateDialog({
         caCO3: editingItem.caCO3 ?? "",
         odor: editingItem.odor ?? "",
         nucleatingAgent: editingItem.nucleatingAgent ?? "",
+        pelletVisual: editingItem.pelletVisual ?? "",
       };
 
       // Cek jika customer punya mandatoryFields dan ada letDownRatio
@@ -240,6 +242,7 @@ export default function PlanningDetailUpdateDialog({
       mfr: formData.mfr === "" ? null : Number(formData.mfr),
       dispersibility:
         formData.dispersibility === "" ? null : formData.dispersibility,
+      pelletVisual: formData.pelletVisual === "" ? null : formData.pelletVisual,
       contamination:
         formData.contamination === "" ? null : Number(formData.contamination),
       macaroni: formData.macaroni === "" ? null : Number(formData.macaroni),
@@ -312,7 +315,7 @@ export default function PlanningDetailUpdateDialog({
         </DialogHeader>
         <form onSubmit={handleUpdate}>
           <div className="space-y-6 py-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
               <div className="col-span-full">
                 <div className="border rounded-lg shadow-md p-4">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
@@ -506,18 +509,7 @@ export default function PlanningDetailUpdateDialog({
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="dispersibility">Dispersibility</Label>
-                <Input
-                  id="dispersibility"
-                  placeholder="Dispersibility"
-                  value={formData.dispersibility}
-                  onChange={(e) =>
-                    handleInputChange("dispersibility", e.target.value)
-                  }
-                  className="h-8 text-sm py-1 px-2"
-                />
-              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="contamination">Contamination</Label>
                 <Input
@@ -755,8 +747,8 @@ export default function PlanningDetailUpdateDialog({
                 />
               </div>
             </div>
-            <div className="flex space-x-4 border rounded-lg shadow-md p-4 mb-4 bg-white">
-              <div className="space-y-2 flex-1">
+            <div className="grid grid-cols-3 gap-4 border rounded-lg shadow-md p-4 mb-4 bg-white">
+              <div className="space-y-2">
                 <Label htmlFor="visualCheck">Visual Check</Label>
                 <Select
                   value={formData.visualCheck}
@@ -768,27 +760,72 @@ export default function PlanningDetailUpdateDialog({
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
                     <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 flex-1">
+              <div className="space-y-2">
                 <Label htmlFor="odor">Odor</Label>
                 <Select
                   value={formData.odor}
-                  onValueChange={(value) => handleInputChange("odor", value)}
+                  onValueChange={(value) =>
+                    handleInputChange("odor", value === "empty" ? "" : value)
+                  }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
                     <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 flex-1">
+              <div className="space-y-2">
+                <Label htmlFor="dispersibility">Dispersibility</Label>
+                <Select
+                  value={formData.dispersibility}
+                  onValueChange={(value) =>
+                    handleInputChange(
+                      "dispersibility",
+                      value === "empty" ? "" : value
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="pelletVisual">Pellet Visual</Label>
+                <Select
+                  value={formData.pelletVisual}
+                  onValueChange={(value) =>
+                    handleInputChange(
+                      "pelletVisual",
+                      value === "empty" ? "" : value
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="colorCheck">Color Check</Label>
                 <Select
                   value={formData.colorCheck}
@@ -800,7 +837,7 @@ export default function PlanningDetailUpdateDialog({
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
                     <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>

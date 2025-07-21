@@ -192,7 +192,7 @@ export default function PlanningCreateForm() {
                 />
               </div>
               <div className="space-y-2">
-                <label>Qty Planning</label>
+                <label>Qty Planning (Kg)</label>
                 <Input
                   name="qtyPlanning"
                   value={formData.qtyPlanning}

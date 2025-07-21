@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -45,8 +44,8 @@ import {
   asyncDeleteCustomer,
 } from "@/store/customer/action";
 import React from "react";
+import { getBadge } from "@/components/common/statusBedge";
 
-// Available fields for selection
 const availableFields = [
   "pelletLength",
   "pelletDiameter",
@@ -76,6 +75,7 @@ const availableFields = [
   "hiding",
   "dispersion",
   "contamination",
+  "pelletVisual",
 ];
 
 // Field labels for display
@@ -101,13 +101,14 @@ const fieldLabels = {
   colorDeltaE: "Color Delta E",
   deltaP: "Delta P",
   macaroni: "Macaroni",
-  caCO3: "caCO3",
+  caCO3: "CaCO3",
   odor: "Odor",
   nucleatingAgent: "Nucleating Agent",
   hals: "HALS",
   hiding: "Hiding",
   dispersion: "Dispersion",
   contamination: "Contamination",
+  pelletVisual: "Pellet Visual",
 };
 
 export default function CustomerList() {
@@ -311,13 +312,14 @@ export default function CustomerList() {
                                 : customer[field]
                             )
                             .map((field) => (
-                              <Badge
-                                key={field}
-                                variant="secondary"
-                                className="bg-yellow-50 text-yellow-800 border-yellow-200"
-                              >
-                                {fieldLabels[field] || field}
-                              </Badge>
+                              <React.Fragment key={field}>
+                                {getBadge({
+                                  value: fieldLabels[field] || field,
+                                  type: "customer",
+                                  className:
+                                    "bg-yellow-50 text-yellow-800 border-yellow-200",
+                                })}
+                              </React.Fragment>
                             ))}
                         </div>
                       </TableCell>

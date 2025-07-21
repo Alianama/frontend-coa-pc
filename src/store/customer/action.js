@@ -39,6 +39,7 @@ const availableFields = [
   "hiding",
   "dispersion",
   "contamination",
+  "pelletVisual",
 ];
 
 function receiveCustomerActionCreator(customers) {

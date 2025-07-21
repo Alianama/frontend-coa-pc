@@ -67,6 +67,7 @@ export default function PlanningDetailForm() {
     hals: "",
     hiding: "",
     dispersion: "",
+    pelletVisual: "",
   });
 
   // Ambil data planning detail berdasarkan lot
@@ -190,6 +191,7 @@ export default function PlanningDetailForm() {
         formData.pelletDiameter === "" ? null : Number(formData.pelletDiameter),
       visualCheck: formData.visualCheck === "" ? null : formData.visualCheck,
       colorCheck: formData.colorCheck === "" ? null : formData.colorCheck,
+      pelletVisual: formData.pelletVisual === "" ? null : formData.pelletVisual,
       moisture: formData.moisture === "" ? null : Number(formData.moisture),
       carbonContent:
         formData.carbonContent === "" ? null : Number(formData.carbonContent),
@@ -692,7 +694,7 @@ export default function PlanningDetailForm() {
                   className="h-8 text-sm py-1 px-2"
                 />
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="dispersibility">Dispersibility</Label>
                 <Input
                   id="dispersibility"
@@ -703,7 +705,7 @@ export default function PlanningDetailForm() {
                   }
                   className="h-8 text-sm py-1 px-2"
                 />
-              </div>
+              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="nucleatingAgent">Nucleating Agent</Label>
                 <Input
@@ -743,14 +745,18 @@ export default function PlanningDetailForm() {
                 <Select
                   value={formData.visualCheck}
                   onValueChange={(value) =>
-                    handleInputChange("visualCheck", value)
+                    handleInputChange(
+                      "visualCheck",
+                      value === "empty" ? "" : value
+                    )
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
                     <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
@@ -761,14 +767,39 @@ export default function PlanningDetailForm() {
                 <Select
                   value={formData.colorCheck}
                   onValueChange={(value) =>
-                    handleInputChange("colorCheck", value)
+                    handleInputChange(
+                      "colorCheck",
+                      value === "empty" ? "" : value
+                    )
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dispersibility">Dispersibility</Label>
+                <Select
+                  value={formData.dispersibility ?? ""}
+                  onValueChange={(value) =>
+                    handleInputChange(
+                      "dispersibility",
+                      value === "empty" ? "" : value
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
                     <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>
@@ -776,14 +807,38 @@ export default function PlanningDetailForm() {
               <div className="space-y-2">
                 <Label htmlFor="odor">Odor</Label>
                 <Select
-                  value={formData.odor}
-                  onValueChange={(value) => handleInputChange("odor", value)}
+                  value={formData.odor ?? ""}
+                  onValueChange={(value) =>
+                    handleInputChange("odor", value === "empty" ? "" : value)
+                  }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder="Pilih status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pass">Pass</SelectItem>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
+                    <SelectItem value="NG">NG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="pelletVisual">Pellet Visual</Label>
+                <Select
+                  value={formData.pelletVisual ?? ""}
+                  onValueChange={(value) =>
+                    handleInputChange(
+                      "pelletVisual",
+                      value === "empty" ? "" : value
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="empty">DEFAULT</SelectItem>
+                    <SelectItem value="PASS">PASS</SelectItem>
                     <SelectItem value="NG">NG</SelectItem>
                   </SelectContent>
                 </Select>

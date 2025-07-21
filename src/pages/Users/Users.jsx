@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -75,6 +74,7 @@ import {
 } from "@/store/users/action";
 import { toast } from "sonner";
 import RolesManagement from "./Roles";
+import { getBadge } from "@/components/common/statusBedge";
 
 export default function UserManagement() {
   const roles = useSelector((state) => state.roles);
@@ -120,20 +120,6 @@ export default function UserManagement() {
       selectedRole === "all" || userRoleName === selectedRoleName;
     return matchesSearch && matchesRole;
   });
-
-  const getRoleBadgeVariant = (roleName) => {
-    // Ganti SUPER_ADMIN jadi SUPERADMIN di switch
-    switch (roleName === "SUPER_ADMIN" ? "SUPERADMIN" : roleName) {
-      case "SUPERADMIN":
-        return "destructive";
-      case "ADMIN":
-        return "default";
-      case "USER":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
@@ -443,12 +429,7 @@ export default function UserManagement() {
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
-                      <Badge variant={getRoleBadgeVariant(user.role.name)}>
-                        {/* Ganti SUPER_ADMIN jadi SUPERADMIN di badge */}
-                        {user.role.name === "SUPER_ADMIN"
-                          ? "SUPERADMIN"
-                          : user.role.name}
-                      </Badge>
+                      {getBadge({ value: user.role.name, type: "role" })}
                     </TableCell>
                     <TableCell>{formatDate(user.createdAt)}</TableCell>
                     <TableCell className="text-right">

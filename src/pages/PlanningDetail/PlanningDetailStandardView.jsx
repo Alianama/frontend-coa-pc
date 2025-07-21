@@ -15,6 +15,23 @@ import {
 } from "../../components/ui/table";
 import PropTypes from "prop-types";
 
+function getOperator(operator) {
+  switch (operator) {
+    case "PLUS_MINUS":
+      return "±";
+    case "LESS_THAN":
+      return "<";
+    case "LESS_EQUAL":
+      return "≤";
+    case "GREATER_THAN":
+      return ">";
+    case "GREATER_EQUAL":
+      return "≥";
+    default:
+      return operator;
+  }
+}
+
 export default function PlanningDetailStandardView({
   open,
   onClose,
@@ -66,20 +83,7 @@ export default function PlanningDetailStandardView({
                     <TableCell>
                       {qc.tolerance !== null ? qc.tolerance : "-"}
                     </TableCell>
-                    <TableCell>
-                      {qc.operator === "PLUS_MINUS" && "±"}
-                      {qc.operator === "LESS_THAN" && "<"}
-                      {qc.operator === "LESS_EQUAL" && "≤"}
-                      {qc.operator === "GREATER_THAN" && ">"}
-                      {qc.operator === "GREATER_EQUAL" && "≥"}
-                      {![
-                        "PLUS_MINUS",
-                        "LESS_THAN",
-                        "LESS_EQUAL",
-                        "GREATER_THAN",
-                        "GREATER_EQUAL",
-                      ].includes(qc.operator) && qc.operator}
-                    </TableCell>
+                    <TableCell>{getOperator(qc.operator)}</TableCell>
                     <TableCell
                       className={`font-bold ${
                         qc.result === "Passed"
@@ -87,7 +91,9 @@ export default function PlanningDetailStandardView({
                           : "text-red-600"
                       }`}
                     >
-                      {qc.result}
+                      {qc.result === null || qc.result === ""
+                        ? "NG"
+                        : qc.result}
                     </TableCell>
                   </TableRow>
                 ))}

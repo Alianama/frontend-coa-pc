@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Edit, Trash2, Shield, Settings } from "lucide-react";
 import { asyncGetAllRoles } from "@/store/roles/action";
+import { getBadge } from "@/components/common/statusBedge";
 
 export default function RolesManagement() {
   const dispatch = useDispatch();
@@ -27,19 +27,6 @@ export default function RolesManagement() {
   useEffect(() => {
     dispatch(asyncGetAllRoles());
   }, [dispatch]);
-
-  const getRoleBadgeVariant = (roleName) => {
-    switch (roleName) {
-      case "SUPER_ADMIN":
-        return "destructive";
-      case "ADMIN":
-        return "default";
-      case "USER":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
 
   return (
     <Card>
@@ -56,9 +43,7 @@ export default function RolesManagement() {
             <Card key={role.id} className="relative">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <Badge variant={getRoleBadgeVariant(role.name)}>
-                    {role.name === "SUPER_ADMIN" ? "SUPERADMIN" : role.name}
-                  </Badge>
+                  {getBadge({ value: role.name, type: "role" })}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0">

@@ -63,6 +63,8 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
       resin: data.resin || "-",
       moulding: data.moulding || "-",
       letDownRatio: data.letDownRatio || "_",
+      dispersibility: data.dispersibility || "-",
+      pelletVisual: data.pelletVisual || "-",
       pageInfo: "1 dari 1",
       noDucument: "FRM / III / PC_QC /09",
       tanggalTerbit: "02 Januari 2024",
@@ -193,7 +195,7 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
               </div>
             </div>
           </div>
-          {/* Tabel Properties */}
+
           <table
             className="w-full text-center text-sm "
             style={{ borderCollapse: "collapse" }}
@@ -202,6 +204,7 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
               <tr>
                 <th className="border border-black p-1">Properties</th>
                 <th className="border border-black p-1">Specification</th>
+                <th className="border border-black p-1">Unit</th>
                 <th className="border border-black p-1">Result</th>
               </tr>
             </thead>
@@ -214,16 +217,22 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
                       {item.parameter || "-"}
                     </td>
                     <td className="border text-[12px] py-1 border-black">
-                      {item.standard || "-"}
+                      {item.specification || "-"}
                     </td>
                     <td className="border text-[12px] py-1 border-black">
-                      {item.result || "-"}
+                      {item.unit || "-"}
+                    </td>
+                    <td className="border text-[12px] py-1 border-black">
+                      {item.result
+                        ? item.result === "Pass"
+                          ? "PASS"
+                          : item.result
+                        : "-"}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td className="border border-black ">-</td>
                   <td className="border border-black ">-</td>
                   <td className="border border-black ">-</td>
                   <td className="border border-black ">-</td>
@@ -234,21 +243,20 @@ const ComponentToPrintTable = React.forwardRef(({ data }, ref) => {
           <h1 className="text-[11px] pt-5">
             *Notes : {certificateData.remarks}{" "}
           </h1>
-          {/* Footer signature */}
-          <div className="flex flex-row justify-between mt-40 mb-10">
+          <div className="flex flex-row justify-end mt-40 mb-10">
             <div className="w-1/2" />
-            <div className="flex flex-row w-1/2">
+            <div className="flex flex-row gap-4 w-1/3">
               <div className="flex flex-col items-center w-1/2">
                 <div>Issue by :</div>
                 <div className="mt-20 mb-1 w-32 " />
-                <div className="font-semibold border-b text-center border-black min-w-32">
+                <div className="font-semibold border-b text-center border-black min-w-20">
                   {certificateData.issuedBy || "__________"}
                 </div>
               </div>
               <div className="flex flex-col items-center w-1/2">
                 <div>Approved by :</div>
                 <div className="mt-20 mb-1 w-32 " />
-                <div className="font-semibold border-b text-center border-black min-w-32">
+                <div className="font-semibold border-b text-center border-black min-w-20">
                   {certificateData.approvedBy || "__________"}
                 </div>
               </div>
