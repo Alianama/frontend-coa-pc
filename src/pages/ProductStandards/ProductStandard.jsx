@@ -72,6 +72,7 @@ const FIELD_LABELS = {
   tintDeltaA: "Tint ΔA",
   tintDeltaB: "Tint ΔB",
   tintDeltaE: "Tint ΔE",
+  deltaP: "Delta P",
   density: "Density",
   mfr: "MFR",
   dispersion: "Dispersion",
